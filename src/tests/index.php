@@ -224,6 +224,51 @@ function testFoundWordParadigms ($paradigms, &$res) {
       $res[] = $form->getPartOfSpeech();
     };
   }
+
+  foreach ($paradigms->getByPartOfSpeech('VERB') as $paradigm) {
+    $res[] = $paradigm instanceof phpMorphy_WordDescriptor;
+    $res[] = count($paradigm);
+    $res[] = count($paradigm)
+      ? $paradigm->getWordForm(0) instanceof phpMorphy_WordDescriptor
+      : null
+    ;
+
+    $formsOfSourceWord = $paradigm->getFoundWordForm();
+    $res[] = count($formsOfSourceWord);
+
+    foreach ($formsOfSourceWord as $form) {
+      $res[] = $form instanceof phpMorphy_WordForm;
+      $res[] = $form->getWord();
+      $res[] = $form->getFormNo();
+      $res[] = $form->getGrammems();
+      $res[] = $form->hasGrammems(['ЕД', 'РД']);
+      $res[] = $form->getPartOfSpeech();
+    };
+
+    $sampleFormsByGrammem = $paradigm->getWordFormsByGrammems('ИМ');
+    $res[] = count($sampleFormsByGrammem);
+
+    foreach ($sampleFormsByGrammem as $form) {
+      $res[] = $form instanceof phpMorphy_WordForm;
+      $res[] = $form->getWord();
+      $res[] = $form->getFormNo();
+      $res[] = $form->getGrammems();
+      $res[] = $form->hasGrammems(['ЕД', 'РД']);
+      $res[] = $form->getPartOfSpeech();
+    };
+
+    $sampleFormsByPartOfSpeech = $paradigm->getWordFormsByPartOfSpeech('С');
+    $res[] = count($sampleFormsByPartOfSpeech);
+
+    foreach ($sampleFormsByPartOfSpeech as $form) {
+      $res[] = $form instanceof phpMorphy_WordForm;
+      $res[] = $form->getWord();
+      $res[] = $form->getFormNo();
+      $res[] = $form->getGrammems();
+      $res[] = $form->hasGrammems(['ЕД', 'РД']);
+      $res[] = $form->getPartOfSpeech();
+    };
+  }
 }
 
 $tests['findWord'] = function () use ($words, $morphy) {

@@ -84,6 +84,10 @@ class Morphy {
     this.dir = opts.dir;
     this.options = opts;
     
+    if (this.options.lang != 'ru_RU') {
+      this.options.use_ancodes_cache = false;
+    }
+    
     this.morpher = new phpMorphy(this.dir, this.lang, this.options);
   }
 

@@ -760,8 +760,8 @@ class Morphy_Morphier_Helper {
         all: php.array_map([this.ancodes_resolver, 'resolve'], all_ancodes[annot['form_no']])
       });
     });
-
-    return _.uniq(result);
+    
+    return _.uniqWith(result, _.isEqual);
   }
 
   getGrammarInfoMergeForms (annots) {
@@ -798,7 +798,7 @@ class Morphy_Morphier_Helper {
       });
     });
 
-    return _.uniq(result);
+    return _.uniqWith(result, _.isEqual);
   }
 
   getGrammarInfo (annots) {
@@ -832,7 +832,7 @@ class Morphy_Morphier_Helper {
       result.push(unique_info);
     });
 
-    return _.uniq(result);
+    return _.uniqWith(result, _.isEqual);
   }
 
   /**
