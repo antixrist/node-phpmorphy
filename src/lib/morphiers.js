@@ -1196,7 +1196,8 @@ class Morphy_WordDescriptor extends Array {
     poses = castArray(poses);
 
     return _.some(this, wf => {
-      return poses.includes(wf.getPartOfSpeech());
+      return poses.indexOf(wf.getPartOfSpeech()) >= 0;
+      // return poses.includes(wf.getPartOfSpeech());
     });
   }
 
@@ -1205,7 +1206,8 @@ class Morphy_WordDescriptor extends Array {
     const result = [];
 
     _.forEach(this, wf => {
-      if (poses.includes(wf.getPartOfSpeech())) {
+      if (poses.indexOf(wf.getPartOfSpeech()) >= 0) {
+      // if (poses.includes(wf.getPartOfSpeech())) {
         result.push(wf);
       }
     });

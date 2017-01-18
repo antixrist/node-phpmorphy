@@ -62,14 +62,14 @@ class Morphy_UnicodeHelper {
       
       switch (utf_type) {
         case 'utf':
-          if (![8, 16, 32].includes(utf_base)) {
+          if ([8, 16, 32].indexOf(utf_base) < 0) {
           // if (!php.in_array(utf_base, [8, 16, 32])) {
             throw new Error('Invalid utf base');
           }
           
           break;
         case 'ucs':
-          if (![2, 4].includes(utf_base)) {
+          if ([2, 4].indexOf(utf_base) < 0) {
           // if (!php.in_array(utf_base, [2, 4])) {
             throw new Error('Invalid ucs base');
           }

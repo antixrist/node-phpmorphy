@@ -404,7 +404,7 @@ async function runLocalTests (words, morphy) {
         morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], false),
         morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], true),
         morphy.castFormByGramInfo('ШКАФ', null, null, true, (form, partOfSpeech, grammems, formNo) => {
-          return grammems.includes('ИМ');
+          return _.includes(grammems, 'ИМ');
         }),
         morphy.castFormByGramInfo(word, 'КР_ПРИЛ', ['ЕД', 'ЖР'], true)
       );

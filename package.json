@@ -6,7 +6,7 @@
     "build": "webpack",
     "build:production": "cross-env NODE_ENV=production webpack",
     "dev": "cross-env NODE_ENV=development nodemon",
-    "start": "cross-env NODE_ENV=production node",
+    "postinstall": "npm run build",
     "test": "node ./build/test"
   },
   "main": "./build/index.js",
