@@ -48,7 +48,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/webpack/webpack.git"
+    "url": "https://github.com/antixrist/node-phpmorphy.git"
   },
-  "homepage": "https://github.com/webpack/webpack"
+  "homepage": "https://github.com/antixrist/node-phpmorphy"
 }
