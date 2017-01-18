@@ -379,8 +379,12 @@ function isStringifyedNumber(any) {
 function toBuffer(something, encoding = 'utf-8') {
   let retVal = something;
 
+  function _ref(item) {
+    return toBuffer(item, encoding);
+  }
+
   if (_lodash2.default.isArray(something)) {
-    retVal = _lodash2.default.map(something, item => toBuffer(item, encoding));
+    retVal = _lodash2.default.map(something, _ref);
   } else if (Buffer.isBuffer(something)) {
     retVal = something;
   } else if (_lodash2.default.isString(something)) {
@@ -4300,6 +4304,10 @@ class Morphy_Morphier_Helper {
   composeFormsWithAncodes(word, annots, foundFormNo) {
     const result = [];
 
+    function _ref(ancode) {
+      return result.push([word, ancode]);
+    }
+
     _lodash2.default.forEach(annots, (annot, annotIdx) => {
       const baseAndPrefix = this.getBaseAndPrefix(word, annot['cplen'], annot['plen'], annot['flen']);
       const base = baseAndPrefix[0];
@@ -4325,7 +4333,7 @@ class Morphy_Morphier_Helper {
           foundFormNo[annotIdx]['high'] = count + _lodash2.default.size(ancodes[form_no]) - 1;
         }
 
-        _lodash2.default.forEach(ancodes[form_no], ancode => result.push([word, ancode]));
+        _lodash2.default.forEach(ancodes[form_no], _ref);
       }
     });
 
@@ -5153,6 +5161,10 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     let annot_raw;
     let result_for_annot;
 
+    function _ref2(word) {
+      return result[word] = result_for_annot;
+    }
+
     _lodash2.default.forEach(this.findWord(words), item => {
       words = item.data;
       annot_raw = item.annots;
@@ -5165,7 +5177,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
         _lodash2.default.forEach(words, word => result[word] = this.helper[method](word, annot_raw));
       } else {
         result_for_annot = this.helper[method](annot_raw);
-        _lodash2.default.forEach(words, word => result[word] = result_for_annot);
+        _lodash2.default.forEach(words, _ref2);
       }
     });
 
@@ -5212,6 +5224,14 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     let stack_idx = 0;
 
     // TODO: Improve this
+
+    function _ref3(dest) {
+      stack_idx += 3;
+      stack[stack_idx] = dest;
+      stack[stack_idx + 1] = path;
+      stack[stack_idx + 2] = trans;
+    }
+
     while (stack_idx >= 0) {
       n = stack[stack_idx];
       path = Buffer.concat([Buffer.from(stack[stack_idx + 1]), labels[n]]);
@@ -5246,12 +5266,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
       }
 
       if (dests[n] !== false) {
-        _lodash2.default.forEach(dests[n], dest => {
-          stack_idx += 3;
-          stack[stack_idx] = dest;
-          stack[stack_idx + 1] = path;
-          stack[stack_idx + 2] = trans;
-        });
+        _lodash2.default.forEach(dests[n], _ref3);
       }
     }
 
@@ -8574,32 +8589,10 @@ __webpack_require__(55);
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let runPhpTests = (() => {
-  var _ref = _asyncToGenerator(function* (words, opts) {
-    let res;
-
-    try {
-      res = yield runPhpFileWithArgs({ words, opts });
-    } catch (e) {
-      throw e;
-    }
-
-    try {
-      res = JSON.parse(res);
-    } catch (e) {
-      !!res && (e.message = `${ e.message }
-[php]: ${ (0, _utils.inspect)(res) }`);
-      throw e;
-    }
-
-    if (!res.success) {
-      throw new Error(`[php]: "${ res.message }". ${ res.words ? (0, _utils.inspect)(res.words) : '' }`);
-    }
-
-    return res.words;
-  });
+  var _ref2 = _asyncToGenerator(_ref3);
 
   return function runPhpTests(_x, _x2) {
-    return _ref.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 })();
 
@@ -8607,286 +8600,10 @@ let runPhpTests = (() => {
 
 
 let runLocalTests = (() => {
-  var _ref2 = _asyncToGenerator(function* (words, morphy) {
-    const tests = {};
-    words = _lodash2.default.isArray(words) ? words : [words];
-    // для совместимости с результатами из php
-    words = words.map(function (word) {
-      return word.toUpperCase();
-    });
-
-    tests['initialize'] = function () {
-      return [morphy.getEncoding(), morphy.getLocale()];
-    };
-
-    tests['getters'] = function () {
-      return [morphy.getCommonMorphier() instanceof _morphiers.Morphy_Morphier_Interface, morphy.getPredictBySuffixMorphier() instanceof _morphiers.Morphy_Morphier_Interface, morphy.getPredictByDatabaseMorphier() instanceof _morphiers.Morphy_Morphier_Interface, morphy.getBulkMorphier() instanceof _morphiers.Morphy_Morphier_Interface];
-    };
-
-    tests['isLastPredicted'] = function () {
-      const res = [];
-
-      res.push(morphy.lemmatize('глокая', _3.default.NORMAL), morphy.isLastPredicted());
-
-      res.push(morphy.lemmatize('глокая', _3.default.IGNORE_PREDICT), morphy.isLastPredicted());
-
-      res.push(morphy.lemmatize('тест', _3.default.ONLY_PREDICT), morphy.isLastPredicted());
-
-      return res;
-    };
-
-    tests['getLastPredictionType'] = function () {
-      const res = [];
-
-      res.push(morphy.lemmatize('тест', _3.default.NORMAL), morphy.getLastPredictionType() == _3.default.PREDICT_BY_NONE);
-
-      res.push(morphy.lemmatize('глокая', _3.default.IGNORE_PREDICT), morphy.getLastPredictionType() == _3.default.PREDICT_BY_NONE);
-
-      res.push(morphy.lemmatize('тестдрайв', _3.default.ONLY_PREDICT), morphy.getLastPredictionType() == _3.default.PREDICT_BY_SUFFIX);
-
-      res.push(morphy.lemmatize('подфигачить', _3.default.ONLY_PREDICT), morphy.getLastPredictionType() == _3.default.PREDICT_BY_DB);
-
-      return res;
-    };
-
-    tests['lemmatize && getBaseForm'] = function () {
-      let res = { lemmatize: {}, getBaseForm: {} };
-
-      words.forEach(function (word) {
-        return res.lemmatize[word] = morphy.lemmatize(word);
-      });
-      words.forEach(function (word) {
-        return res.getBaseForm[word] = morphy.getBaseForm(word);
-      });
-
-      return res;
-    };
-
-    tests['lemmatize bulk && getBaseForm bulk'] = function () {
-      let res = {};
-
-      res.lemmatize = morphy.lemmatize(words);
-      res.getBaseForm = morphy.getBaseForm(words);
-
-      return res;
-    };
-
-    /**
-     * @param {Morphy_WordDescriptor_Collection} paradigms
-     * @param {Array} res
-     */
-    function testFoundWordParadigms(paradigms, res) {
-      if (!paradigms) {
-        return;
-      }
-
-      res.push(paradigms instanceof _morphiers.Morphy_WordDescriptor_Collection, paradigms.length);
-
-      paradigms.forEach(paradigm => {
-        res.push(paradigm instanceof _morphiers.Morphy_WordDescriptor, paradigm.length, paradigm.getBaseForm(), paradigm.getPseudoRoot(), paradigm.getAllForms(), paradigm.getFoundWordForm().length, paradigm.hasGrammems('НО'), paradigm.hasGrammems('ИМ'), paradigm.getWordFormsByGrammems('НО').length, paradigm.getWordFormsByGrammems('ИМ').length, paradigm.hasPartOfSpeech('С'), paradigm.hasPartOfSpeech('ДЕЕПРИЧАСТИЕ'), paradigm.getWordFormsByPartOfSpeech('С').length, paradigm.getWordFormsByPartOfSpeech('ДЕЕПРИЧАСТИЕ').length);
-      });
-
-      res.push(paradigms.getByPartOfSpeech('С').length);
-
-      // для русских слов
-      paradigms.getByPartOfSpeech('С').forEach(paradigm => {
-        res.push(paradigm instanceof _morphiers.Morphy_WordDescriptor, paradigm.length, paradigm.length ? paradigm.getWordForm(0) instanceof _morphiers.Morphy_WordDescriptor : null);
-
-        const formsOfSourceWord = paradigm.getFoundWordForm();
-        res.push(formsOfSourceWord.length);
-
-        formsOfSourceWord.forEach(form => res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech()));
-
-        const sampleFormsByGrammem = paradigm.getWordFormsByGrammems('ИМ');
-        res.push(sampleFormsByGrammem.length);
-
-        sampleFormsByGrammem.forEach(form => res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech()));
-
-        const sampleFormsByPartOfSpeech = paradigm.getWordFormsByPartOfSpeech('С');
-        res.push(sampleFormsByPartOfSpeech.length);
-
-        sampleFormsByPartOfSpeech.forEach(form => res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech()));
-      });
-
-      // для английских слов
-      paradigms.getByPartOfSpeech('VERB').forEach(paradigm => {
-        res.push(paradigm instanceof _morphiers.Morphy_WordDescriptor, paradigm.length, paradigm.length ? paradigm.getWordForm(0) instanceof _morphiers.Morphy_WordDescriptor : null);
-
-        const formsOfSourceWord = paradigm.getFoundWordForm();
-        res.push(formsOfSourceWord.length);
-
-        formsOfSourceWord.forEach(form => res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech()));
-
-        const sampleFormsByGrammem = paradigm.getWordFormsByGrammems('ИМ');
-        res.push(sampleFormsByGrammem.length);
-
-        sampleFormsByGrammem.forEach(form => res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech()));
-
-        const sampleFormsByPartOfSpeech = paradigm.getWordFormsByPartOfSpeech('С');
-        res.push(sampleFormsByPartOfSpeech.length);
-
-        sampleFormsByPartOfSpeech.forEach(form => res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech()));
-      });
-    }
-
-    tests['findWord'] = function () {
-      const res = [];
-
-      words.forEach(function (word) {
-        const paradigms = morphy.findWord(word);
-        testFoundWordParadigms(paradigms, res);
-      });
-
-      return res;
-    };
-
-    tests['findWord bulk'] = function () {
-      const res = [];
-
-      _lodash2.default.forEach(morphy.findWord(words), function (paradigms, word) {
-        testFoundWordParadigms(paradigms, res);
-      });
-
-      return res;
-    };
-
-    tests['getAllForms'] = function () {
-      return words.map(function (word) {
-        return morphy.getAllForms(word);
-      });
-    };
-
-    tests['getAllForms bulk'] = function () {
-      return morphy.getAllForms(words);
-    };
-
-    tests['getPseudoRoot'] = function () {
-      return words.map(function (word) {
-        return morphy.getPseudoRoot(word);
-      });
-    };
-
-    tests['getPseudoRoot bulk'] = function () {
-      return morphy.getPseudoRoot(words);
-    };
-
-    tests['getPartOfSpeech'] = function () {
-      return words.map(function (word) {
-        return morphy.getPartOfSpeech(word);
-      });
-    };
-
-    tests['getPartOfSpeech bulk'] = function () {
-      return morphy.getPartOfSpeech(words);
-    };
-
-    tests['getAllFormsWithGramInfo'] = function () {
-      return {
-        asText: words.map(function (word) {
-          return morphy.getAllFormsWithGramInfo(word, true);
-        }),
-        '!asText': words.map(function (word) {
-          return morphy.getAllFormsWithGramInfo(word, false);
-        })
-      };
-    };
-
-    tests['getAllFormsWithGramInfo bulk'] = function () {
-      return {
-        asText: morphy.getAllFormsWithGramInfo(words, true),
-        '!asText': morphy.getAllFormsWithGramInfo(words, false)
-      };
-    };
-
-    tests['getAllFormsWithAncodes'] = function () {
-      return words.map(function (word) {
-        return morphy.getAllFormsWithAncodes(word);
-      });
-    };
-
-    tests['getAllFormsWithAncodes bulk'] = function () {
-      return morphy.getAllFormsWithAncodes(words);
-    };
-
-    tests['getAncode'] = function () {
-      return words.map(function (word) {
-        return morphy.getAncode(word);
-      });
-    };
-
-    tests['getAncode bulk'] = function () {
-      return morphy.getAncode(words);
-    };
-
-    tests['getGramInfo'] = function () {
-      return words.map(function (word) {
-        return morphy.getGramInfo(word);
-      });
-    };
-
-    tests['getGramInfo bulk'] = function () {
-      return morphy.getGramInfo(words);
-    };
-
-    tests['getGramInfoMergeForms'] = function () {
-      return words.map(function (word) {
-        return morphy.getGramInfoMergeForms(word);
-      });
-    };
-
-    tests['getGramInfoMergeForms bulk'] = function () {
-      return morphy.getGramInfoMergeForms(words);
-    };
-
-    tests['castFormByGramInfo'] = function () {
-      const res = [];
-
-      words.forEach(function (word) {
-        res.push(morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], false), morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], true), morphy.castFormByGramInfo('ШКАФ', null, null, true, function (form, partOfSpeech, grammems, formNo) {
-          return _lodash2.default.includes(grammems, 'ИМ');
-        }), morphy.castFormByGramInfo(word, 'КР_ПРИЛ', ['ЕД', 'ЖР'], true));
-      });
-
-      return res;
-    };
-
-    tests['castFormByPattern'] = function () {
-      const res = [];
-
-      const provider = morphy.getGrammemsProvider();
-      provider.excludeGroups('С', 'род');
-
-      res.push(morphy.castFormByPattern('ДИВАН', 'СТОЛАМИ', null, true), morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true), morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', provider, true), morphy.castFormByPattern('КРЕСЛО', 'СТУЛЬЯМИ', provider, true));
-
-      words.forEach(function (word) {
-        res.push(morphy.castFormByPattern(word, 'СТОЛАМИ', null, true), morphy.castFormByPattern(word, 'СТОЛАМИ', provider, true), morphy.castFormByPattern('СТОЛАМИ', word, null, true), morphy.castFormByPattern('СТОЛАМИ', word, provider, true), morphy.castFormByPattern(word, 'ДИВАН', null, true), morphy.castFormByPattern(word, 'ДИВАН', provider, true), morphy.castFormByPattern('ДИВАН', word, null, true), morphy.castFormByPattern('ДИВАН', word, provider, true), morphy.castFormByPattern(word, 'КРОВАТЯМИ', null, true), morphy.castFormByPattern(word, 'КРОВАТЯМИ', provider, true), morphy.castFormByPattern('КРОВАТЯМИ', word, null, true), morphy.castFormByPattern('КРОВАТЯМИ', word, provider, true));
-      });
-
-      morphy.getDefaultGrammemsProvider().excludeGroups('С', 'род');
-      res.push(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true));
-
-      return res;
-    };
-
-    // /** @todo: castFormByAncode */
-    // tests['castFormByAncode'] = () => {
-    //   const res = [];
-    //
-    //   return res;
-    // };
-
-
-    /** Run tests */
-    const results = {};
-    _lodash2.default.forEach(tests, function (fn, name) {
-      results[name] = fn();
-    });
-
-    return results;
-  });
+  var _ref4 = _asyncToGenerator(_ref22);
 
   return function runLocalTests(_x3, _x4) {
-    return _ref2.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 })();
 
@@ -8931,8 +8648,12 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 //   .value()
 // ;
 
+function _ref(item) {
+  return (0, _utils.inspect)(item);
+}
+
 const log = function log(...args) {
-  _utils.logger.log(...args.map(item => (0, _utils.inspect)(item)));
+  _utils.logger.log(...args.map(_ref));
 };
 
 function cliEncode(any) {
@@ -8963,6 +8684,354 @@ function runPhpFileWithArgs(args, cb) {
       return resolve(stdout);
     });
   });
+}
+
+function* _ref3(words, opts) {
+  let res;
+
+  try {
+    res = yield runPhpFileWithArgs({ words, opts });
+  } catch (e) {
+    throw e;
+  }
+
+  try {
+    res = JSON.parse(res);
+  } catch (e) {
+    !!res && (e.message = `${ e.message }
+[php]: ${ (0, _utils.inspect)(res) }`);
+    throw e;
+  }
+
+  if (!res.success) {
+    throw new Error(`[php]: "${ res.message }". ${ res.words ? (0, _utils.inspect)(res.words) : '' }`);
+  }
+
+  return res.words;
+}
+
+function _ref5(word) {
+  return word.toUpperCase();
+}
+
+/**
+ * @param {Morphy_WordDescriptor_Collection} paradigms
+ * @param {Array} res
+ */
+function testFoundWordParadigms(paradigms, res) {
+  if (!paradigms) {
+    return;
+  }
+
+  res.push(paradigms instanceof _morphiers.Morphy_WordDescriptor_Collection, paradigms.length);
+
+  paradigms.forEach(paradigm => {
+    res.push(paradigm instanceof _morphiers.Morphy_WordDescriptor, paradigm.length, paradigm.getBaseForm(), paradigm.getPseudoRoot(), paradigm.getAllForms(), paradigm.getFoundWordForm().length, paradigm.hasGrammems('НО'), paradigm.hasGrammems('ИМ'), paradigm.getWordFormsByGrammems('НО').length, paradigm.getWordFormsByGrammems('ИМ').length, paradigm.hasPartOfSpeech('С'), paradigm.hasPartOfSpeech('ДЕЕПРИЧАСТИЕ'), paradigm.getWordFormsByPartOfSpeech('С').length, paradigm.getWordFormsByPartOfSpeech('ДЕЕПРИЧАСТИЕ').length);
+  });
+
+  res.push(paradigms.getByPartOfSpeech('С').length);
+
+  // для русских слов
+
+  function _ref6(form) {
+    return res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech());
+  }
+
+  function _ref7(form) {
+    return res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech());
+  }
+
+  function _ref8(form) {
+    return res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech());
+  }
+
+  paradigms.getByPartOfSpeech('С').forEach(paradigm => {
+    res.push(paradigm instanceof _morphiers.Morphy_WordDescriptor, paradigm.length, paradigm.length ? paradigm.getWordForm(0) instanceof _morphiers.Morphy_WordDescriptor : null);
+
+    const formsOfSourceWord = paradigm.getFoundWordForm();
+    res.push(formsOfSourceWord.length);
+
+    formsOfSourceWord.forEach(_ref6);
+
+    const sampleFormsByGrammem = paradigm.getWordFormsByGrammems('ИМ');
+    res.push(sampleFormsByGrammem.length);
+
+    sampleFormsByGrammem.forEach(_ref7);
+
+    const sampleFormsByPartOfSpeech = paradigm.getWordFormsByPartOfSpeech('С');
+    res.push(sampleFormsByPartOfSpeech.length);
+
+    sampleFormsByPartOfSpeech.forEach(_ref8);
+  });
+
+  // для английских слов
+
+  function _ref9(form) {
+    return res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech());
+  }
+
+  function _ref10(form) {
+    return res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech());
+  }
+
+  function _ref11(form) {
+    return res.push(form instanceof _morphiers.Morphy_WordForm, form.getWord(), form.getFormNo(), form.getGrammems(), form.hasGrammems(['ЕД', 'РД']), form.getPartOfSpeech());
+  }
+
+  paradigms.getByPartOfSpeech('VERB').forEach(paradigm => {
+    res.push(paradigm instanceof _morphiers.Morphy_WordDescriptor, paradigm.length, paradigm.length ? paradigm.getWordForm(0) instanceof _morphiers.Morphy_WordDescriptor : null);
+
+    const formsOfSourceWord = paradigm.getFoundWordForm();
+    res.push(formsOfSourceWord.length);
+
+    formsOfSourceWord.forEach(_ref9);
+
+    const sampleFormsByGrammem = paradigm.getWordFormsByGrammems('ИМ');
+    res.push(sampleFormsByGrammem.length);
+
+    sampleFormsByGrammem.forEach(_ref10);
+
+    const sampleFormsByPartOfSpeech = paradigm.getWordFormsByPartOfSpeech('С');
+    res.push(sampleFormsByPartOfSpeech.length);
+
+    sampleFormsByPartOfSpeech.forEach(_ref11);
+  });
+}
+
+function _ref21(form, partOfSpeech, grammems, formNo) {
+  return _lodash2.default.includes(grammems, 'ИМ');
+}
+
+function* _ref22(words, morphy) {
+  const tests = {};
+  words = _lodash2.default.isArray(words) ? words : [words];
+  // для совместимости с результатами из php
+  words = words.map(_ref5);
+
+  tests['initialize'] = function () {
+    return [morphy.getEncoding(), morphy.getLocale()];
+  };
+
+  tests['getters'] = function () {
+    return [morphy.getCommonMorphier() instanceof _morphiers.Morphy_Morphier_Interface, morphy.getPredictBySuffixMorphier() instanceof _morphiers.Morphy_Morphier_Interface, morphy.getPredictByDatabaseMorphier() instanceof _morphiers.Morphy_Morphier_Interface, morphy.getBulkMorphier() instanceof _morphiers.Morphy_Morphier_Interface];
+  };
+
+  tests['isLastPredicted'] = function () {
+    const res = [];
+
+    res.push(morphy.lemmatize('глокая', _3.default.NORMAL), morphy.isLastPredicted());
+
+    res.push(morphy.lemmatize('глокая', _3.default.IGNORE_PREDICT), morphy.isLastPredicted());
+
+    res.push(morphy.lemmatize('тест', _3.default.ONLY_PREDICT), morphy.isLastPredicted());
+
+    return res;
+  };
+
+  tests['getLastPredictionType'] = function () {
+    const res = [];
+
+    res.push(morphy.lemmatize('тест', _3.default.NORMAL), morphy.getLastPredictionType() == _3.default.PREDICT_BY_NONE);
+
+    res.push(morphy.lemmatize('глокая', _3.default.IGNORE_PREDICT), morphy.getLastPredictionType() == _3.default.PREDICT_BY_NONE);
+
+    res.push(morphy.lemmatize('тестдрайв', _3.default.ONLY_PREDICT), morphy.getLastPredictionType() == _3.default.PREDICT_BY_SUFFIX);
+
+    res.push(morphy.lemmatize('подфигачить', _3.default.ONLY_PREDICT), morphy.getLastPredictionType() == _3.default.PREDICT_BY_DB);
+
+    return res;
+  };
+
+  tests['lemmatize && getBaseForm'] = function () {
+    let res = { lemmatize: {}, getBaseForm: {} };
+
+    words.forEach(function (word) {
+      return res.lemmatize[word] = morphy.lemmatize(word);
+    });
+    words.forEach(function (word) {
+      return res.getBaseForm[word] = morphy.getBaseForm(word);
+    });
+
+    return res;
+  };
+
+  tests['lemmatize bulk && getBaseForm bulk'] = function () {
+    let res = {};
+
+    res.lemmatize = morphy.lemmatize(words);
+    res.getBaseForm = morphy.getBaseForm(words);
+
+    return res;
+  };tests['findWord'] = function () {
+    const res = [];
+
+    words.forEach(function (word) {
+      const paradigms = morphy.findWord(word);
+      testFoundWordParadigms(paradigms, res);
+    });
+
+    return res;
+  };
+
+  tests['findWord bulk'] = function () {
+    const res = [];
+
+    _lodash2.default.forEach(morphy.findWord(words), function (paradigms, word) {
+      testFoundWordParadigms(paradigms, res);
+    });
+
+    return res;
+  };
+
+  function _ref12(word) {
+    return morphy.getAllForms(word);
+  }
+
+  tests['getAllForms'] = function () {
+    return words.map(_ref12);
+  };
+
+  tests['getAllForms bulk'] = function () {
+    return morphy.getAllForms(words);
+  };
+
+  function _ref13(word) {
+    return morphy.getPseudoRoot(word);
+  }
+
+  tests['getPseudoRoot'] = function () {
+    return words.map(_ref13);
+  };
+
+  tests['getPseudoRoot bulk'] = function () {
+    return morphy.getPseudoRoot(words);
+  };
+
+  function _ref14(word) {
+    return morphy.getPartOfSpeech(word);
+  }
+
+  tests['getPartOfSpeech'] = function () {
+    return words.map(_ref14);
+  };
+
+  tests['getPartOfSpeech bulk'] = function () {
+    return morphy.getPartOfSpeech(words);
+  };
+
+  function _ref15(word) {
+    return morphy.getAllFormsWithGramInfo(word, true);
+  }
+
+  function _ref16(word) {
+    return morphy.getAllFormsWithGramInfo(word, false);
+  }
+
+  tests['getAllFormsWithGramInfo'] = function () {
+    return {
+      asText: words.map(_ref15),
+      '!asText': words.map(_ref16)
+    };
+  };
+
+  tests['getAllFormsWithGramInfo bulk'] = function () {
+    return {
+      asText: morphy.getAllFormsWithGramInfo(words, true),
+      '!asText': morphy.getAllFormsWithGramInfo(words, false)
+    };
+  };
+
+  function _ref17(word) {
+    return morphy.getAllFormsWithAncodes(word);
+  }
+
+  tests['getAllFormsWithAncodes'] = function () {
+    return words.map(_ref17);
+  };
+
+  tests['getAllFormsWithAncodes bulk'] = function () {
+    return morphy.getAllFormsWithAncodes(words);
+  };
+
+  function _ref18(word) {
+    return morphy.getAncode(word);
+  }
+
+  tests['getAncode'] = function () {
+    return words.map(_ref18);
+  };
+
+  tests['getAncode bulk'] = function () {
+    return morphy.getAncode(words);
+  };
+
+  function _ref19(word) {
+    return morphy.getGramInfo(word);
+  }
+
+  tests['getGramInfo'] = function () {
+    return words.map(_ref19);
+  };
+
+  tests['getGramInfo bulk'] = function () {
+    return morphy.getGramInfo(words);
+  };
+
+  function _ref20(word) {
+    return morphy.getGramInfoMergeForms(word);
+  }
+
+  tests['getGramInfoMergeForms'] = function () {
+    return words.map(_ref20);
+  };
+
+  tests['getGramInfoMergeForms bulk'] = function () {
+    return morphy.getGramInfoMergeForms(words);
+  };
+
+  tests['castFormByGramInfo'] = function () {
+    const res = [];
+
+    words.forEach(function (word) {
+      res.push(morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], false), morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], true), morphy.castFormByGramInfo('ШКАФ', null, null, true, _ref21), morphy.castFormByGramInfo(word, 'КР_ПРИЛ', ['ЕД', 'ЖР'], true));
+    });
+
+    return res;
+  };
+
+  tests['castFormByPattern'] = function () {
+    const res = [];
+
+    const provider = morphy.getGrammemsProvider();
+    provider.excludeGroups('С', 'род');
+
+    res.push(morphy.castFormByPattern('ДИВАН', 'СТОЛАМИ', null, true), morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true), morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', provider, true), morphy.castFormByPattern('КРЕСЛО', 'СТУЛЬЯМИ', provider, true));
+
+    words.forEach(function (word) {
+      res.push(morphy.castFormByPattern(word, 'СТОЛАМИ', null, true), morphy.castFormByPattern(word, 'СТОЛАМИ', provider, true), morphy.castFormByPattern('СТОЛАМИ', word, null, true), morphy.castFormByPattern('СТОЛАМИ', word, provider, true), morphy.castFormByPattern(word, 'ДИВАН', null, true), morphy.castFormByPattern(word, 'ДИВАН', provider, true), morphy.castFormByPattern('ДИВАН', word, null, true), morphy.castFormByPattern('ДИВАН', word, provider, true), morphy.castFormByPattern(word, 'КРОВАТЯМИ', null, true), morphy.castFormByPattern(word, 'КРОВАТЯМИ', provider, true), morphy.castFormByPattern('КРОВАТЯМИ', word, null, true), morphy.castFormByPattern('КРОВАТЯМИ', word, provider, true));
+    });
+
+    morphy.getDefaultGrammemsProvider().excludeGroups('С', 'род');
+    res.push(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true));
+
+    return res;
+  };
+
+  // /** @todo: castFormByAncode */
+  // tests['castFormByAncode'] = () => {
+  //   const res = [];
+  //
+  //   return res;
+  // };
+
+
+  /** Run tests */
+  const results = {};
+  _lodash2.default.forEach(tests, function (fn, name) {
+    results[name] = fn();
+  });
+
+  return results;
 }
 
 const opts = [{
@@ -9107,45 +9176,47 @@ _asyncToGenerator(function* () {
 
   console.time('tests time');
 
+  function* _ref27({ name, words, opts }, idx) {
+    name = name || idx;
+
+    const morphy = new _3.default(opts);
+    try {
+      var _ref25 = yield Promise.all([runPhpTests(words, morphy.options), runLocalTests(words, morphy)]),
+          _ref26 = _slicedToArray(_ref25, 2);
+
+      const phpResults = _ref26[0],
+            localResults = _ref26[1];
+
+
+      results[name] = {
+        words,
+        opts,
+        tests: _lodash2.default.keys(localResults).reduce(function (tests, testName) {
+          tests[testName] = {
+            // success: _.isEqual(phpResults[testName], localResults[testName]),
+            // php: phpResults[testName],
+            // local: localResults[testName]
+            success: _lodash2.default.isEqual(consistentResults(phpResults[testName]), consistentResults(localResults[testName])),
+            php: phpResults[testName],
+            local: localResults[testName]
+          };
+
+          return tests;
+        }, {})
+      };
+    } catch (err) {
+      throw err;
+      // logger.error(err);
+    }
+
+    return true;
+  }
+
   yield Promise.all(testData.map((() => {
-    var _ref4 = _asyncToGenerator(function* ({ name, words, opts }, idx) {
-      name = name || idx;
-
-      const morphy = new _3.default(opts);
-      try {
-        var _ref5 = yield Promise.all([runPhpTests(words, morphy.options), runLocalTests(words, morphy)]),
-            _ref6 = _slicedToArray(_ref5, 2);
-
-        const phpResults = _ref6[0],
-              localResults = _ref6[1];
-
-
-        results[name] = {
-          words,
-          opts,
-          tests: _lodash2.default.keys(localResults).reduce(function (tests, testName) {
-            tests[testName] = {
-              // success: _.isEqual(phpResults[testName], localResults[testName]),
-              // php: phpResults[testName],
-              // local: localResults[testName]
-              success: _lodash2.default.isEqual(consistentResults(phpResults[testName]), consistentResults(localResults[testName])),
-              php: phpResults[testName],
-              local: localResults[testName]
-            };
-
-            return tests;
-          }, {})
-        };
-      } catch (err) {
-        throw err;
-        // logger.error(err);
-      }
-
-      return true;
-    });
+    var _ref24 = _asyncToGenerator(_ref27);
 
     return function (_x5, _x6) {
-      return _ref4.apply(this, arguments);
+      return _ref24.apply(this, arguments);
     };
   })()));
 
@@ -9174,12 +9245,14 @@ Local results: ${ (0, _utils.inspect)(test.local) }
 })().catch(err => _utils.logger.error(err));
 
 function consistentResults(any) {
-  if (_lodash2.default.isPlainObject(any)) {
-    return Object.keys(any).sort().reduce((res, key) => {
-      res[key] = consistentResults(any[key]);
+  function _ref28(res, key) {
+    res[key] = consistentResults(any[key]);
 
-      return res;
-    }, {});
+    return res;
+  }
+
+  if (_lodash2.default.isPlainObject(any)) {
+    return Object.keys(any).sort().reduce(_ref28, {});
   } else if (_lodash2.default.isArray(any)) {
     return _lodash2.default.sortBy(any.map(consistentResults), any.length && (_lodash2.default.isNumber(any[0]) || (0, _utils.isStringifyedNumber)(any[0])) ? _lodash2.default.toInteger : JSON.stringify);
   }

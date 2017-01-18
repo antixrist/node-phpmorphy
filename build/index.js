@@ -379,8 +379,12 @@ function isStringifyedNumber(any) {
 function toBuffer(something, encoding = 'utf-8') {
   let retVal = something;
 
+  function _ref(item) {
+    return toBuffer(item, encoding);
+  }
+
   if (_lodash2.default.isArray(something)) {
-    retVal = _lodash2.default.map(something, item => toBuffer(item, encoding));
+    retVal = _lodash2.default.map(something, _ref);
   } else if (Buffer.isBuffer(something)) {
     retVal = something;
   } else if (_lodash2.default.isString(something)) {
@@ -4300,6 +4304,10 @@ class Morphy_Morphier_Helper {
   composeFormsWithAncodes(word, annots, foundFormNo) {
     const result = [];
 
+    function _ref(ancode) {
+      return result.push([word, ancode]);
+    }
+
     _lodash2.default.forEach(annots, (annot, annotIdx) => {
       const baseAndPrefix = this.getBaseAndPrefix(word, annot['cplen'], annot['plen'], annot['flen']);
       const base = baseAndPrefix[0];
@@ -4325,7 +4333,7 @@ class Morphy_Morphier_Helper {
           foundFormNo[annotIdx]['high'] = count + _lodash2.default.size(ancodes[form_no]) - 1;
         }
 
-        _lodash2.default.forEach(ancodes[form_no], ancode => result.push([word, ancode]));
+        _lodash2.default.forEach(ancodes[form_no], _ref);
       }
     });
 
@@ -5153,6 +5161,10 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     let annot_raw;
     let result_for_annot;
 
+    function _ref2(word) {
+      return result[word] = result_for_annot;
+    }
+
     _lodash2.default.forEach(this.findWord(words), item => {
       words = item.data;
       annot_raw = item.annots;
@@ -5165,7 +5177,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
         _lodash2.default.forEach(words, word => result[word] = this.helper[method](word, annot_raw));
       } else {
         result_for_annot = this.helper[method](annot_raw);
-        _lodash2.default.forEach(words, word => result[word] = result_for_annot);
+        _lodash2.default.forEach(words, _ref2);
       }
     });
 
@@ -5212,6 +5224,14 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     let stack_idx = 0;
 
     // TODO: Improve this
+
+    function _ref3(dest) {
+      stack_idx += 3;
+      stack[stack_idx] = dest;
+      stack[stack_idx + 1] = path;
+      stack[stack_idx + 2] = trans;
+    }
+
     while (stack_idx >= 0) {
       n = stack[stack_idx];
       path = Buffer.concat([Buffer.from(stack[stack_idx + 1]), labels[n]]);
@@ -5246,12 +5266,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
       }
 
       if (dests[n] !== false) {
-        _lodash2.default.forEach(dests[n], dest => {
-          stack_idx += 3;
-          stack[stack_idx] = dest;
-          stack[stack_idx + 1] = path;
-          stack[stack_idx + 2] = trans;
-        });
+        _lodash2.default.forEach(dests[n], _ref3);
       }
     }
 
