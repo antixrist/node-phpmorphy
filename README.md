@@ -648,6 +648,29 @@ function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 let morphy;
 
 morphy = new Morphy('ru', {
+  resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_TEXT // <==
+});
+
+log(morphy.getAllFormsWithAncodes('Я'));
+/*
+[
+  {
+    all:    [
+      'МС 1Л,ЕД,ИМ',
+      'МС 1Л,ЕД,РД',
+      'МС 1Л,ЕД,ВН',
+      'МС 1Л,ЕД,ДТ',
+      'МС 1Л,ЕД,ПР',
+      'МС 1Л,ЕД,ТВ',
+      'МС 1Л,ЕД,ТВ'
+    ],
+    forms:  ['Я', 'МЕНЯ', 'МЕНЯ', 'МНЕ', 'МНЕ', 'МНОЙ', 'МНОЮ'],
+    common: null
+  }
+]
+*/
+
+morphy = new Morphy('ru', {
   resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_INT // <==
 });
 

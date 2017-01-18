@@ -88,68 +88,68 @@ async function runLocalTests (words, morphy) {
   // для совместимости с результатами из php
   words = words.map(word => word.toUpperCase());
   
-  // tests['initialize'] = () => {
-  //   return [
-  //     morphy.getEncoding(),
-  //     morphy.getLocale()
-  //   ];
-  // };
-  //
-  // tests['getters'] = () => {
-  //   return [
-  //     morphy.getCommonMorphier() instanceof Morphy_Morphier_Interface,
-  //     morphy.getPredictBySuffixMorphier() instanceof Morphy_Morphier_Interface,
-  //     morphy.getPredictByDatabaseMorphier() instanceof Morphy_Morphier_Interface,
-  //     morphy.getBulkMorphier() instanceof Morphy_Morphier_Interface
-  //   ];
-  // };
-  //
-  // tests['isLastPredicted'] = () => {
-  //   const res = [];
-  //
-  //   res.push(
-  //     morphy.lemmatize('глокая', Morphy.NORMAL),
-  //     morphy.isLastPredicted()
-  //   );
-  //
-  //   res.push(
-  //     morphy.lemmatize('глокая', Morphy.IGNORE_PREDICT),
-  //     morphy.isLastPredicted()
-  //   );
-  //
-  //   res.push(
-  //     morphy.lemmatize('тест', Morphy.ONLY_PREDICT),
-  //     morphy.isLastPredicted()
-  //   );
-  //
-  //   return res;
-  // };
-  //
-  // tests['getLastPredictionType'] = () => {
-  //   const res = [];
-  //
-  //   res.push(
-  //     morphy.lemmatize('тест', Morphy.NORMAL),
-  //     morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE
-  //   );
-  //
-  //   res.push(
-  //     morphy.lemmatize('глокая', Morphy.IGNORE_PREDICT),
-  //     morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE
-  //   );
-  //
-  //   res.push(
-  //     morphy.lemmatize('тестдрайв', Morphy.ONLY_PREDICT),
-  //     morphy.getLastPredictionType() == Morphy.PREDICT_BY_SUFFIX
-  //   );
-  //
-  //   res.push(
-  //     morphy.lemmatize('подфигачить', Morphy.ONLY_PREDICT),
-  //     morphy.getLastPredictionType() == Morphy.PREDICT_BY_DB
-  //   );
-  //
-  //   return res;
-  // };
+  tests['initialize'] = () => {
+    return [
+      morphy.getEncoding(),
+      morphy.getLocale()
+    ];
+  };
+
+  tests['getters'] = () => {
+    return [
+      morphy.getCommonMorphier() instanceof Morphy_Morphier_Interface,
+      morphy.getPredictBySuffixMorphier() instanceof Morphy_Morphier_Interface,
+      morphy.getPredictByDatabaseMorphier() instanceof Morphy_Morphier_Interface,
+      morphy.getBulkMorphier() instanceof Morphy_Morphier_Interface
+    ];
+  };
+
+  tests['isLastPredicted'] = () => {
+    const res = [];
+
+    res.push(
+      morphy.lemmatize('глокая', Morphy.NORMAL),
+      morphy.isLastPredicted()
+    );
+
+    res.push(
+      morphy.lemmatize('глокая', Morphy.IGNORE_PREDICT),
+      morphy.isLastPredicted()
+    );
+
+    res.push(
+      morphy.lemmatize('тест', Morphy.ONLY_PREDICT),
+      morphy.isLastPredicted()
+    );
+
+    return res;
+  };
+
+  tests['getLastPredictionType'] = () => {
+    const res = [];
+
+    res.push(
+      morphy.lemmatize('тест', Morphy.NORMAL),
+      morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE
+    );
+
+    res.push(
+      morphy.lemmatize('глокая', Morphy.IGNORE_PREDICT),
+      morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE
+    );
+
+    res.push(
+      morphy.lemmatize('тестдрайв', Morphy.ONLY_PREDICT),
+      morphy.getLastPredictionType() == Morphy.PREDICT_BY_SUFFIX
+    );
+
+    res.push(
+      morphy.lemmatize('подфигачить', Morphy.ONLY_PREDICT),
+      morphy.getLastPredictionType() == Morphy.PREDICT_BY_DB
+    );
+
+    return res;
+  };
 
   tests['lemmatize && getBaseForm'] = () => {
     let res = { lemmatize: {}, getBaseForm: {} };
@@ -180,7 +180,7 @@ async function runLocalTests (words, morphy) {
       paradigms instanceof Morphy_WordDescriptor_Collection,
       paradigms.length
     );
-  
+
     paradigms.forEach(paradigm => {
       res.push(
         paradigm instanceof Morphy_WordDescriptor,
@@ -276,75 +276,75 @@ async function runLocalTests (words, morphy) {
     return res;
   };
 
-  // tests['getAllForms'] = () => {
-  //   return words.map(word => morphy.getAllForms(word));
-  // };
-  //
-  // tests['getAllForms bulk'] = () => {
-  //   return morphy.getAllForms(words);
-  // };
-  //
-  // tests['getPseudoRoot'] = () => {
-  //   return words.map(word => morphy.getPseudoRoot(word));
-  // };
-  //
-  // tests['getPseudoRoot bulk'] = () => {
-  //   return morphy.getPseudoRoot(words);
-  // };
-  //
-  // tests['getPartOfSpeech'] = () => {
-  //   return words.map(word => morphy.getPartOfSpeech(word)).concat('...');
-  // };
-  //
-  // tests['getPartOfSpeech bulk'] = () => {
-  //   return morphy.getPartOfSpeech(words);
-  // };
-  //
-  // tests['getAllFormsWithGramInfo'] = () => {
-  //   return {
-  //     asText: words.map(word => morphy.getAllFormsWithGramInfo(word, true)),
-  //     '!asText': words.map(word => morphy.getAllFormsWithGramInfo(word, false))
-  //   };
-  // };
-  //
-  // tests['getAllFormsWithGramInfo bulk'] = () => {
-  //   return {
-  //     asText: morphy.getAllFormsWithGramInfo(words, true),
-  //     '!asText': morphy.getAllFormsWithGramInfo(words, false)
-  //   };
-  // };
-  //
-  // tests['getAllFormsWithAncodes'] = () => {
-  //   return words.map(word => morphy.getAllFormsWithAncodes(word));
-  // };
-  //
-  // tests['getAllFormsWithAncodes bulk'] = () => {
-  //   return morphy.getAllFormsWithAncodes(words);
-  // };
-  //
-  // tests['getAncode'] = () => {
-  //   return words.map(word => morphy.getAncode(word));
-  // };
-  //
-  // tests['getAncode bulk'] = () => {
-  //   return morphy.getAncode(words);
-  // };
-  //
-  // tests['getGramInfo'] = () => {
-  //   return words.map(word => morphy.getGramInfo(word));
-  // };
-  //
-  // tests['getGramInfo bulk'] = () => {
-  //   return morphy.getGramInfo(words);
-  // };
-  //
-  // tests['getGramInfoMergeForms'] = () => {
-  //   return words.map(word => morphy.getGramInfoMergeForms(word));
-  // };
-  //
-  // tests['getGramInfoMergeForms bulk'] = () => {
-  //   return morphy.getGramInfoMergeForms(words);
-  // };
+  tests['getAllForms'] = () => {
+    return words.map(word => morphy.getAllForms(word));
+  };
+
+  tests['getAllForms bulk'] = () => {
+    return morphy.getAllForms(words);
+  };
+
+  tests['getPseudoRoot'] = () => {
+    return words.map(word => morphy.getPseudoRoot(word));
+  };
+
+  tests['getPseudoRoot bulk'] = () => {
+    return morphy.getPseudoRoot(words);
+  };
+
+  tests['getPartOfSpeech'] = () => {
+    return words.map(word => morphy.getPartOfSpeech(word));
+  };
+
+  tests['getPartOfSpeech bulk'] = () => {
+    return morphy.getPartOfSpeech(words);
+  };
+
+  tests['getAllFormsWithGramInfo'] = () => {
+    return {
+      asText: words.map(word => morphy.getAllFormsWithGramInfo(word, true)),
+      '!asText': words.map(word => morphy.getAllFormsWithGramInfo(word, false))
+    };
+  };
+
+  tests['getAllFormsWithGramInfo bulk'] = () => {
+    return {
+      asText: morphy.getAllFormsWithGramInfo(words, true),
+      '!asText': morphy.getAllFormsWithGramInfo(words, false)
+    };
+  };
+
+  tests['getAllFormsWithAncodes'] = () => {
+    return words.map(word => morphy.getAllFormsWithAncodes(word));
+  };
+
+  tests['getAllFormsWithAncodes bulk'] = () => {
+    return morphy.getAllFormsWithAncodes(words);
+  };
+
+  tests['getAncode'] = () => {
+    return words.map(word => morphy.getAncode(word));
+  };
+
+  tests['getAncode bulk'] = () => {
+    return morphy.getAncode(words);
+  };
+
+  tests['getGramInfo'] = () => {
+    return words.map(word => morphy.getGramInfo(word));
+  };
+
+  tests['getGramInfo bulk'] = () => {
+    return morphy.getGramInfo(words);
+  };
+
+  tests['getGramInfoMergeForms'] = () => {
+    return words.map(word => morphy.getGramInfoMergeForms(word));
+  };
+
+  tests['getGramInfoMergeForms bulk'] = () => {
+    return morphy.getGramInfoMergeForms(words);
+  };
 
   tests['castFormByGramInfo'] = () => {
     const res = [];
@@ -362,7 +362,7 @@ async function runLocalTests (words, morphy) {
 
     return res;
   };
-  
+
   tests['castFormByPattern'] = () => {
     const res = [];
 
@@ -422,7 +422,8 @@ async function runLocalTests (words, morphy) {
 }
 
 const words = [];
-words.push(...'глокая душа красный спать мурелки шлепают пельсиски стакелках светится мычай'.split(' '));
+// words.push(...'глокая душа красный спать мурелки шлепают пельсиски стакелках светится мычай'.split(' '));
+words.push(...'глокая'.split(' '));
 
 // words.push(...'This has been a known bug with a known solution for at least since 2009 years but no one seems to be willing to fix it '.split(' '));
 

@@ -49,7 +49,7 @@ class Morphy_GramTab_Interface  {
 class Morphy_GramTab_Empty extends Morphy_GramTab_Interface {
 
   getGrammems (ancodeId) {
-    return {};
+    return [];
   }
 
   getPartOfSpeech (ancodeId) {
@@ -141,8 +141,6 @@ class Morphy_GramTab_Proxy extends Morphy_GramTab_Interface {
 class Morphy_GramTab extends Morphy_GramTab_Interface {
 
   /**
-   * TODO: remove this
-   *
    * @param {Morphy_Storage} $storage
    * @returns {Morphy_GramTab}
    */
@@ -171,7 +169,7 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
     if (!php.isset(this.ancodes[ancodeId])) {
       throw new Error(`Invalid ancode id '${ ancodeId }'`);
     }
-
+    
     return this.ancodes[ancodeId]['grammem_ids'];
   }
 
@@ -215,7 +213,7 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
 
   includeConsts () {
     /** todo: вот те самые константы */
-    require('./gramtab_consts');
+    return require('./gramtab_consts');
   }
 
   ancodeToString (ancodeId, commonAncode) {

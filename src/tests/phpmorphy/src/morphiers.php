@@ -1472,7 +1472,7 @@ abstract class phpMorphy_Morphier_Base implements phpMorphy_Morphier_Interface {
         if(false === ($annots = $this->finder->findWord($word))) {
             return false;
         }
-        
+
         return $this->helper->getWordDescriptor($word, $annots);
     }
 
@@ -1734,7 +1734,7 @@ class phpMorphy_Morphier_Bulk implements phpMorphy_Morphier_Interface {
         return $this->processAnnotsWithHelper($words, 'getAllFormsWithResolvedAncodes', true);
     }
     
-    function getWordDescriptor($word) {
+    function getWordDescriptor($words) {
         return $this->processAnnotsWithHelper($words, 'getWordDescriptor', true);
     }
     

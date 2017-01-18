@@ -671,9 +671,6 @@ class Morphy_Morphier_Helper {
     grammems = _.toArray(grammems);
     partOfSpeech = php.isset(partOfSpeech) ? partOfSpeech + '' : null;
   
-    // console.log(typeof partOfSpeech, partOfSpeech);
-    // console.log(partOfSpeech);
-    
     /**
      * Проверено:
      * grammems
@@ -700,8 +697,6 @@ class Morphy_Morphier_Helper {
        * prefix
        */
   
-      // console.log(grammems);
-      
       _.forEach(all_ancodes, form_ancodes => {
         _.forEach(form_ancodes, ancode => {
           const form_pos = this.gramtab.getPartOfSpeech(ancode);
@@ -719,16 +714,11 @@ class Morphy_Morphier_Helper {
               return;
             }
           } else {
-            // console.log(inspect(partOfSpeech));
-            // console.log(inspect(form_pos));
-            
             if (php.isset(partOfSpeech) && form_pos !== partOfSpeech) {
               form_no++;
               return;
             }
 
-            // console.log(_.difference(grammems, form_grammems));
-            
             if (_.size(php.array_diff(grammems, form_grammems)) > 0) {
               form_no++;
               return;
@@ -753,8 +743,6 @@ class Morphy_Morphier_Helper {
       });
     });
 
-    // console.log(_.keys(result));
-    
     return returnWords ? php.array_keys(result) : result;
   }
 
@@ -1026,6 +1014,8 @@ class Morphy_WordForm {
   }
 
   constructor (word, form_no, pos_id, grammems) {
+    grammems = _.values(grammems);
+
     this.word = word + '';
     this.form_no = parseInt(form_no, 10);
     this.pos_id = pos_id;
@@ -2036,7 +2026,6 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     });
   
     _.keys(result).forEach(key => {
-      // console.log('keys', key, result[key]);
       result[key] = _.keys(result[key]);
       
       if (result[key].length && isStringifyedNumber(result[key][0])) {
@@ -2044,20 +2033,6 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
       }
     });
     
-    // for (let keys = _.keys(result), i = 0, c = _.size(result); i < c; i++) {
-    //   key = keys[i];
-    //
-    //   result[key] = _.keys(result[key]);
-    // }
-  
-    // console.log('result', result);
-  
-    // let result = {};
-    // _.forEach(this.decodeAnnot(annots, false), annot => result[this.extractPartOfSpeech(annot)] = 1);
-    // result = _.keys(result);
-    // result = this.resolve_pos ? result : result.map(_.toInteger);
-  
-  
     return result;
   }
 

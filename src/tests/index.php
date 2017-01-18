@@ -75,58 +75,58 @@ $tests = [];
 
 /** Declare tests */
 
-//$tests['initialize'] = function () use ($words, $morphy) {
-//  $result = [
-//    $morphy->getEncoding(),
-//    $morphy->getLocale()
-//  ];
-//
-//  return $result;
-//};
-//
-//$tests['getters'] = function () use ($words, $morphy) {
-//  $result = [
-//    $morphy->getCommonMorphier() instanceof phpMorphy_Morphier_Interface,
-//    $morphy->getPredictBySuffixMorphier() instanceof phpMorphy_Morphier_Interface,
-//    $morphy->getPredictByDatabaseMorphier() instanceof phpMorphy_Morphier_Interface,
-//    $morphy->getBulkMorphier() instanceof phpMorphy_Morphier_Interface
-//  ];
-//
-//  return $result;
-//};
-//
-//$tests['isLastPredicted'] = function () use ($words, $morphy) {
-//  $result = [];
-//
-//  $result[] = $morphy->lemmatize('ГЛОКАЯ', phpMorphy::NORMAL);
-//  $result[] = $morphy->isLastPredicted();
-//
-//  $result[] = $morphy->lemmatize('ГЛОКАЯ', phpMorphy::IGNORE_PREDICT);
-//  $result[] = $morphy->isLastPredicted();
-//
-//  $result[] = $morphy->lemmatize('ТЕСТ', phpMorphy::ONLY_PREDICT);
-//  $result[] = $morphy->isLastPredicted();
-//
-//  return $result;
-//};
-//
-//$tests['getLastPredictionType'] = function () use ($words, $morphy) {
-//  $result = [];
-//
-//  $result[] = $morphy->lemmatize('ТЕСТ', phpMorphy::NORMAL);
-//  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_NONE;
-//
-//  $result[] = $morphy->lemmatize('ГЛОКАЯ', phpMorphy::IGNORE_PREDICT);
-//  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_NONE;
-//
-//  $result[] = $morphy->lemmatize('ТЕСТДРАЙВ', phpMorphy::ONLY_PREDICT);
-//  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_SUFFIX;
-//
-//  $result[] = $morphy->lemmatize('ПОДФИГАЧИТЬ', phpMorphy::ONLY_PREDICT);
-//  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_DB;
-//
-//  return $result;
-//};
+$tests['initialize'] = function () use ($words, $morphy) {
+  $result = [
+    $morphy->getEncoding(),
+    $morphy->getLocale()
+  ];
+
+  return $result;
+};
+
+$tests['getters'] = function () use ($words, $morphy) {
+  $result = [
+    $morphy->getCommonMorphier() instanceof phpMorphy_Morphier_Interface,
+    $morphy->getPredictBySuffixMorphier() instanceof phpMorphy_Morphier_Interface,
+    $morphy->getPredictByDatabaseMorphier() instanceof phpMorphy_Morphier_Interface,
+    $morphy->getBulkMorphier() instanceof phpMorphy_Morphier_Interface
+  ];
+
+  return $result;
+};
+
+$tests['isLastPredicted'] = function () use ($words, $morphy) {
+  $result = [];
+
+  $result[] = $morphy->lemmatize('ГЛОКАЯ', phpMorphy::NORMAL);
+  $result[] = $morphy->isLastPredicted();
+
+  $result[] = $morphy->lemmatize('ГЛОКАЯ', phpMorphy::IGNORE_PREDICT);
+  $result[] = $morphy->isLastPredicted();
+
+  $result[] = $morphy->lemmatize('ТЕСТ', phpMorphy::ONLY_PREDICT);
+  $result[] = $morphy->isLastPredicted();
+
+  return $result;
+};
+
+$tests['getLastPredictionType'] = function () use ($words, $morphy) {
+  $result = [];
+
+  $result[] = $morphy->lemmatize('ТЕСТ', phpMorphy::NORMAL);
+  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_NONE;
+
+  $result[] = $morphy->lemmatize('ГЛОКАЯ', phpMorphy::IGNORE_PREDICT);
+  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_NONE;
+
+  $result[] = $morphy->lemmatize('ТЕСТДРАЙВ', phpMorphy::ONLY_PREDICT);
+  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_SUFFIX;
+
+  $result[] = $morphy->lemmatize('ПОДФИГАЧИТЬ', phpMorphy::ONLY_PREDICT);
+  $result[] = $morphy->getLastPredictionType() == phpMorphy::PREDICT_BY_DB;
+
+  return $result;
+};
 
 $tests['lemmatize && getBaseForm'] = function () use ($words, $morphy) {
   $result = ['lemmatize' => [], 'getBaseForm' => []];
@@ -249,133 +249,133 @@ $tests['findWord bulk'] = function () use ($words, $morphy) {
 };
 
 
-//$tests['getAllForms'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $res[] = $morphy->getAllForms($word);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getAllForms bulk'] = function () use ($words, $morphy) {
-//  return $morphy->getAllForms($words);
-//};
-//
-//
-//$tests['getPseudoRoot'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $res[] = $morphy->getPseudoRoot($word);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getPseudoRoot bulk'] = function () use ($words, $morphy) {
-//  return $morphy->getPseudoRoot($words);
-//};
-//
-//
-//$tests['getPartOfSpeech'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $res[] = $morphy->getPartOfSpeech($word);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getPartOfSpeech bulk'] = function () use ($words, $morphy) {
-//  return $morphy->getPartOfSpeech($words);
-//};
-//
-//
-//$tests['getAllFormsWithGramInfo'] = function () use ($words, $morphy) {
-//  $res = [
-//    'asText' => [],
-//    '!asText' => []
-//  ];
-//
-//  foreach ($words as $word) {
-//    $res['asText'][] = $morphy->getAllFormsWithGramInfo($word, true);
-//    $res['!asText'][] = $morphy->getAllFormsWithGramInfo($word, false);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getAllFormsWithGramInfo bulk'] = function () use ($words, $morphy) {
-//  $res = [
-//    'asText' => $morphy->getAllFormsWithGramInfo($words, true),
-//    '!asText' => $morphy->getAllFormsWithGramInfo($words, false)
-//  ];
-//
-//  return $res;
-//};
-//
-//
-//$tests['getAllFormsWithAncodes'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $res[] = $morphy->getAllFormsWithAncodes($word);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getAllFormsWithAncodes bulk'] = function () use ($words, $morphy) {
-//  return $morphy->getAllFormsWithAncodes($words);
-//};
-//
-//
-//$tests['getAncode'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $res[] = $morphy->getAncode($word);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getAncode bulk'] = function () use ($words, $morphy) {
-//  return $morphy->getAncode($words);
-//};
-//
-//
-//$tests['getGramInfo'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $res[] = $morphy->getGramInfo($word);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getGramInfo bulk'] = function () use ($words, $morphy) {
-//  return $morphy->getGramInfo($words);
-//};
-//
-//
-//$tests['getGramInfoMergeForms'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $res[] = $morphy->getGramInfoMergeForms($word);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['getGramInfoMergeForms bulk'] = function () use ($words, $morphy) {
-//  return $morphy->getGramInfoMergeForms($words);
-//};
+$tests['getAllForms'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $res[] = $morphy->getAllForms($word);
+  }
+
+  return $res;
+};
+
+$tests['getAllForms bulk'] = function () use ($words, $morphy) {
+  return $morphy->getAllForms($words);
+};
+
+
+$tests['getPseudoRoot'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $res[] = $morphy->getPseudoRoot($word);
+  }
+
+  return $res;
+};
+
+$tests['getPseudoRoot bulk'] = function () use ($words, $morphy) {
+  return $morphy->getPseudoRoot($words);
+};
+
+
+$tests['getPartOfSpeech'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $res[] = $morphy->getPartOfSpeech($word);
+  }
+
+  return $res;
+};
+
+$tests['getPartOfSpeech bulk'] = function () use ($words, $morphy) {
+  return $morphy->getPartOfSpeech($words);
+};
+
+
+$tests['getAllFormsWithGramInfo'] = function () use ($words, $morphy) {
+  $res = [
+    'asText' => [],
+    '!asText' => []
+  ];
+
+  foreach ($words as $word) {
+    $res['asText'][] = $morphy->getAllFormsWithGramInfo($word, true);
+    $res['!asText'][] = $morphy->getAllFormsWithGramInfo($word, false);
+  }
+
+  return $res;
+};
+
+$tests['getAllFormsWithGramInfo bulk'] = function () use ($words, $morphy) {
+  $res = [
+    'asText' => $morphy->getAllFormsWithGramInfo($words, true),
+    '!asText' => $morphy->getAllFormsWithGramInfo($words, false)
+  ];
+
+  return $res;
+};
+
+
+$tests['getAllFormsWithAncodes'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $res[] = $morphy->getAllFormsWithAncodes($word);
+  }
+
+  return $res;
+};
+
+$tests['getAllFormsWithAncodes bulk'] = function () use ($words, $morphy) {
+  return $morphy->getAllFormsWithAncodes($words);
+};
+
+
+$tests['getAncode'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $res[] = $morphy->getAncode($word);
+  }
+
+  return $res;
+};
+
+$tests['getAncode bulk'] = function () use ($words, $morphy) {
+  return $morphy->getAncode($words);
+};
+
+
+$tests['getGramInfo'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $res[] = $morphy->getGramInfo($word);
+  }
+
+  return $res;
+};
+
+$tests['getGramInfo bulk'] = function () use ($words, $morphy) {
+  return $morphy->getGramInfo($words);
+};
+
+
+$tests['getGramInfoMergeForms'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $res[] = $morphy->getGramInfoMergeForms($word);
+  }
+
+  return $res;
+};
+
+$tests['getGramInfoMergeForms bulk'] = function () use ($words, $morphy) {
+  return $morphy->getGramInfoMergeForms($words);
+};
 
 $tests['castFormByGramInfo'] = function () use ($words, $morphy) {
   $res = [];

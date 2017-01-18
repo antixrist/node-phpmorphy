@@ -83,10 +83,7 @@ class Morphy {
     this.lang = opts.lang;
     this.dir = opts.dir;
     this.options = opts;
-  
-    // force
-    // this.options.graminfo_as_text = true;
-  
+    
     this.morpher = new phpMorphy(this.dir, this.lang, this.options);
   }
 
