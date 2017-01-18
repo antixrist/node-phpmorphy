@@ -1,6 +1,6 @@
 {
   "name": "phpmorphy",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "scripts": {
     "rebuilder": "webpack --watch",
     "build": "webpack",
