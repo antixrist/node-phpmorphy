@@ -1,0 +1,49 @@
+{
+  "name": "phpmorphy",
+  "version": "2.0.1",
+  "scripts": {
+    "rebuilder": "webpack --watch",
+    "build": "webpack",
+    "build:production": "cross-env NODE_ENV=production webpack",
+    "dev": "cross-env NODE_ENV=development nodemon",
+    "start": "cross-env NODE_ENV=production node",
+    "test": "node ./build/test"
+  },
+  "main": "./build/index.js",
+  "dependencies": {
+    "encoding": "^0.1.12",
+    "lodash": "^4.17.4",
+    "path-exists": "^3.0.0",
+    "phpjs": "^1.3.2",
+    "phpunserialize": "^1.0.1"
+  },
+  "keywords": [
+    "phpmorphy",
+    "morphy",
+    "morphology",
+    "lemma",
+    "lemmatize",
+    "grammar"
+  ],
+  "engines": {
+    "node": ">= 5.10.0",
+    "npm": ">= 3.0.0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.18.0",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-closure-elimination": "^1.1.14",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-env": "^1.1.8",
+    "circular-dependency-plugin": "^2.0.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "cross-env": "^3.1.4",
+    "glob": "^7.1.1",
+    "nodemon": "^1.11.0",
+    "source-map-loader": "^0.1.6",
+    "source-map-support": "^0.4.8",
+    "webpack": "2.2.0-rc.3"
+  }
+}
