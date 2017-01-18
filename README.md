@@ -120,7 +120,7 @@ morphy.getEncoding();
 /** @returns {string} */
 morphy.getLocale();
 ```
-Возвращает код языка. В формате: *`ISO3166` код страны* + *символ '_'* + *`ISO639` код языка*.
+Возвращает код языка. В формате: *`ISO3166` код страны* + *'_'* + *`ISO639` код языка*.
 `ru_RU` или `en_EN` или `uk_UA` и т.д., в зависимости от словаря.
 
 ***
@@ -166,24 +166,27 @@ morphy.isLastPredicted();
 Возвращает `true` если при анализе последнего слова выяснилось, что слово отсутствует в словаре и было предсказано. `false` в ином случае.
 
 ```javascript
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
 // слова ГЛОКАЯ нет в словаре, слово ТЕСТ есть в словаре
-console.log(morphy.lemmatize('ГЛОКАЯ', Morphy.NORMAL));
+log(morphy.lemmatize('ГЛОКАЯ', Morphy.NORMAL));
 // 'ГЛОКАЯ'
-console.log(morphy.isLastPredicted());
+log(morphy.isLastPredicted());
 // TRUE (слово было предсказано)
  
-console.log(morphy.lemmatize('ГЛОКАЯ', Morphy.IGNORE_PREDICT)); 
+log(morphy.lemmatize('ГЛОКАЯ', Morphy.IGNORE_PREDICT)); 
 // FALSE
 // если предыдущий вызов вернул FALSE, то isLastPredicted() возвращает FALSE
-console.log(morphy.isLastPredicted());
+log(morphy.isLastPredicted());
 // FALSE
 
 morphy.lemmatize('ТЕСТ', Morphy.NORMAL);
-console.log(morphy.isLastPredicted());
+log(morphy.isLastPredicted());
 // FALSE (слово ТЕСТ было найдено в словаре)
  
 morphy.lemmatize('ТЕСТ', Morphy.ONLY_PREDICT);
-console.log(morphy.isLastPredicted());
+log(morphy.isLastPredicted());
 // TRUE (был использован режим ONLY_PREDICT соответственно ТЕСТ было предсказано)
 ```
 
@@ -202,22 +205,25 @@ morphy.getLastPredictionType();
 3. `Morphy.PREDICT_BY_DB` – слово было предсказано по базе окончаний.
 
 ```javascript
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
 morphy.lemmatize('ТЕСТ', Morphy.NORMAL);
 // слово ТЕСТ есть в словаре, предсказание не использовалось.
-console.log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE);
+log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE);
 // TRUE
  
 morphy.lemmatize('ГЛОКАЯ', Morphy.IGNORE_PREDICT);
 // слово ГЛОКАЯ отсутствует в  словаре, предсказать не удалось (lemmatize вернул FALSE).
-console.log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE);
+log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE);
 // TRUE
  
 morphy.lemmatize('ТЕСТДРАЙВ', Morphy.ONLY_PREDICT);
-console.log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_SUFFIX);
+log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_SUFFIX);
 // TRUE
  
 morphy.lemmatize('ПОДФИГАЧИТЬ', Morphy.ONLY_PREDICT);
-console.log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_DB);
+log(morphy.getLastPredictionType() == Morphy.PREDICT_BY_DB);
 // TRUE
 ```
 
@@ -245,19 +251,25 @@ morphy.getAllFormsWithGramInfo(word, type);
 Благодаря некоторым оптимизациям внутри кода, позволяет увеличить скорость обработки слов на ~50%. В данном режиме функция возвращает массив, в качестве ключа выступает исходное слово, соответствующее значение – результат.
 
 ```javascript
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
 const words = ['СОБАКА', 'КОШКА'];
 const result = {};
 
 words.forEach(word => result[word] = morphy.lemmatize(word));
 
-console.log(result);
+log(result);
 // { 'СОБАКА': [ 'СОБАКА' ], 'КОШКА': [ 'КОШКА' ] }
 ```
 `result` можно получить на 50% быстрее в `bulk`-режиме:
 ```javascript
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
 const words = ['СОБАКА', 'КОШКА'];
 const result = morphy.lemmatize(words);
-console.log(result);
+log(result);
 // { 'СОБАКА': [ 'СОБАКА' ], 'КОШКА': [ 'КОШКА' ] }
 ```
 
@@ -288,7 +300,9 @@ morphy.findWord(word, type);
 Используется для детального анализа слов.
 
 ```javascript
-const log = console.log.bind(console);
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
 const word = 'ДУША';
 const paradigms = morphy.findWord(word);
 
@@ -359,18 +373,17 @@ morphy.lemmatize(word, type);
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
-
-log(inspect(morphy.lemmatize('КОЛБАСЫ'))); // [ 'КОЛБАСА' ]
-log(inspect(morphy.lemmatize('ТЕСТ'))); // [ 'ТЕСТ', 'ТЕСТО' ]
+log(morphy.lemmatize('КОЛБАСЫ')); // [ 'КОЛБАСА' ]
+log(morphy.lemmatize('ТЕСТ')); // [ 'ТЕСТ', 'ТЕСТО' ]
 
 // ТЕСТ отождествляется с формами слов
 // ТЕСТ – единственное число, именительный, винительный падежи
 // ТЕСТО – множественное число, родительный падеж
-log(inspect(morphy.lemmatize('ГЛОКАЯ', Morphy.IGNORE_PREDICT))); // FALSE
+log(morphy.lemmatize('ГЛОКАЯ', Morphy.IGNORE_PREDICT)); // FALSE
 
-log(inspect(morphy.lemmatize(['КОЛБАСЫ', 'ТЕСТ', 'ГЛОКАЯ'], Morphy.IGNORE_PREDICT)));
+log(morphy.lemmatize(['КОЛБАСЫ', 'ТЕСТ', 'ГЛОКАЯ'], Morphy.IGNORE_PREDICT));
 // {
 //   'ТЕСТ': [ 'ТЕСТ', 'ТЕСТО' ],
 //   'КОЛБАСЫ': [ 'КОЛБАСА' ],
@@ -403,8 +416,11 @@ morphy.getAllForms(word, type);
 Возвращает список всех форм (в виде массива) для слова. Если word отождествляется с формами разных слов, словоформы для каждого слова сливаются в один массив.
 
 ```javascript
-const result = morphy.getAllForms('ТЕСТ');
-// В result помещаются все формы для слов ТЕСТ и ТЕСТО:
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
+log(morphy.getAllForms('ТЕСТ'));
+// все формы для слов ТЕСТ и ТЕСТО:
 // [ 'ТЕСТ', 'ТЕСТА', 'ТЕСТУ', 'ТЕСТОМ', 'ТЕСТЕ', 'ТЕСТЫ', 'ТЕСТОВ', 'ТЕСТАМ', 'ТЕСТАМИ', 'ТЕСТАХ', 'ТЕСТО' ]
 ```
 
@@ -422,10 +438,10 @@ morphy.getPseudoRoot(word, type);
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
-log(inspect(morphy.getPseudoRoot('ТЕСТ'))); // [ 'ТЕСТ' ]
-log(inspect(morphy.getPseudoRoot('ДЕТЕЙ'))); // [ '' ]
+log(morphy.getPseudoRoot('ТЕСТ')); // [ 'ТЕСТ' ]
+log(morphy.getPseudoRoot('ДЕТЕЙ')); // [ '' ]
 ```
 
 ***
@@ -442,13 +458,13 @@ morphy.getPartOfSpeech(word, type);
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
 // ТЕСТ образовывается от ТЕСТ и ТЕСТО, однако оба слова являются существительными
-log(inspect(morphy.getPartOfSpeech('ТЕСТ'))); // [ 'С' ]
+log(morphy.getPartOfSpeech('ТЕСТ')); // [ 'С' ]
 
 // ДУША образовывается от ДУШ, ДУША и ДУШИТЬ
-log(inspect(morphy.getPartOfSpeech('ДУША'))); // [ 'С', 'ДЕЕПРИЧАСТИЕ' ]
+log(morphy.getPartOfSpeech('ДУША')); // [ 'С', 'ДЕЕПРИЧАСТИЕ' ]
 ```
 
 ***
@@ -467,12 +483,9 @@ morphy.getAllFormsWithGramInfo(word, asText, type);
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
-let result;
-
-result = morphy.getAllFormsWithGramInfo('ТЕСТ', true);
-log(inspect(result));
+log(morphy.getAllFormsWithGramInfo('ТЕСТ', true));
 /*
 [
   // омоним №1
@@ -545,8 +558,7 @@ log(inspect(result));
 ]
 */
 
-result = morphy.getAllFormsWithGramInfo('ТЕСТ', false);
-log(inspect(result));
+log(morphy.getAllFormsWithGramInfo('ТЕСТ', false));
 /*
 [
   // омоним №1
@@ -631,15 +643,15 @@ morphy.getAllFormsWithAncodes(word, type);
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
 let morphy;
 
 morphy = new Morphy('ru', {
-  resolve_ancode: Morphy.RESOLVE_ANCODES_AS_INT // <==
+  resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_INT // <==
 });
 
-log(inspect(morphy.getAllFormsWithAncodes('Я')));
+log(morphy.getAllFormsWithAncodes('Я'));
 /*
 [
   {
@@ -651,10 +663,10 @@ log(inspect(morphy.getAllFormsWithAncodes('Я')));
 */
 
 morphy = new Morphy('ru', {
-  resolve_ancode: Morphy.RESOLVE_ANCODES_AS_DIALING // <==
+  resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_DIALING // <==
 });
 
-log(inspect(morphy.getAllFormsWithAncodes('Я')));
+log(morphy.getAllFormsWithAncodes('Я'));
 /*
 [
   {
@@ -680,15 +692,15 @@ morphy.getAncode(word, type);
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
 let morphy;
 
 morphy = new Morphy('ru', {
-  resolve_ancode: Morphy.RESOLVE_ANCODES_AS_TEXT // <==
+  resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_TEXT // <==
 });
 
-log(inspect(morphy.getAncode('ТЕСТ')));
+log(morphy.getAncode('ТЕСТ'));
 /*
 [
   {common: ' НО', all: ['С МР,ЕД,ИМ', 'С МР,ЕД,ВН']},
@@ -697,10 +709,10 @@ log(inspect(morphy.getAncode('ТЕСТ')));
 */
 
 morphy = new Morphy('ru', {
-  resolve_ancode: Morphy.RESOLVE_ANCODES_AS_INT // <==
+  resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_INT // <==
 });
 
-log(inspect(morphy.getAncode('ТЕСТ')));
+log(morphy.getAncode('ТЕСТ'));
 /*
 [
   {common: 687, all: [0, 4]},
@@ -709,10 +721,10 @@ log(inspect(morphy.getAncode('ТЕСТ')));
 */
 
 morphy = new Morphy('ru', {
-  resolve_ancode: Morphy.RESOLVE_ANCODES_AS_DIALING // <==
+  resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_DIALING // <==
 });
 
-log(inspect(morphy.getAncode('ТЕСТ')));
+log(morphy.getAncode('ТЕСТ'));
 /*
 [
   {common: 'Фа', all: ['аа', 'аг']},
@@ -734,9 +746,9 @@ morphy.getGramInfo(word, type);
 Возвращает грамматическую информацию для слова
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
-log(inspect(morphy.getGramInfo('ТЕСТ')));
+log(morphy.getGramInfo('ТЕСТ'));
 /*
 [
   [
@@ -762,9 +774,9 @@ morphy.getGramInfoMergeForms(word, type);
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
-log(inspect(morphy.getGramInfoMergeForms('ТЕСТ')));
+log(morphy.getGramInfoMergeForms('ТЕСТ'));
 
 /*
 [
@@ -805,12 +817,12 @@ morphy.castFormByGramInfo(word, partOfSpeech, grammems, returnOnlyWord = false, 
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
 const word = 'ШКАФ';
  
 // поставим слово ШКАФ в множественное число, предложный падеж
-log(inspect(morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], false)));
+log(morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], false));
 /*
 [
   {
@@ -823,7 +835,7 @@ log(inspect(morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], false)));
 */
  
 // возвращает только слово, без грамматической информации
-log(inspect(morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], true)));
+log(morphy.castFormByGramInfo(word, null, ['МН', 'ПР'], true));
 // [ 'ШКАФАХ' ]
  
 // применим пользовательский фильтр
@@ -836,12 +848,12 @@ function cast_predicate (form, partOfSpeech, grammems, formNo) {
 }
  
 // приведём ШКАФ в именительный падеж
-log(inspect(morphy.castFormByGramInfo(word, null, null, true, cast_predicate)));
+log(morphy.castFormByGramInfo(word, null, null, true, cast_predicate));
 // [ 'ШКАФ', 'ШКАФЫ' ]
  
 // выберем краткое прилагательное единственного числа, женского рода.
 // если не указать часть речи, будут выбраны все прилагательные единственного числа, женского рода
-log(inspect(morphy.castFormByGramInfo('КРАСНЫЙ', 'КР_ПРИЛ', ['ЕД', 'ЖР'], true)));
+log(morphy.castFormByGramInfo('КРАСНЫЙ', 'КР_ПРИЛ', ['ЕД', 'ЖР'], true));
 // [ 'КРАСНА' ]
 ```
 
@@ -863,22 +875,28 @@ morphy.castFormByPattern (word, patternWord, grammemsProvider, returnOnlyWord, c
 
 ```javascript
 const { inspect } = require('util');
-const log = console.log.bind(console);
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
 
-log(inspect(morphy.castFormByPattern('ДИВАН', 'СТОЛАМИ', null, true))); 
+log(morphy.castFormByPattern('ДИВАН', 'СТОЛАМИ', null, true)); 
 // [ 'ДИВАНАМИ' ]
 ```
 
 Сложность возникает, если некоторые граммемы у слов не совпадают. Т.к. данная функция ищет в парадигме слова `word` форму, у которой граммемы совпадают с граммемами `patternWord`, то в таких случаях на выходе получим пустой результат. Например, `ДИВАН` и `КРОВАТЬ` имеют разный род (мужской и женский соответственно).
 
 ```javascript
-log(inspect(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true)));
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
+log(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true));
 // []
 ```
 
 Нам требуется указать, что род сравнивать не нужно. Можно это сделать следующим способом:
 
 ```javascript
+const { inspect } = require('util');
+function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+
 const provider = morphy.getGrammemsProvider();
 provider.excludeGroups('С', 'род');
 /*
@@ -902,14 +920,14 @@ provider.excludeGroups('С', 'род');
  
 следует помнить, что все данные должны быть в кодировке словаря
 */
-log(inspect(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', provider, true)));
+log(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', provider, true));
 // [ 'ДИВАНАМИ' ]
-log(inspect(morphy.castFormByPattern('КРЕСЛО', 'СТУЛЬЯМИ', provider, true)));
+log(morphy.castFormByPattern('КРЕСЛО', 'СТУЛЬЯМИ', provider, true));
 // [ 'КРЕСЛАМИ' ]
 
 // Чтобы не передавать provider каждый раз, можно сделать изменения глобально
 morphy.getDefaultGrammemsProvider().excludeGroups('С', 'род');
-log(inspect(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true))); 
+log(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true)); 
 // [ 'ДИВАНАМИ' ]
 ```
 
