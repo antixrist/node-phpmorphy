@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import path from 'path';
 import encoding from 'encoding';
-import jschardet from 'jschardet';
 import { exec } from 'child_process';
 import { inspect, logger, isStringifyedNumber } from '../utils';
 import Morphy from '../';

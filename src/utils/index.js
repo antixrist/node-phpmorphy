@@ -236,23 +236,23 @@ php.substr = function php$substr (str, start, len) {
   return php._substr.apply(php._substr, arguments);
 };
 
-/**
- * @param raw
- * @returns {String|null}
- */
-function detectEncoding (raw) {
-  let buffer, result;
-  if (Buffer.isBuffer(raw)) {
-    buffer = raw;
-  } else {
-    raw = (_.isString(raw)) ? raw : raw +'';
-    buffer = Buffer.from(raw, 'binary');
-  }
-  
-  result = jschardet.detect(buffer);
-  
-  return (result.encoding) ? result.encoding : null;
-}
+// /**
+//  * @param raw
+//  * @returns {String|null}
+//  */
+// function detectEncoding (raw) {
+//   let buffer, result;
+//   if (Buffer.isBuffer(raw)) {
+//     buffer = raw;
+//   } else {
+//     raw = (_.isString(raw)) ? raw : raw +'';
+//     buffer = Buffer.from(raw, 'binary');
+//   }
+//
+//   result = jschardet.detect(buffer);
+//
+//   return (result.encoding) ? result.encoding : null;
+// }
 
 /**
  * @param any
@@ -340,7 +340,7 @@ export {
   // detectCharset,
   // convert,
   php,
-  detectEncoding,
+  // detectEncoding,
   isStringifyedNumber,
   toBuffer,
   buffer2str,
