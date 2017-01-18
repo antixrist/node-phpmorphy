@@ -334,7 +334,7 @@ class phpMorphy {
    */
   getPseudoRoot (word, type = NORMAL) {
     word = toBuffer(word);
-
+    
     return this.invoke('getPseudoRoot', word, type);
   }
 
@@ -550,7 +550,7 @@ class phpMorphy {
   invoke (method, word, type) {
     this.last_prediction_type = PREDICT_BY_NONE;
     word = toBuffer(word);
-
+    
     let result;
     let not_found;
 
@@ -577,12 +577,12 @@ class phpMorphy {
       });
     } else {
       result = this.__common_morphier[method](word);
-      
+  
       if (!result && type !== IGNORE_PREDICT) {
         result = this.predictWord(method, word);
       }
     }
-
+    
     return result;
   }
 

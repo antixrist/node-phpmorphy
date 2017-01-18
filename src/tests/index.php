@@ -127,128 +127,128 @@ $tests = [];
 //
 //  return $result;
 //};
-//
-//$tests['lemmatize && getBaseForm'] = function () use ($words, $morphy) {
-//  $result = ['lemmatize' => [], 'getBaseForm' => []];
-//
-//  foreach ($words as $word) {
-//    $result['lemmatize'][$word] = $morphy->lemmatize($word);
-//  }
-//  foreach ($words as $word) {
-//    $result['getBaseForm'][$word] = $morphy->getBaseForm($word);
-//  }
-//
-//  return $result;
-//};
-//
-//$tests['lemmatize bulk && getBaseForm bulk'] = function () use ($words, $morphy) {
-//  $result = [];
-//
-//  $result['lemmatize'] = $morphy->lemmatize($words);
-//  $result['getBaseForm'] = $morphy->getBaseForm($words);
-//
-//  return $result;
-//};
-//
-//
-//function testFoundWordParadigms ($paradigms, &$res) {
-//  if (!$paradigms) { return; }
-//
-//  $res[] = $paradigms instanceof phpMorphy_WordDescriptor_Collection;
-//  $res[] = count($paradigms);
-//
-//  foreach ($paradigms as $paradigm) {
-//    $res[] = $paradigm instanceof phpMorphy_WordDescriptor;
-//    $res[] = count($paradigm);
-//
-//    $res[] = $paradigm->getBaseForm();
-//    $res[] = $paradigm->getPseudoRoot();
-//
-//    $res[] = $paradigm->getAllForms();
-//    $res[] = count($paradigm->getFoundWordForm());
-//
-//    $res[] = $paradigm->hasGrammems('НО');
-//    $res[] = $paradigm->hasGrammems('ИМ');
-//    $res[] = count($paradigm->getWordFormsByGrammems('НО'));
-//    $res[] = count($paradigm->getWordFormsByGrammems('ИМ'));
-//
-//    $res[] = $paradigm->hasPartOfSpeech('С');
-//    $res[] = $paradigm->hasPartOfSpeech('ДЕЕПРИЧАСТИЕ');
-//    $res[] = count($paradigm->getWordFormsByPartOfSpeech('С'));
-//    $res[] = count($paradigm->getWordFormsByPartOfSpeech('ДЕЕПРИЧАСТИЕ'));
-//  }
-//
-//  $res[] = count($paradigms->getByPartOfSpeech('С'));
-//
-//  foreach ($paradigms->getByPartOfSpeech('С') as $paradigm) {
-//    $res[] = $paradigm instanceof phpMorphy_WordDescriptor;
-//    $res[] = count($paradigm);
-//    $res[] = count($paradigm)
-//      ? $paradigm->getWordForm(0) instanceof phpMorphy_WordDescriptor
-//      : null
-//    ;
-//
-//    $formsOfSourceWord = $paradigm->getFoundWordForm();
-//    $res[] = count($formsOfSourceWord);
-//
-//    foreach ($formsOfSourceWord as $form) {
-//      $res[] = $form instanceof phpMorphy_WordForm;
-//      $res[] = $form->getWord();
-//      $res[] = $form->getFormNo();
-//      $res[] = $form->getGrammems();
-//      $res[] = $form->hasGrammems(['ЕД', 'РД']);
-//      $res[] = $form->getPartOfSpeech();
-//    };
-//
-//    $sampleFormsByGrammem = $paradigm->getWordFormsByGrammems('ИМ');
-//    $res[] = count($sampleFormsByGrammem);
-//
-//    foreach ($sampleFormsByGrammem as $form) {
-//      $res[] = $form instanceof phpMorphy_WordForm;
-//      $res[] = $form->getWord();
-//      $res[] = $form->getFormNo();
-//      $res[] = $form->getGrammems();
-//      $res[] = $form->hasGrammems(['ЕД', 'РД']);
-//      $res[] = $form->getPartOfSpeech();
-//    };
-//
-//    $sampleFormsByPartOfSpeech = $paradigm->getWordFormsByPartOfSpeech('С');
-//    $res[] = count($sampleFormsByPartOfSpeech);
-//
-//    foreach ($sampleFormsByPartOfSpeech as $form) {
-//      $res[] = $form instanceof phpMorphy_WordForm;
-//      $res[] = $form->getWord();
-//      $res[] = $form->getFormNo();
-//      $res[] = $form->getGrammems();
-//      $res[] = $form->hasGrammems(['ЕД', 'РД']);
-//      $res[] = $form->getPartOfSpeech();
-//    };
-//  }
-//}
-//
-//$tests['findWord'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($words as $word) {
-//    $paradigms = $morphy->findWord($word);
-//
-//    testFoundWordParadigms($paradigms, $res);
-//  }
-//
-//  return $res;
-//};
-//
-//$tests['findWord bulk'] = function () use ($words, $morphy) {
-//  $res = [];
-//
-//  foreach ($morphy->findWord($words) as $word => $paradigms) {
-//    testFoundWordParadigms($paradigms, $res);
-//  }
-//
-//  return $res;
-//};
-//
-//
+
+$tests['lemmatize && getBaseForm'] = function () use ($words, $morphy) {
+  $result = ['lemmatize' => [], 'getBaseForm' => []];
+
+  foreach ($words as $word) {
+    $result['lemmatize'][$word] = $morphy->lemmatize($word);
+  }
+  foreach ($words as $word) {
+    $result['getBaseForm'][$word] = $morphy->getBaseForm($word);
+  }
+
+  return $result;
+};
+
+$tests['lemmatize bulk && getBaseForm bulk'] = function () use ($words, $morphy) {
+  $result = [];
+
+  $result['lemmatize'] = $morphy->lemmatize($words);
+  $result['getBaseForm'] = $morphy->getBaseForm($words);
+
+  return $result;
+};
+
+
+function testFoundWordParadigms ($paradigms, &$res) {
+  if (!$paradigms) { return; }
+
+  $res[] = $paradigms instanceof phpMorphy_WordDescriptor_Collection;
+  $res[] = count($paradigms);
+
+  foreach ($paradigms as $paradigm) {
+    $res[] = $paradigm instanceof phpMorphy_WordDescriptor;
+    $res[] = count($paradigm);
+
+    $res[] = $paradigm->getBaseForm();
+    $res[] = $paradigm->getPseudoRoot();
+
+    $res[] = $paradigm->getAllForms();
+    $res[] = count($paradigm->getFoundWordForm());
+
+    $res[] = $paradigm->hasGrammems('НО');
+    $res[] = $paradigm->hasGrammems('ИМ');
+    $res[] = count($paradigm->getWordFormsByGrammems('НО'));
+    $res[] = count($paradigm->getWordFormsByGrammems('ИМ'));
+
+    $res[] = $paradigm->hasPartOfSpeech('С');
+    $res[] = $paradigm->hasPartOfSpeech('ДЕЕПРИЧАСТИЕ');
+    $res[] = count($paradigm->getWordFormsByPartOfSpeech('С'));
+    $res[] = count($paradigm->getWordFormsByPartOfSpeech('ДЕЕПРИЧАСТИЕ'));
+  }
+
+  $res[] = count($paradigms->getByPartOfSpeech('С'));
+
+  foreach ($paradigms->getByPartOfSpeech('С') as $paradigm) {
+    $res[] = $paradigm instanceof phpMorphy_WordDescriptor;
+    $res[] = count($paradigm);
+    $res[] = count($paradigm)
+      ? $paradigm->getWordForm(0) instanceof phpMorphy_WordDescriptor
+      : null
+    ;
+
+    $formsOfSourceWord = $paradigm->getFoundWordForm();
+    $res[] = count($formsOfSourceWord);
+
+    foreach ($formsOfSourceWord as $form) {
+      $res[] = $form instanceof phpMorphy_WordForm;
+      $res[] = $form->getWord();
+      $res[] = $form->getFormNo();
+      $res[] = $form->getGrammems();
+      $res[] = $form->hasGrammems(['ЕД', 'РД']);
+      $res[] = $form->getPartOfSpeech();
+    };
+
+    $sampleFormsByGrammem = $paradigm->getWordFormsByGrammems('ИМ');
+    $res[] = count($sampleFormsByGrammem);
+
+    foreach ($sampleFormsByGrammem as $form) {
+      $res[] = $form instanceof phpMorphy_WordForm;
+      $res[] = $form->getWord();
+      $res[] = $form->getFormNo();
+      $res[] = $form->getGrammems();
+      $res[] = $form->hasGrammems(['ЕД', 'РД']);
+      $res[] = $form->getPartOfSpeech();
+    };
+
+    $sampleFormsByPartOfSpeech = $paradigm->getWordFormsByPartOfSpeech('С');
+    $res[] = count($sampleFormsByPartOfSpeech);
+
+    foreach ($sampleFormsByPartOfSpeech as $form) {
+      $res[] = $form instanceof phpMorphy_WordForm;
+      $res[] = $form->getWord();
+      $res[] = $form->getFormNo();
+      $res[] = $form->getGrammems();
+      $res[] = $form->hasGrammems(['ЕД', 'РД']);
+      $res[] = $form->getPartOfSpeech();
+    };
+  }
+}
+
+$tests['findWord'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($words as $word) {
+    $paradigms = $morphy->findWord($word);
+
+    testFoundWordParadigms($paradigms, $res);
+  }
+
+  return $res;
+};
+
+$tests['findWord bulk'] = function () use ($words, $morphy) {
+  $res = [];
+
+  foreach ($morphy->findWord($words) as $word => $paradigms) {
+    testFoundWordParadigms($paradigms, $res);
+  }
+
+  return $res;
+};
+
+
 //$tests['getAllForms'] = function () use ($words, $morphy) {
 //  $res = [];
 //

@@ -150,132 +150,132 @@ async function runLocalTests (words, morphy) {
   //
   //   return res;
   // };
-  //
-  // tests['lemmatize && getBaseForm'] = () => {
-  //   let res = { lemmatize: {}, getBaseForm: {} };
-  //
-  //   words.forEach(word => res.lemmatize[word] = morphy.lemmatize(word));
-  //   words.forEach(word => res.getBaseForm[word] = morphy.getBaseForm(word));
-  //
-  //   return res;
-  // };
-  //
-  // tests['lemmatize bulk && getBaseForm bulk'] = () => {
-  //   let res = {};
-  //
-  //   res.lemmatize = morphy.lemmatize(words);
-  //   res.getBaseForm = morphy.getBaseForm(words);
-  //
-  //   return res;
-  // };
-  //
-  // /**
-  //  * @param {Morphy_WordDescriptor_Collection} paradigms
-  //  * @param {Array} res
-  //  */
-  // function testFoundWordParadigms (paradigms, res) {
-  //   if (!paradigms) { return; }
-  //
-  //   res.push(
-  //     paradigms instanceof Morphy_WordDescriptor_Collection,
-  //     paradigms.length
-  //   );
-  //
-  //   paradigms.forEach(paradigm => {
-  //     res.push(
-  //       paradigm instanceof Morphy_WordDescriptor,
-  //       paradigm.length,
-  //
-  //       paradigm.getBaseForm(),
-  //       paradigm.getPseudoRoot(),
-  //
-  //       paradigm.getAllForms(),
-  //       paradigm.getFoundWordForm().length,
-  //
-  //       paradigm.hasGrammems('НО'),
-  //       paradigm.hasGrammems('ИМ'),
-  //       paradigm.getWordFormsByGrammems('НО').length,
-  //       paradigm.getWordFormsByGrammems('ИМ').length,
-  //
-  //       paradigm.hasPartOfSpeech('С'),
-  //       paradigm.hasPartOfSpeech('ДЕЕПРИЧАСТИЕ'),
-  //       paradigm.getWordFormsByPartOfSpeech('С').length,
-  //       paradigm.getWordFormsByPartOfSpeech('ДЕЕПРИЧАСТИЕ').length
-  //     );
-  //   });
-  //
-  //   res.push(
-  //     paradigms.getByPartOfSpeech('С').length
-  //   );
-  //
-  //   paradigms.getByPartOfSpeech('С').forEach(paradigm => {
-  //     res.push(
-  //       paradigm instanceof Morphy_WordDescriptor,
-  //       paradigm.length,
-  //       paradigm.length
-  //         ? paradigm.getWordForm(0) instanceof Morphy_WordDescriptor
-  //         : null
-  //     );
-  //
-  //     const formsOfSourceWord = paradigm.getFoundWordForm();
-  //     res.push(formsOfSourceWord.length);
-  //
-  //     formsOfSourceWord.forEach(form => res.push(
-  //       form instanceof Morphy_WordForm,
-  //       form.getWord(),
-  //       form.getFormNo(),
-  //       form.getGrammems(),
-  //       form.hasGrammems(['ЕД', 'РД']),
-  //       form.getPartOfSpeech()
-  //     ));
-  //
-  //     const sampleFormsByGrammem = paradigm.getWordFormsByGrammems('ИМ');
-  //     res.push(sampleFormsByGrammem.length);
-  //
-  //     sampleFormsByGrammem.forEach(form => res.push(
-  //       form instanceof Morphy_WordForm,
-  //       form.getWord(),
-  //       form.getFormNo(),
-  //       form.getGrammems(),
-  //       form.hasGrammems(['ЕД', 'РД']),
-  //       form.getPartOfSpeech()
-  //     ));
-  //
-  //     const sampleFormsByPartOfSpeech = paradigm.getWordFormsByPartOfSpeech('С');
-  //     res.push(sampleFormsByPartOfSpeech.length);
-  //
-  //     sampleFormsByPartOfSpeech.forEach(form => res.push(
-  //       form instanceof Morphy_WordForm,
-  //       form.getWord(),
-  //       form.getFormNo(),
-  //       form.getGrammems(),
-  //       form.hasGrammems(['ЕД', 'РД']),
-  //       form.getPartOfSpeech()
-  //     ));
-  //   });
-  // }
-  //
-  // tests['findWord'] = () => {
-  //   const res = [];
-  //
-  //   words.forEach(word => {
-  //     const paradigms = morphy.findWord(word);
-  //     testFoundWordParadigms(paradigms, res);
-  //   });
-  //
-  //   return res;
-  // };
-  //
-  // tests['findWord bulk'] = () => {
-  //   const res = [];
-  //
-  //   _.forEach(morphy.findWord(words), (paradigms, word) => {
-  //     testFoundWordParadigms(paradigms, res);
-  //   });
-  //
-  //   return res;
-  // };
-  //
+
+  tests['lemmatize && getBaseForm'] = () => {
+    let res = { lemmatize: {}, getBaseForm: {} };
+
+    words.forEach(word => res.lemmatize[word] = morphy.lemmatize(word));
+    words.forEach(word => res.getBaseForm[word] = morphy.getBaseForm(word));
+
+    return res;
+  };
+
+  tests['lemmatize bulk && getBaseForm bulk'] = () => {
+    let res = {};
+
+    res.lemmatize = morphy.lemmatize(words);
+    res.getBaseForm = morphy.getBaseForm(words);
+
+    return res;
+  };
+
+  /**
+   * @param {Morphy_WordDescriptor_Collection} paradigms
+   * @param {Array} res
+   */
+  function testFoundWordParadigms (paradigms, res) {
+    if (!paradigms) { return; }
+
+    res.push(
+      paradigms instanceof Morphy_WordDescriptor_Collection,
+      paradigms.length
+    );
+  
+    paradigms.forEach(paradigm => {
+      res.push(
+        paradigm instanceof Morphy_WordDescriptor,
+        paradigm.length,
+
+        paradigm.getBaseForm(),
+        paradigm.getPseudoRoot(),
+
+        paradigm.getAllForms(),
+        paradigm.getFoundWordForm().length,
+
+        paradigm.hasGrammems('НО'),
+        paradigm.hasGrammems('ИМ'),
+        paradigm.getWordFormsByGrammems('НО').length,
+        paradigm.getWordFormsByGrammems('ИМ').length,
+
+        paradigm.hasPartOfSpeech('С'),
+        paradigm.hasPartOfSpeech('ДЕЕПРИЧАСТИЕ'),
+        paradigm.getWordFormsByPartOfSpeech('С').length,
+        paradigm.getWordFormsByPartOfSpeech('ДЕЕПРИЧАСТИЕ').length
+      );
+    });
+
+    res.push(
+      paradigms.getByPartOfSpeech('С').length
+    );
+
+    paradigms.getByPartOfSpeech('С').forEach(paradigm => {
+      res.push(
+        paradigm instanceof Morphy_WordDescriptor,
+        paradigm.length,
+        paradigm.length
+          ? paradigm.getWordForm(0) instanceof Morphy_WordDescriptor
+          : null
+      );
+
+      const formsOfSourceWord = paradigm.getFoundWordForm();
+      res.push(formsOfSourceWord.length);
+
+      formsOfSourceWord.forEach(form => res.push(
+        form instanceof Morphy_WordForm,
+        form.getWord(),
+        form.getFormNo(),
+        form.getGrammems(),
+        form.hasGrammems(['ЕД', 'РД']),
+        form.getPartOfSpeech()
+      ));
+
+      const sampleFormsByGrammem = paradigm.getWordFormsByGrammems('ИМ');
+      res.push(sampleFormsByGrammem.length);
+
+      sampleFormsByGrammem.forEach(form => res.push(
+        form instanceof Morphy_WordForm,
+        form.getWord(),
+        form.getFormNo(),
+        form.getGrammems(),
+        form.hasGrammems(['ЕД', 'РД']),
+        form.getPartOfSpeech()
+      ));
+
+      const sampleFormsByPartOfSpeech = paradigm.getWordFormsByPartOfSpeech('С');
+      res.push(sampleFormsByPartOfSpeech.length);
+
+      sampleFormsByPartOfSpeech.forEach(form => res.push(
+        form instanceof Morphy_WordForm,
+        form.getWord(),
+        form.getFormNo(),
+        form.getGrammems(),
+        form.hasGrammems(['ЕД', 'РД']),
+        form.getPartOfSpeech()
+      ));
+    });
+  }
+
+  tests['findWord'] = () => {
+    const res = [];
+
+    words.forEach(word => {
+      const paradigms = morphy.findWord(word);
+      testFoundWordParadigms(paradigms, res);
+    });
+
+    return res;
+  };
+
+  tests['findWord bulk'] = () => {
+    const res = [];
+
+    _.forEach(morphy.findWord(words), (paradigms, word) => {
+      testFoundWordParadigms(paradigms, res);
+    });
+
+    return res;
+  };
+
   // tests['getAllForms'] = () => {
   //   return words.map(word => morphy.getAllForms(word));
   // };
