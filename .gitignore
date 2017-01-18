@@ -6,5 +6,4 @@ tmp
 npm-debug.log
 /logs
 /dist
-/build
 yarn-error.log
