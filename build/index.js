@@ -1,4 +1,4 @@
-require('source-map-support').install({ environment: 'node' });
+module.exports =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -5545,7 +5545,7 @@ module.exports = require("encoding");
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(__dirname) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -5986,7 +5986,6 @@ class Morphy {
 }
 
 exports.default = Morphy;
-/* WEBPACK VAR INJECTION */}.call(exports, "src"))
 
 /***/ },
 /* 18 */

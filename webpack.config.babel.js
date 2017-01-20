@@ -6,6 +6,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
 
 const cwd = process.cwd();
+const isProduction = process.env.NODE_ENV == 'production';
 const SCRIPTS_SOURCES = 'src';
 const SCRIPTS_TARGET = 'build';
 
@@ -39,11 +40,12 @@ const config = {
     filename: `[name].js`,
     chunkFilename: `[name].js`,
     /** папка назначения */
-    path: path.join(cwd, SCRIPTS_TARGET)
+    path: path.join(cwd, SCRIPTS_TARGET),
+    libraryTarget: "commonjs-module"
   },
   node: {
-    __dirname: true,
-    __filename: true
+    __dirname: false,
+    __filename: false
   },
   devtool: 'source-map',
   resolve: {
@@ -81,13 +83,14 @@ const config = {
       from: '**/*.!(js)',
       to: ''
     }]),
-    new CircularDependencyPlugin({ failOnError: false }),
+    new CircularDependencyPlugin({ failOnError: false })
+  ].concat(isProduction ? [] : [
     new BannerPlugin({
       banner: `require('source-map-support').install({ environment: 'node' });`,
       raw: true,
       entryOnly: false
     })
-  ],
+  ]),
   stats: {
     colors: true,
     chunks: false,
