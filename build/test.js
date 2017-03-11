@@ -1,3 +1,4 @@
+require('source-map-support').install({ environment: 'node' });
 module.exports =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -4834,7 +4835,10 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
       plen = prefix.length;
       slen = suffix.length;
 
-      if ((!plen || _utils.php.substr(word, 0, plen).equals(prefix)) && (!slen || _utils.php.substr(word, -slen).equals(suffix))) {
+      const partOfWordInPlaceOfPrefix = _utils.php.substr(word, 0, plen);
+      const partOfWordInPlaceOfSuffix = _utils.php.substr(word, -slen);
+
+      if ((!plen || partOfWordInPlaceOfPrefix && partOfWordInPlaceOfPrefix.equals(prefix)) && (!slen || partOfWordInPlaceOfSuffix && partOfWordInPlaceOfSuffix.equals(suffix))) {
         result.push(annot);
       }
     });
@@ -8658,7 +8662,7 @@ const log = function log(...args) {
 function cliEncode(any) {
   return Buffer.from(JSON.stringify(any)).toString('base64');
 }
-const phpTestsFile = _path2.default.join(_path2.default.relative(process.cwd(), __dirname), 'index.php');
+const phpTestsFile = _path2.default.join(_path2.default.relative(process.cwd(), __dirname), 'tests/index.php');
 function runPhpFileWithArgs(args, cb) {
   cb = _lodash2.default.isFunction(cb) ? cb : _lodash2.default.noop;
 
@@ -9127,7 +9131,7 @@ const opts = [{
 }];
 
 const words = [];
-words.push(...'глокая душа красный спать мурелки шлепают пельсиски стакелках светится мычай This has been a known bug with a known solution for at least since 2009 years but no one seems to be willing to fix it'.split(' '));
+words.push(...'ет глокая душа красный спать мурелки шлепают пельсиски стакелках светится мычай This has been a known bug with a known solution for at least since 2009 years but no one seems to be willing to fix it'.split(' '));
 
 var _$partition = _lodash2.default.partition(words, word => /^[a-z]+$/i.test(word)),
     _$partition2 = _slicedToArray(_$partition, 2);

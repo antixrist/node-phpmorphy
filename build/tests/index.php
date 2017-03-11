@@ -61,7 +61,7 @@ $words = array_map('mb_strtoupper', $words);
 $dir = getcwd() .'/dicts';
 $lang = $opts['lang'] ? $opts['lang'] : 'ru_RU';
 
-require_once(dirname(__FILE__) .'/phpmorphy/src/common.php');
+require_once(getcwd() .'/phpmorphy/src/common.php');
 
 /** Create phpMorphy instance */
 try {

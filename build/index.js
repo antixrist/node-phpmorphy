@@ -1,3 +1,4 @@
+require('source-map-support').install({ environment: 'node' });
 module.exports =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -4834,7 +4835,10 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
       plen = prefix.length;
       slen = suffix.length;
 
-      if ((!plen || _utils.php.substr(word, 0, plen).equals(prefix)) && (!slen || _utils.php.substr(word, -slen).equals(suffix))) {
+      const partOfWordInPlaceOfPrefix = _utils.php.substr(word, 0, plen);
+      const partOfWordInPlaceOfSuffix = _utils.php.substr(word, -slen);
+
+      if ((!plen || partOfWordInPlaceOfPrefix && partOfWordInPlaceOfPrefix.equals(prefix)) && (!slen || partOfWordInPlaceOfSuffix && partOfWordInPlaceOfSuffix.equals(suffix))) {
         result.push(annot);
       }
     });

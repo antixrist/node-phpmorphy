@@ -24,6 +24,8 @@ if(!defined('PHPMORPHY_DIR')) {
     define('PHPMORPHY_DIR', dirname(__FILE__));
 }
 
+//die(PHPMORPHY_DIR);
+
 require_once(PHPMORPHY_DIR . '/fsa/fsa.php');
 require_once(PHPMORPHY_DIR . '/graminfo/graminfo.php');
 require_once(PHPMORPHY_DIR . '/morphiers.php');

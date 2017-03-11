@@ -1490,10 +1490,13 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
 
       plen = prefix.length;
       slen = suffix.length;
-
+      
+      const partOfWordInPlaceOfPrefix = php.substr(word, 0, plen);
+      const partOfWordInPlaceOfSuffix = php.substr(word,   -slen);
+      
       if (
-        (!plen || php.substr(word, 0, plen).equals(prefix)) &&
-        (!slen || php.substr(word,   -slen).equals(suffix))
+        (!plen || (partOfWordInPlaceOfPrefix && partOfWordInPlaceOfPrefix.equals(prefix))) &&
+        (!slen || (partOfWordInPlaceOfSuffix && partOfWordInPlaceOfSuffix.equals(suffix)))
       ) {
         result.push(annot);
       }
