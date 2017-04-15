@@ -13,7 +13,8 @@
     "babel-polyfill": "^6.20.0",
     "lodash": "^4.17.4",
     "phpjs": "^1.3.2",
-    "phpunserialize": "^1.0.1"
+    "phpunserialize": "^1.0.1",
+    "source-map-support": "^0.4.8"
   },
   "devDependencies": {
     "babel": "^6.5.2",
@@ -27,7 +28,6 @@
     "glob": "^7.1.1",
     "nodemon": "^1.11.0",
     "source-map-loader": "^0.1.6",
-    "source-map-support": "^0.4.8",
     "webpack": "2.2.0-rc.3"
   },
   "keywords": [
