@@ -120,8 +120,8 @@ morphy.getEncoding();
 /** @returns {string} */
 morphy.getLocale();
 ```
-Возвращает код языка. В формате: *`ISO3166` код страны* + *'_'* + *`ISO639` код языка*.
-`ru_RU` или `en_EN` или `uk_UA` и т.д., в зависимости от словаря.
+Возвращает код языка. В формате: `<код страны в ISO3166>_<код языка в ISO639>`.
+`ru_RU`, `en_EN`, или `uk_UA` и т.д., в зависимости от словаря.
 
 ***
 
@@ -167,7 +167,7 @@ morphy.isLastPredicted();
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 // слова ГЛОКАЯ нет в словаре, слово ТЕСТ есть в словаре
 log(morphy.lemmatize('ГЛОКАЯ', Morphy.NORMAL));
@@ -206,7 +206,7 @@ morphy.getLastPredictionType();
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 morphy.lemmatize('ТЕСТ', Morphy.NORMAL);
 // слово ТЕСТ есть в словаре, предсказание не использовалось.
@@ -252,7 +252,7 @@ morphy.getAllFormsWithGramInfo(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 const words = ['СОБАКА', 'КОШКА'];
 const result = {};
@@ -265,7 +265,7 @@ log(result);
 `result` можно получить на 50% быстрее в `bulk`-режиме:
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 const words = ['СОБАКА', 'КОШКА'];
 const result = morphy.lemmatize(words);
@@ -301,7 +301,7 @@ morphy.findWord(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 const word = 'ДУША';
 const paradigms = morphy.findWord(word);
@@ -373,7 +373,7 @@ morphy.lemmatize(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.lemmatize('КОЛБАСЫ')); // [ 'КОЛБАСА' ]
 log(morphy.lemmatize('ТЕСТ')); // [ 'ТЕСТ', 'ТЕСТО' ]
@@ -417,7 +417,7 @@ morphy.getAllForms(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.getAllForms('ТЕСТ'));
 // все формы для слов ТЕСТ и ТЕСТО:
@@ -438,7 +438,7 @@ morphy.getPseudoRoot(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.getPseudoRoot('ТЕСТ')); // [ 'ТЕСТ' ]
 log(morphy.getPseudoRoot('ДЕТЕЙ')); // [ '' ]
@@ -458,7 +458,7 @@ morphy.getPartOfSpeech(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 // ТЕСТ образовывается от ТЕСТ и ТЕСТО, однако оба слова являются существительными
 log(morphy.getPartOfSpeech('ТЕСТ')); // [ 'С' ]
@@ -483,7 +483,7 @@ morphy.getAllFormsWithGramInfo(word, asText, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.getAllFormsWithGramInfo('ТЕСТ', true));
 /*
@@ -643,7 +643,7 @@ morphy.getAllFormsWithAncodes(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 let morphy;
 
@@ -715,7 +715,7 @@ morphy.getAncode(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 let morphy;
 
@@ -769,7 +769,7 @@ morphy.getGramInfo(word, type);
 Возвращает грамматическую информацию для слова
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.getGramInfo('ТЕСТ'));
 /*
@@ -797,7 +797,7 @@ morphy.getGramInfoMergeForms(word, type);
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.getGramInfoMergeForms('ТЕСТ'));
 
@@ -840,7 +840,7 @@ morphy.castFormByGramInfo(word, partOfSpeech, grammems, returnOnlyWord = false, 
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 const word = 'ШКАФ';
  
@@ -898,7 +898,7 @@ morphy.castFormByPattern (word, patternWord, grammemsProvider, returnOnlyWord, c
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.castFormByPattern('ДИВАН', 'СТОЛАМИ', null, true)); 
 // [ 'ДИВАНАМИ' ]
@@ -908,7 +908,7 @@ log(morphy.castFormByPattern('ДИВАН', 'СТОЛАМИ', null, true));
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 log(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true));
 // []
@@ -918,7 +918,7 @@ log(morphy.castFormByPattern('ДИВАН', 'КРОВАТЯМИ', null, true));
 
 ```javascript
 const { inspect } = require('util');
-function log (...args) { console.log(...args.map(arg => inspect(arg))); }
+const log = (...args) => console.log(...args.map(arg => inspect(arg)));
 
 const provider = morphy.getGrammemsProvider();
 provider.excludeGroups('С', 'род');
