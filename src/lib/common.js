@@ -113,7 +113,7 @@ class Morphy_FilesBundle {
       token,
       '.',
       this.lang,
-      (php.isset(extraExt) ? '.' + extraExt : ''),
+      (php.var.isset(extraExt) ? '.' + extraExt : ''),
       '.bin'
     ].join(''));
   }
@@ -162,7 +162,7 @@ class Morphy_WordDescriptor_Collection_Serializer {
    */
   serializeGramInfo (wordForm, asText = false) {
     if (asText) {
-      return wordForm.getPartOfSpeech() + ' ' + php.implode(',', wordForm.getGrammems());
+      return wordForm.getPartOfSpeech() + ' ' + php.strings.implode(',', wordForm.getGrammems());
     }
 
     return {
@@ -284,7 +284,7 @@ class phpMorphy {
   findWord (word, type = NORMAL) {
     const result = {};
 
-    if (php.is_array(word)) {
+    if (php.var.is_array(word)) {
       word.forEach(w => result[w] = this.invoke('getWordDescriptor', toBuffer(w), type));
       return result;
     }
@@ -375,7 +375,7 @@ class phpMorphy {
       return false;
     }
 
-    if (php.is_array(word)) {
+    if (php.var.is_array(word)) {
       const out = {};
       _.forEach(result, (r, w) => {
         if (false !== r) {
@@ -452,8 +452,8 @@ class phpMorphy {
     const ancode_id = resolver.unresolve(ancode);
     const data = this.helper.getGrammemsAndPartOfSpeech(ancode_id);
 
-    if (php.isset(common_ancode_id)) {
-      data[1] = php.array_merge(data[1], this.helper.getGrammems(common_ancode_id));
+    if (php.var.isset(common_ancode_id)) {
+      data[1] = php.array.array_merge(data[1], this.helper.getGrammems(common_ancode_id));
     }
 
     return this.castFormByGramInfo(
@@ -515,7 +515,7 @@ class phpMorphy {
         const essential_grammems = grammemsProvider.getGrammems(pos);
   
         const grammems = (essential_grammems !== false)
-          ? php.array_intersect(grammar['grammems'], essential_grammems)
+          ? php.array.array_intersect(grammar['grammems'], essential_grammems)
           : grammar['grammems']
         ;
         
@@ -530,7 +530,7 @@ class phpMorphy {
         );
 
         if (res.length) {
-          result = php.array_merge(result, res);
+          result = php.array.array_merge(result, res);
         }
       });
     });
@@ -555,7 +555,7 @@ class phpMorphy {
     let not_found;
 
     if (type === ONLY_PREDICT) {
-      if (php.is_array(word)) {
+      if (php.var.is_array(word)) {
         result = {};
         _.forEach(word, w => result[w] = this.predictWord(method, w));
 
@@ -565,7 +565,7 @@ class phpMorphy {
       }
     }
 
-    if (php.is_array(word)) {
+    if (php.var.is_array(word)) {
       result = this.__bulk_morphier[method](word);
       not_found = this.__bulk_morphier.getNotFoundWords();
 

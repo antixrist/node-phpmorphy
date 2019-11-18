@@ -46,7 +46,7 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
       'vaffixes_offset',
       'vaffixes_size',
       'vbase_size'
-    ].join('/'), php.substr(mem, offset, 20));
+    ].join('/'), php.strings.substr(mem, offset, 20));
 
     result['offset'] = offset;
 
@@ -59,7 +59,7 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
     // TODO: this can be wrong due to aligning ancodes map section
     const offset = info['offset'] + 20 + info['forms_count'] * 2;
 
-    return php.unpack('v' + forms_count, php.substr(mem, offset, forms_count * 2));
+    return php.unpack('v' + forms_count, php.strings.substr(mem, offset, forms_count * 2));
   }
 
   splitAncodes (ancodes, map) {
@@ -86,7 +86,7 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
     const forms_count = info['forms_count'];
     // TODO: this can be wrong due to aligning ancodes section
     const offset = info['offset'] + 20;
-    const ancodes = php.unpack('v' + forms_count, php.substr(mem, offset, forms_count * 2));
+    const ancodes = php.unpack('v' + forms_count, php.strings.substr(mem, offset, forms_count * 2));
     const map = this.readAncodesMap(info);
 
     return this.splitAncodes(ancodes, map);
@@ -96,13 +96,13 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
     const mem  = this.resource;
     let offset = info['offset'] + 20;
 
-    if (php.isset(info['affixes_offset'])) {
+    if (php.var.isset(info['affixes_offset'])) {
       offset += info['affixes_offset'];
     } else {
       offset += info['forms_count'] * 2 + info['packed_forms_count'] * 2;
     }
 
-    return php.substr(
+    return php.strings.substr(
       mem,
       offset,
       info['affixes_size'] - this.ends_size
@@ -116,7 +116,7 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
   readSectionIndex (offset, count) {
     const mem = this.resource;
 
-    return php.array_values(php.unpack('V' + count, php.substr(mem, offset, count * 4)));
+    return php.array.array_values(php.unpack('V' + count, php.strings.substr(mem, offset, count * 4)));
   }
 
   readAllFlexia () {
@@ -160,10 +160,10 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
         this.header['poses_size']
       ),
       $size => {
-        res = php.unpack('vid/Cis_predict', php.substr(mem, offset, 3));
+        res = php.unpack('vid/Cis_predict', php.strings.substr(mem, offset, 3));
   
         result[res['id']] = {
-          name: this.cleanupCString(php.substr(mem, offset + 3, $size - 3)),
+          name: this.cleanupCString(php.strings.substr(mem, offset + 3, $size - 3)),
           is_predict: !!res['is_predict']
         };
   
@@ -187,11 +187,11 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
         this.header['grammems_size']
       ),
       size => {
-        res = php.unpack('vid/Cshift', php.substr(mem, offset, 3));
+        res = php.unpack('vid/Cshift', php.strings.substr(mem, offset, 3));
   
         result[res['id']] = {
           'shift': res['shift'],
-          'name':  this.cleanupCString(php.substr(mem, offset + 3, size - 3))
+          'name':  this.cleanupCString(php.strings.substr(mem, offset + 3, size - 3))
         };
   
         offset += size;
@@ -210,14 +210,14 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
     let grammem_ids;
 
     for (let $i = 0; $i < this.header['ancodes_count']; $i++) {
-      res = php.unpack('vid/vpos_id', php.substr(mem, offset, 4));
+      res = php.unpack('vid/vpos_id', php.strings.substr(mem, offset, 4));
       offset += 4;
 
-      grammems_count = php.unpack('v', php.substr(mem, offset, 2))[1];
+      grammems_count = php.unpack('v', php.strings.substr(mem, offset, 2))[1];
       offset += 2;
 
       grammem_ids = (grammems_count)
-        ? php.array_values(php.unpack('v' + grammems_count, php.substr(mem, offset, grammems_count * 2)))
+        ? php.array.array_values(php.unpack('v' + grammems_count, php.strings.substr(mem, offset, grammems_count * 2)))
         : [];
 
       result[res['id']] = {

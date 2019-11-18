@@ -2,7 +2,7 @@ import _ from 'lodash';
 import util from 'util';
 // import jschardet from 'jschardet';
 // import encoding from 'encoding';
-import php from 'phpjs';
+import php from 'locutus/php';
 import phpunserialize from 'phpunserialize';
 
 /**
@@ -104,8 +104,8 @@ function inspect (object, opts = {
 //   return retVal;
 // }
 
-//php.ini_set('unicode.semantics', 'on');
-php.ini_set('phpjs.objectsAsArrays', false);
+//php.info.ini_set('unicode.semantics', 'on');
+php.info.ini_set('phpjs.objectsAsArrays', false);
 
 php.unpack = function unpack (format, buffer) {
   /**
@@ -203,9 +203,9 @@ php.unpack = function unpack (format, buffer) {
   }
 };
 
-php.unserialize = phpunserialize;
+php.var.unserialize = phpunserialize;
 
-php.ord = function ord (str, idx) {
+php.strings.ord = function ord (str, idx) {
   if (!Buffer.isBuffer(str)) {
     str = Buffer.from(str);
   }
@@ -215,14 +215,14 @@ php.ord = function ord (str, idx) {
   return str[idx];
 };
 
-php._substr = php.substr; // safe
+php.strings._substr = php.strings.substr; // safe
 /**
  * @param {String|Buffer} str
  * @param {Number} start
  * @param {Number} [len]
  * @returns {string|Buffer|boolean}
  */
-php.substr = function php$substr (str, start, len) {
+php.strings.substr = function php$substr (str, start, len) {
   let end;
   
   if (Buffer.isBuffer(str)) {
@@ -233,7 +233,7 @@ php.substr = function php$substr (str, start, len) {
     return (start >= str.length || start < 0 || start > end) ? false : str.slice(start, end);
   }
   
-  return php._substr.apply(php._substr, arguments);
+  return php.strings._substr.apply(php.strings._substr, arguments);
 };
 
 // /**

@@ -118,7 +118,7 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
     }
 
     const storage_type = storage.getTypeAsString();
-    const className = `Morphy_GramInfo_${ php.ucfirst(storage_type) }`;
+    const className = `Morphy_GramInfo_${ php.strings.ucfirst(storage_type) }`;
     const graminfoAccess = require('./access/graminfo_'+ storage_type);
     
     return new graminfoAccess[className](storage.getResource(), header);
@@ -154,12 +154,12 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
     ].join('/'), headerRaw);
 
     let offset = 24 * 4;
-    let len = php.ord(php.substr(headerRaw, offset++, 1));
+    let len = php.strings.ord(php.strings.substr(headerRaw, offset++, 1));
 
-    header['lang'] = php.rtrim(php.substr(headerRaw, offset, len));
+    header['lang'] = php.strings.rtrim(php.strings.substr(headerRaw, offset, len));
     offset += len;
-    len = php.ord(php.substr(headerRaw, offset++, 1));
-    header['encoding'] = php.rtrim(php.substr(headerRaw, offset, len));
+    len = php.strings.ord(php.strings.substr(headerRaw, offset++, 1));
+    header['encoding'] = php.strings.rtrim(php.strings.substr(headerRaw, offset, len));
 
     return header;
   }
@@ -173,8 +173,8 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
     
     this.resource = resource;
     this.header = header;
-    //this.ends      = php.str_repeat('\0', header['char_size'] + 1);
-    //this.ends_size = php.strlen(this.ends);
+    //this.ends      = php.strings.str_repeat('\0', header['char_size'] + 1);
+    //this.ends_size = php.strings.strlen(this.ends);
     const buf = Buffer.alloc(header['char_size'] + 1);
     this.ends = buf.fill('\0');
     this.ends_size = buf.length;
@@ -201,9 +201,9 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
   }
 
   cleanupCString (string) {
-    //var pos = php.strpos(string, this.ends);
+    //var pos = php.strings.strpos(string, this.ends);
     //if (pos !== false) {
-    //  string = php.substr(string, 0, pos);
+    //  string = php.strings.substr(string, 0, pos);
     //}
 
     let stringBuf = (Buffer.isBuffer(string)) ? string : Buffer.from(string);
@@ -340,7 +340,7 @@ class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
     this.storage = $storage;
     this._info = null;
     this.cache = this.readCache($cacheFile);
-    //this.ends = php.str_repeat('\0', this.getCharSize() + 1);
+    //this.ends = php.strings.str_repeat('\0', this.getCharSize() + 1);
     const buf = Buffer.alloc(this.getCharSize() + 1);
     this.ends = buf.fill('\0');
   }
@@ -419,7 +419,7 @@ class Morphy_GramInfo_RuntimeCaching extends Morphy_GramInfo_Decorator {
   readFlexiaData (info) {
     const offset = info['offset'];
 
-    if (!php.isset(this.$flexia_all[offset])) {
+    if (!php.var.isset(this.$flexia_all[offset])) {
       this.$flexia_all[offset] = this.info.readFlexiaData(info);
     }
 
@@ -441,7 +441,7 @@ class Morphy_GramInfo_AncodeCache extends Morphy_GramInfo_Decorator {
     this.miss  = 0;
     this.cache = null;
 
-    this.cache = php.unserialize(resource.read(0, resource.getFileSize()).toString());
+    this.cache = php.var.unserialize(resource.read(0, resource.getFileSize()).toString());
     if (this.cache === false) {
       throw new Error("Can`t read ancodes cache");
     }
@@ -451,7 +451,7 @@ class Morphy_GramInfo_AncodeCache extends Morphy_GramInfo_Decorator {
     const $offset = info['offset'];
 
     // todo: проверить доступ по индекс
-    if (php.isset(this.cache[$offset])) {
+    if (php.var.isset(this.cache[$offset])) {
       this.hits++;
       return this.cache[$offset];
     }

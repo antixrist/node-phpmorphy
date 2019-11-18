@@ -127,7 +127,7 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
     }
 
     const storage_type = storage.getTypeAsString();
-    const className = `Morphy_Fsa_${ php.ucfirst(type) }_${ php.ucfirst(storage_type) }`;
+    const className = `Morphy_Fsa_${ php.strings.ucfirst(type) }_${ php.strings.ucfirst(storage_type) }`;
     const fsaAccess = require('./access/fsa_'+ type +'_'+ storage_type);
     
     return new fsaAccess[className](storage.getResource(), header);
@@ -210,8 +210,8 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
   }
 
   getAlphabet () {
-    if (!php.isset(this.alphabet)) {
-      //this.alphabet = php.str_split(this.readAlphabet());
+    if (!php.var.isset(this.alphabet)) {
+      //this.alphabet = php.strings.str_split(this.readAlphabet());
 
       const alphabet = this.readAlphabet();
       const alphabetBuf = Buffer.from(alphabet);
