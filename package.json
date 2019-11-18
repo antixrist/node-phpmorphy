@@ -1,6 +1,6 @@
 {
   "name": "phpmorphy-locutus",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "scripts": {
     "rebuilder": "cross-env NODE_ENV=development webpack --watch",
     "build": "cross-env NODE_ENV=production webpack",
@@ -13,7 +13,7 @@
     "encoding": "^0.1.12",
     "locutus": "^2.0.11",
     "lodash": "^4.17.4",
-    "phpmorphy-locutus": "^0.0.8",
+    "phpmorphy-locutus": "^0.1.0",
     "phpunserialize": "^1.0.1",
     "source-map-support": "^0.4.8"
   },
@@ -51,5 +51,5 @@
     "url": "https://github.com/noduslabs/node-phpmorphy"
   },
   "homepage": "https://github.com/noduslabs/node-phpmorphy",
-  "description": "The original package is located at https://github.com/antixrist/node-phpmorphy however it used phpjs module, which contained dependencies with critical vulnerabilities and is not maintained anymore. This package was swapped for the newer lucutus package and some references have been changed to the new ones.  "
+  "description": "The original package is located at https://github.com/antixrist/node-phpmorphy however it used the phpjs module, which contained dependencies with critical vulnerabilities and is not maintained anymore. This package was swapped for the newer lucutus package and all the references to phpjs have been changed to the new ones.  "
 }
