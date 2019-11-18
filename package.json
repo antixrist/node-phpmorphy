@@ -1,6 +1,6 @@
 {
   "name": "phpmorphy",
-  "version": "2.0.13",
+  "version": "2.1.0",
   "scripts": {
     "rebuilder": "cross-env NODE_ENV=development webpack --watch",
     "build": "cross-env NODE_ENV=production webpack",
@@ -50,7 +50,7 @@
   },
   "homepage": "https://github.com/antixrist/node-phpmorphy",
   "author": {
-    "name" : "antixrist"
+    "name": "antixrist"
   },
   "description": "Original package is located at http://phpmorphy.sourceforge.net/"
 }
