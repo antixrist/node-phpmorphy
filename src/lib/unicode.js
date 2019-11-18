@@ -39,7 +39,7 @@ class Morphy_UnicodeHelper {
     const { cache, doCreate } = Morphy_UnicodeHelper;
 
     encoding = encoding.toLowerCase();
-    if (php.isset(cache[encoding])) {
+    if (php.var.isset(cache[encoding])) {
       return cache[encoding];
     }
     
@@ -63,14 +63,14 @@ class Morphy_UnicodeHelper {
       switch (utf_type) {
         case 'utf':
           if ([8, 16, 32].indexOf(utf_base) < 0) {
-          // if (!php.in_array(utf_base, [8, 16, 32])) {
+          // if (!php.array.in_array(utf_base, [8, 16, 32])) {
             throw new Error('Invalid utf base');
           }
           
           break;
         case 'ucs':
           if ([2, 4].indexOf(utf_base) < 0) {
-          // if (!php.in_array(utf_base, [2, 4])) {
+          // if (!php.array.in_array(utf_base, [2, 4])) {
             throw new Error('Invalid ucs base');
           }
           
@@ -80,11 +80,11 @@ class Morphy_UnicodeHelper {
       }
       
       if (utf_base > 8 || 'ucs' === utf_type) {
-        if (php.isset(matches[5])) {
+        if (php.var.isset(matches[5])) {
           endiannes = matches[5] == 'be' ? 'be' : 'le';
         } else {
-          tmp = php.pack('L', 1);
-          endiannes = php.ord(tmp) == 0 ? 'be' : 'le';
+          tmp = php.misc.pack('L', 1);
+          endiannes = php.strings.ord(tmp) == 0 ? 'be' : 'le';
         }
       }
       
@@ -95,7 +95,7 @@ class Morphy_UnicodeHelper {
         encoding_name = utf_type + '-' + utf_base;
       }
       
-      className = `Morphy_UnicodeHelper_${ php.str_replace('-', '_', encoding_name) }`;
+      className = `Morphy_UnicodeHelper_${ php.strings.str_replace('-', '_', encoding_name) }`;
       
       return new Morphy_UnicodeHelper.unicodeHelpers[className](encoding_name);
     } else {
@@ -142,18 +142,18 @@ class Morphy_UnicodeHelper_MultiByteFixed extends Morphy_UnicodeHelper_Base {
   }
 
   strrev (str) {
-    return php.implode('', php.array_reverse(php.str_split(str, this.size)));
+    return php.strings.implode('', php.array.array_reverse(php.strings.str_split(str, this.size)));
   }
 
   php_strlen (str) {
-    return php.strlen(str) / this.size;
+    return php.strings.strlen(str) / this.size;
   }
 
   fixTrailing (str) {
-    const len = php.strlen(str);
+    const len = php.strings.strlen(str);
 
     if ((len % this.size) > 0) {
-      return php.substr(str, 0, Math.floor(len / this.size) * this.size);
+      return php.strings.substr(str, 0, Math.floor(len / this.size) * this.size);
     }
 
     return str;
@@ -201,7 +201,7 @@ class Morphy_UnicodeHelper_utf_8 extends Morphy_UnicodeHelper_Base {
   }
 
   firstCharSize (str) {
-    return 1 + this.tails_length[php.ord(str)];
+    return 1 + this.tails_length[php.strings.ord(str)];
   }
 
   strrev (str) {
@@ -290,9 +290,9 @@ class Morphy_UnicodeHelper_utf_16_Base extends Morphy_UnicodeHelper_Base {
   }
 
   strrev (str) {
-    const count = php.strlen(str);
+    const count = php.strings.strlen(str);
     const fmt = this.char_fmt + count;
-    const words = php.array_reverse(php.unpack(fmt, str));
+    const words = php.array.array_reverse(php.unpack(fmt, str));
 
     let ord;
     let t;
@@ -310,37 +310,37 @@ class Morphy_UnicodeHelper_utf_16_Base extends Morphy_UnicodeHelper_Base {
       }
     }
 
-    php.array_unshift(words, fmt);
+    php.array.array_unshift(words, fmt);
 
-    return php.pack(...words);
+    return php.misc.pack(...words);
   }
 
   fixTrailing (str) {
-    let strlen = php.strlen(str);
+    let strlen = php.strings.strlen(str);
 
     if (strlen & 1) {
       strlen--;
-      str = php.substr(str, 0, strlen);
+      str = php.strings.substr(str, 0, strlen);
     }
 
     if (strlen < 2) {
       return '';
     }
 
-    let ord = php.unpack(this.char_fmt, php.substr(str, -2, 2))[1];
+    let ord = php.unpack(this.char_fmt, php.strings.substr(str, -2, 2))[1];
 
     if (this.isSurrogate(ord)) {
       if (strlen < 4) {
         return '';
       }
 
-      ord = php.unpack(this.char_fmt, php.substr(str, -4, 2))[1];
+      ord = php.unpack(this.char_fmt, php.strings.substr(str, -4, 2))[1];
 
       if (this.isSurrogate(ord)) {
         // full surrogate pair
         return str;
       } else {
-        return php.substr(str, 0, -2);
+        return php.strings.substr(str, 0, -2);
       }
     }
 
@@ -348,7 +348,7 @@ class Morphy_UnicodeHelper_utf_16_Base extends Morphy_UnicodeHelper_Base {
   }
 
   php_strlen (str) {
-    let count = php.strlen(str) / 2;
+    let count = php.strings.strlen(str) / 2;
     const fmt = this.char_fmt + count;
 
     _.forEach(php.unpack(fmt, str), ord => {

@@ -52,7 +52,7 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = php.ord(wordBuf, i);
+      char = php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
@@ -143,12 +143,12 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.call_user_func(callback, path, annot)) {
-          if (!php.call_user_func(callback, null, annot)) {
+          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          if (!php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(((trans) >> 10) & 0x3FFFFF);
@@ -161,7 +161,7 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.substr(Buffer.from(path), 0, -1).toString();
+        //path = php.strings.substr(Buffer.from(path), 0, -1).toString();
       }
     } while (!!stack.length);
 
@@ -255,7 +255,7 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
 
     buf = Buffer.alloc(1);
     fs.readSync(fh, buf, 0, 1, offset);
-    len = php.ord(buf);
+    len = php.strings.ord(buf);
 
     if (len) {
       buf = Buffer.alloc(len);
@@ -269,8 +269,8 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
   }
 
   getAlphabetNum () {
-    if (!php.isset(this.alphabet_num)) {
-      this.alphabet_num = php.array_map(php.ord, this.getAlphabet());
+    if (!php.var.isset(this.alphabet_num)) {
+      this.alphabet_num = php.array.array_map(php.strings.ord, this.getAlphabet());
     }
 
     return this.alphabet_num;

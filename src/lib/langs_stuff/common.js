@@ -41,10 +41,10 @@ class Morphy_GrammemsProvider_Base extends Morphy_GrammemsProvider_Interface {
   includeGroups (partOfSpeech, names) {
     const grammems = this.getAllGrammemsGrouped();
     names = (!_.isArray(names)) ? [names] : names;
-    names = php.array_flip(names);
+    names = php.array.array_flip(names);
 
-    _.forEach(php.array_keys(grammems), key => {
-      if (!php.isset(names[key])) {
+    _.forEach(php.array.array_keys(grammems), key => {
+      if (!php.var.isset(names[key])) {
         delete grammems[key];
       }
     });
@@ -78,7 +78,7 @@ class Morphy_GrammemsProvider_Base extends Morphy_GrammemsProvider_Interface {
   }
 
   getGrammems (partOfSpeech) {
-    if (php.isset(this.grammems[partOfSpeech])) {
+    if (php.var.isset(this.grammems[partOfSpeech])) {
       return this.grammems[partOfSpeech];
     }
 
