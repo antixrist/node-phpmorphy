@@ -53,7 +53,7 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = php.ord(wordBuf, i);
+      char = php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
@@ -195,11 +195,11 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
             annot = trans;
           }
 
-          if (!php.call_user_func(callback, null, annot)) {
+          if (!php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(((trans) >> 11) & 0x1FFFFF);
@@ -212,7 +212,7 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.substr(path, 0, -1);
+        //path = php.strings.substr(path, 0, -1);
       }
     } while (!!stack.length);
 
@@ -311,7 +311,7 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
     let buf = Buffer.alloc(1);
     fs.readSync(fh, buf, 0, 1, offset);
     
-    let len = php.ord(buf);
+    let len = php.strings.ord(buf);
     if (len) {
       buf = Buffer.alloc(len);
       fs.readSync(fh, buf, 0, len, null);

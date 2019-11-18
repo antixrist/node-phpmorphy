@@ -111,7 +111,7 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
     const fh = this.resource;
     let offset = info['offset'] + 20;
 
-    if (php.isset(info['affixes_offset'])) {
+    if (php.var.isset(info['affixes_offset'])) {
       offset += info['affixes_offset'];
     } else {
       offset += info['forms_count'] * 2 + info['packed_forms_count'] * 2;

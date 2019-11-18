@@ -50,13 +50,13 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = php.ord(wordBuf, i);
+      char = php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
       // sparse version
       result = true;
-      buf = php.substr(mem, fsa_start + ((((trans >> 10) & 0x3FFFFF) + char + 1) << 2), 4);
+      buf = php.strings.substr(mem, fsa_start + ((((trans >> 10) & 0x3FFFFF) + char + 1) << 2), 4);
       trans  = php.unpack('V', buf)[0];
 
       if ((trans & 0x0200) || (trans & 0xFF) != char) {
@@ -81,7 +81,7 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
 
       if (readAnnot) {
         // read annot trans
-        buf = php.substr(mem, fsa_start + (((trans >> 10) & 0x3FFFFF) << 2), 4);
+        buf = php.strings.substr(mem, fsa_start + (((trans >> 10) & 0x3FFFFF) << 2), 4);
         trans = php.unpack('V', buf)[0];
 
         if ((trans & 0x0100) == 0) {
@@ -138,12 +138,12 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.call_user_func(callback, path, annot)) {
-          if (!php.call_user_func(callback, null, annot)) {
+          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          if (!php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(((trans) >> 10) & 0x3FFFFF);
@@ -156,7 +156,7 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
       if (i >= c) {
         state     = stack.pop();
         start_idx = stack_idx.pop();
-        //path      = php.substr(Buffer.from(path), 0, -1).toString();
+        //path      = php.strings.substr(Buffer.from(path), 0, -1).toString();
       }
     } while (!!stack.length);
 
@@ -173,7 +173,7 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
     let start_offset = fsa_start + (($index) << 2);
 
     // first try read annot transition
-    buf = php.substr(mem, start_offset, 4);
+    buf = php.strings.substr(mem, start_offset, 4);
     trans = php.unpack('V', buf)[0];
 
     if ((trans & 0x0100)) {
@@ -183,7 +183,7 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
     // read rest
     start_offset += 4;
     _.forEach(this.getAlphabetNum(), char => {
-      buf = php.substr(mem, start_offset + ((char) << 2), 4);
+      buf = php.strings.substr(mem, start_offset + ((char) << 2), 4);
       trans = php.unpack('V', buf)[0];
 
       //if(!(trans & 0x0200) && (trans & 0xFF) == char) {
@@ -219,7 +219,7 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
     let buf;
     let trans;
 
-    buf = php.substr(mem, fsa_start + 4, 4);
+    buf = php.strings.substr(mem, fsa_start + 4, 4);
     trans = php.unpack('V', buf)[0];
 
     return trans;
@@ -227,7 +227,7 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
 
   readAlphabet () {
     const mem = this.resource;
-    const buf = php.substr(mem, this.header['alphabet_offset'], this.header['alphabet_size']);
+    const buf = php.strings.substr(mem, this.header['alphabet_offset'], this.header['alphabet_size']);
 
     return buf.toString();
   }
@@ -241,11 +241,11 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
     const offset = this.header['annot_offset'] + (((trans & 0xFF) << 22) | ((trans >> 10) & 0x3FFFFF));
 
     let annot;
-    let buf = php.substr(mem, offset, 1);
-    let len = php.ord(buf);
+    let buf = php.strings.substr(mem, offset, 1);
+    let len = php.strings.ord(buf);
 
     if (len) {
-      buf = php.substr(mem, offset + 1, len);
+      buf = php.strings.substr(mem, offset + 1, len);
       annot = buf;
     } else {
       annot = null;
@@ -255,8 +255,8 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
   }
 
   getAlphabetNum () {
-    if (!php.isset(this.alphabet_num)) {
-      this.alphabet_num = php.array_map(php.ord, this.getAlphabet());
+    if (!php.var.isset(this.alphabet_num)) {
+      this.alphabet_num = php.array.array_map(php.strings.ord, this.getAlphabet());
     }
 
     return this.alphabet_num;

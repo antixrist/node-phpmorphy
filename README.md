@@ -28,6 +28,20 @@ npm install phpmorphy --save
 yarn add phpmorphy
 ```
 
+## Разработка
+Для устновки всех packages 
+```
+npm install
+```
+
+Затем 
+
+```
+npm run build
+```
+
+
+
 ## Подключение
 ES2015:
 ```javascript

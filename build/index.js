@@ -1,4 +1,3 @@
-require('source-map-support').install({ environment: 'node' });
 module.exports =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -94,9 +93,9 @@ var _util = __webpack_require__(53);
 
 var _util2 = _interopRequireDefault(_util);
 
-var _phpjs = __webpack_require__(51);
+var _php = __webpack_require__(51);
 
-var _phpjs2 = _interopRequireDefault(_phpjs);
+var _php2 = _interopRequireDefault(_php);
 
 var _phpunserialize = __webpack_require__(52);
 
@@ -206,10 +205,10 @@ function inspect(object, opts = {
 //   return retVal;
 // }
 
-//php.ini_set('unicode.semantics', 'on');
-_phpjs2.default.ini_set('phpjs.objectsAsArrays', false);
+//php.info.ini_set('unicode.semantics', 'on');
+_php2.default.info.ini_set('phpjs.objectsAsArrays', false);
 
-_phpjs2.default.unpack = function unpack(format, buffer) {
+_php2.default.unpack = function unpack(format, buffer) {
   /**
    * Параметр format задается в виде строки и состоит из кодов формата и
    * опционального аргумента повторения. Аргумент может быть целочисленным,
@@ -308,9 +307,9 @@ _phpjs2.default.unpack = function unpack(format, buffer) {
   }
 };
 
-_phpjs2.default.unserialize = _phpunserialize2.default;
+_php2.default.var.unserialize = _phpunserialize2.default;
 
-_phpjs2.default.ord = function ord(str, idx) {
+_php2.default.strings.ord = function ord(str, idx) {
   if (!Buffer.isBuffer(str)) {
     str = Buffer.from(str);
   }
@@ -320,14 +319,14 @@ _phpjs2.default.ord = function ord(str, idx) {
   return str[idx];
 };
 
-_phpjs2.default._substr = _phpjs2.default.substr; // safe
+_php2.default.strings._substr = _php2.default.strings.substr; // safe
 /**
  * @param {String|Buffer} str
  * @param {Number} start
  * @param {Number} [len]
  * @returns {string|Buffer|boolean}
  */
-_phpjs2.default.substr = function php$substr(str, start, len) {
+_php2.default.strings.substr = function php$substr(str, start, len) {
   let end;
 
   if (Buffer.isBuffer(str)) {
@@ -338,7 +337,7 @@ _phpjs2.default.substr = function php$substr(str, start, len) {
     return start >= str.length || start < 0 || start > end ? false : str.slice(start, end);
   }
 
-  return _phpjs2.default._substr.apply(_phpjs2.default._substr, arguments);
+  return _php2.default.strings._substr.apply(_php2.default.strings._substr, arguments);
 };
 
 // /**
@@ -442,7 +441,7 @@ exports.onShutdown = onShutdown;
 exports.castArray = castArray;
 exports.logger = logger;
 exports.inspect = inspect;
-exports.php = _phpjs2.default;
+exports.php = _php2.default;
 exports.isStringifyedNumber = isStringifyedNumber;
 exports.toBuffer = toBuffer;
 exports.buffer2str = buffer2str;
@@ -597,7 +596,7 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
     }
 
     const storage_type = storage.getTypeAsString();
-    const className = `Morphy_Fsa_${ _utils.php.ucfirst(type) }_${ _utils.php.ucfirst(storage_type) }`;
+    const className = `Morphy_Fsa_${_utils.php.strings.ucfirst(type)}_${_utils.php.strings.ucfirst(storage_type)}`;
     const fsaAccess = __webpack_require__(25)("./fsa_" + type + '_' + storage_type);
 
     return new fsaAccess[className](storage.getResource(), header);
@@ -653,8 +652,8 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
   }
 
   getAlphabet() {
-    if (!_utils.php.isset(this.alphabet)) {
-      //this.alphabet = php.str_split(this.readAlphabet());
+    if (!_utils.php.var.isset(this.alphabet)) {
+      //this.alphabet = php.strings.str_split(this.readAlphabet());
 
       const alphabet = this.readAlphabet();
       const alphabetBuf = Buffer.from(alphabet);
@@ -857,10 +856,10 @@ class Morphy_GrammemsProvider_Base extends Morphy_GrammemsProvider_Interface {
   includeGroups(partOfSpeech, names) {
     const grammems = this.getAllGrammemsGrouped();
     names = !_lodash2.default.isArray(names) ? [names] : names;
-    names = _utils.php.array_flip(names);
+    names = _utils.php.array.array_flip(names);
 
-    _lodash2.default.forEach(_utils.php.array_keys(grammems), key => {
-      if (!_utils.php.isset(names[key])) {
+    _lodash2.default.forEach(_utils.php.array.array_keys(grammems), key => {
+      if (!_utils.php.var.isset(names[key])) {
         delete grammems[key];
       }
     });
@@ -894,7 +893,7 @@ class Morphy_GrammemsProvider_Base extends Morphy_GrammemsProvider_Interface {
   }
 
   getGrammems(partOfSpeech) {
-    if (_utils.php.isset(this.grammems[partOfSpeech])) {
+    if (_utils.php.var.isset(this.grammems[partOfSpeech])) {
       return this.grammems[partOfSpeech];
     }
 
@@ -984,7 +983,7 @@ class Morphy_GrammemsProvider_Factory {
     const included = Morphy_GrammemsProvider_Factory_included.get(morphy);
 
     if (_lodash2.default.isUndefined(included[locale])) {
-      const className = `Morphy_GrammemsProvider_${ locale }`;
+      const className = `Morphy_GrammemsProvider_${locale}`;
       let grammemsProviders = {};
 
       try {
@@ -1164,7 +1163,7 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
     }
 
     const storage_type = storage.getTypeAsString();
-    const className = `Morphy_GramInfo_${ _utils.php.ucfirst(storage_type) }`;
+    const className = `Morphy_GramInfo_${_utils.php.strings.ucfirst(storage_type)}`;
     const graminfoAccess = __webpack_require__(26)("./graminfo_" + storage_type);
 
     return new graminfoAccess[className](storage.getResource(), header);
@@ -1174,12 +1173,12 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
     const header = _utils.php.unpack(['Vver', 'Vis_be', 'Vflex_count_old', 'Vflex_offset', 'Vflex_size', 'Vflex_count', 'Vflex_index_offset', 'Vflex_index_size', 'Vposes_offset', 'Vposes_size', 'Vposes_count', 'Vposes_index_offset', 'Vposes_index_size', 'Vgrammems_offset', 'Vgrammems_size', 'Vgrammems_count', 'Vgrammems_index_offset', 'Vgrammems_index_size', 'Vancodes_offset', 'Vancodes_size', 'Vancodes_count', 'Vancodes_index_offset', 'Vancodes_index_size', 'Vchar_size', ''].join('/'), headerRaw);
 
     let offset = 24 * 4;
-    let len = _utils.php.ord(_utils.php.substr(headerRaw, offset++, 1));
+    let len = _utils.php.strings.ord(_utils.php.strings.substr(headerRaw, offset++, 1));
 
-    header['lang'] = _utils.php.rtrim(_utils.php.substr(headerRaw, offset, len));
+    header['lang'] = _utils.php.strings.rtrim(_utils.php.strings.substr(headerRaw, offset, len));
     offset += len;
-    len = _utils.php.ord(_utils.php.substr(headerRaw, offset++, 1));
-    header['encoding'] = _utils.php.rtrim(_utils.php.substr(headerRaw, offset, len));
+    len = _utils.php.strings.ord(_utils.php.strings.substr(headerRaw, offset++, 1));
+    header['encoding'] = _utils.php.strings.rtrim(_utils.php.strings.substr(headerRaw, offset, len));
 
     return header;
   }
@@ -1193,8 +1192,8 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
 
     this.resource = resource;
     this.header = header;
-    //this.ends      = php.str_repeat('\0', header['char_size'] + 1);
-    //this.ends_size = php.strlen(this.ends);
+    //this.ends      = php.strings.str_repeat('\0', header['char_size'] + 1);
+    //this.ends_size = php.strings.strlen(this.ends);
     const buf = Buffer.alloc(header['char_size'] + 1);
     this.ends = buf.fill('\0');
     this.ends_size = buf.length;
@@ -1221,9 +1220,9 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
   }
 
   cleanupCString(string) {
-    //var pos = php.strpos(string, this.ends);
+    //var pos = php.strings.strpos(string, this.ends);
     //if (pos !== false) {
-    //  string = php.substr(string, 0, pos);
+    //  string = php.strings.substr(string, 0, pos);
     //}
 
     let stringBuf = Buffer.isBuffer(string) ? string : Buffer.from(string);
@@ -1360,7 +1359,7 @@ class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
     this.storage = $storage;
     this._info = null;
     this.cache = this.readCache($cacheFile);
-    //this.ends = php.str_repeat('\0', this.getCharSize() + 1);
+    //this.ends = php.strings.str_repeat('\0', this.getCharSize() + 1);
     const buf = Buffer.alloc(this.getCharSize() + 1);
     this.ends = buf.fill('\0');
   }
@@ -1434,7 +1433,7 @@ class Morphy_GramInfo_RuntimeCaching extends Morphy_GramInfo_Decorator {
   readFlexiaData(info) {
     const offset = info['offset'];
 
-    if (!_utils.php.isset(this.$flexia_all[offset])) {
+    if (!_utils.php.var.isset(this.$flexia_all[offset])) {
       this.$flexia_all[offset] = this.info.readFlexiaData(info);
     }
 
@@ -1456,7 +1455,7 @@ class Morphy_GramInfo_AncodeCache extends Morphy_GramInfo_Decorator {
     this.miss = 0;
     this.cache = null;
 
-    this.cache = _utils.php.unserialize(resource.read(0, resource.getFileSize()).toString());
+    this.cache = _utils.php.var.unserialize(resource.read(0, resource.getFileSize()).toString());
     if (this.cache === false) {
       throw new Error("Can`t read ancodes cache");
     }
@@ -1466,7 +1465,7 @@ class Morphy_GramInfo_AncodeCache extends Morphy_GramInfo_Decorator {
     const $offset = info['offset'];
 
     // todo: проверить доступ по индекс
-    if (_utils.php.isset(this.cache[$offset])) {
+    if (_utils.php.var.isset(this.cache[$offset])) {
       this.hits++;
       return this.cache[$offset];
     }
@@ -1586,7 +1585,7 @@ class Morphy_Fsa_Sparse_File extends _fsa.Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = _utils.php.ord(wordBuf, i);
+      char = _utils.php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
@@ -1676,12 +1675,12 @@ class Morphy_Fsa_Sparse_File extends _fsa.Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.call_user_func(callback, path, annot)) {
-          if (!_utils.php.call_user_func(callback, null, annot)) {
+          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          if (!_utils.php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(trans >> 10 & 0x3FFFFF);
@@ -1694,7 +1693,7 @@ class Morphy_Fsa_Sparse_File extends _fsa.Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.substr(Buffer.from(path), 0, -1).toString();
+        //path = php.strings.substr(Buffer.from(path), 0, -1).toString();
       }
     } while (!!stack.length);
 
@@ -1788,7 +1787,7 @@ class Morphy_Fsa_Sparse_File extends _fsa.Morphy_Fsa {
 
     buf = Buffer.alloc(1);
     _fs2.default.readSync(fh, buf, 0, 1, offset);
-    len = _utils.php.ord(buf);
+    len = _utils.php.strings.ord(buf);
 
     if (len) {
       buf = Buffer.alloc(len);
@@ -1802,8 +1801,8 @@ class Morphy_Fsa_Sparse_File extends _fsa.Morphy_Fsa {
   }
 
   getAlphabetNum() {
-    if (!_utils.php.isset(this.alphabet_num)) {
-      this.alphabet_num = _utils.php.array_map(_utils.php.ord, this.getAlphabet());
+    if (!_utils.php.var.isset(this.alphabet_num)) {
+      this.alphabet_num = _utils.php.array.array_map(_utils.php.strings.ord, this.getAlphabet());
     }
 
     return this.alphabet_num;
@@ -1862,13 +1861,13 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = _utils.php.ord(wordBuf, i);
+      char = _utils.php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
       // sparse version
       result = true;
-      buf = _utils.php.substr(mem, fsa_start + ((trans >> 10 & 0x3FFFFF) + char + 1 << 2), 4);
+      buf = _utils.php.strings.substr(mem, fsa_start + ((trans >> 10 & 0x3FFFFF) + char + 1 << 2), 4);
       trans = _utils.php.unpack('V', buf)[0];
 
       if (trans & 0x0200 || (trans & 0xFF) != char) {
@@ -1893,7 +1892,7 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
 
       if (readAnnot) {
         // read annot trans
-        buf = _utils.php.substr(mem, fsa_start + ((trans >> 10 & 0x3FFFFF) << 2), 4);
+        buf = _utils.php.strings.substr(mem, fsa_start + ((trans >> 10 & 0x3FFFFF) << 2), 4);
         trans = _utils.php.unpack('V', buf)[0];
 
         if ((trans & 0x0100) == 0) {
@@ -1950,12 +1949,12 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.call_user_func(callback, path, annot)) {
-          if (!_utils.php.call_user_func(callback, null, annot)) {
+          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          if (!_utils.php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(trans >> 10 & 0x3FFFFF);
@@ -1968,7 +1967,7 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path      = php.substr(Buffer.from(path), 0, -1).toString();
+        //path      = php.strings.substr(Buffer.from(path), 0, -1).toString();
       }
     } while (!!stack.length);
 
@@ -1985,7 +1984,7 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
     let start_offset = fsa_start + ($index << 2);
 
     // first try read annot transition
-    buf = _utils.php.substr(mem, start_offset, 4);
+    buf = _utils.php.strings.substr(mem, start_offset, 4);
     trans = _utils.php.unpack('V', buf)[0];
 
     if (trans & 0x0100) {
@@ -1995,7 +1994,7 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
     // read rest
     start_offset += 4;
     _lodash2.default.forEach(this.getAlphabetNum(), char => {
-      buf = _utils.php.substr(mem, start_offset + (char << 2), 4);
+      buf = _utils.php.strings.substr(mem, start_offset + (char << 2), 4);
       trans = _utils.php.unpack('V', buf)[0];
 
       //if(!(trans & 0x0200) && (trans & 0xFF) == char) {
@@ -2031,7 +2030,7 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
     let buf;
     let trans;
 
-    buf = _utils.php.substr(mem, fsa_start + 4, 4);
+    buf = _utils.php.strings.substr(mem, fsa_start + 4, 4);
     trans = _utils.php.unpack('V', buf)[0];
 
     return trans;
@@ -2039,7 +2038,7 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
 
   readAlphabet() {
     const mem = this.resource;
-    const buf = _utils.php.substr(mem, this.header['alphabet_offset'], this.header['alphabet_size']);
+    const buf = _utils.php.strings.substr(mem, this.header['alphabet_offset'], this.header['alphabet_size']);
 
     return buf.toString();
   }
@@ -2053,11 +2052,11 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
     const offset = this.header['annot_offset'] + ((trans & 0xFF) << 22 | trans >> 10 & 0x3FFFFF);
 
     let annot;
-    let buf = _utils.php.substr(mem, offset, 1);
-    let len = _utils.php.ord(buf);
+    let buf = _utils.php.strings.substr(mem, offset, 1);
+    let len = _utils.php.strings.ord(buf);
 
     if (len) {
-      buf = _utils.php.substr(mem, offset + 1, len);
+      buf = _utils.php.strings.substr(mem, offset + 1, len);
       annot = buf;
     } else {
       annot = null;
@@ -2067,8 +2066,8 @@ class Morphy_Fsa_Sparse_Mem extends _fsa.Morphy_Fsa {
   }
 
   getAlphabetNum() {
-    if (!_utils.php.isset(this.alphabet_num)) {
-      this.alphabet_num = _utils.php.array_map(_utils.php.ord, this.getAlphabet());
+    if (!_utils.php.var.isset(this.alphabet_num)) {
+      this.alphabet_num = _utils.php.array.array_map(_utils.php.strings.ord, this.getAlphabet());
     }
 
     return this.alphabet_num;
@@ -2173,7 +2172,7 @@ class Morphy_Fsa_Tree_File extends _fsa.Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = _utils.php.ord(wordBuf, i);
+      char = _utils.php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
@@ -2314,11 +2313,11 @@ class Morphy_Fsa_Tree_File extends _fsa.Morphy_Fsa {
             annot = trans;
           }
 
-          if (!_utils.php.call_user_func(callback, null, annot)) {
+          if (!_utils.php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(trans >> 11 & 0x1FFFFF);
@@ -2331,7 +2330,7 @@ class Morphy_Fsa_Tree_File extends _fsa.Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.substr(path, 0, -1);
+        //path = php.strings.substr(path, 0, -1);
       }
     } while (!!stack.length);
 
@@ -2430,7 +2429,7 @@ class Morphy_Fsa_Tree_File extends _fsa.Morphy_Fsa {
     let buf = Buffer.alloc(1);
     _fs2.default.readSync(fh, buf, 0, 1, offset);
 
-    let len = _utils.php.ord(buf);
+    let len = _utils.php.strings.ord(buf);
     if (len) {
       buf = Buffer.alloc(len);
       _fs2.default.readSync(fh, buf, 0, len, null);
@@ -2497,7 +2496,7 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = _utils.php.ord(wordBuf, i);
+      char = _utils.php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
@@ -2506,7 +2505,7 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
       start_offset = fsa_start + ((trans >> 11 & 0x1FFFFF) << 2);
 
       // read first trans in state
-      buf = _utils.php.substr(mem, start_offset, 4);
+      buf = _utils.php.strings.substr(mem, start_offset, 4);
       trans = _utils.php.unpack('V', buf)[0];
 
       // If first trans is term(i.e. pointing to annot) then skip it
@@ -2516,7 +2515,7 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
           result = false;
         } else {
           start_offset += 4;
-          buf = _utils.php.substr(mem, start_offset, 4);
+          buf = _utils.php.strings.substr(mem, start_offset, 4);
           trans = _utils.php.unpack('V', buf)[0];
         }
       }
@@ -2551,7 +2550,7 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
           }
 
           // read next trans
-          buf = _utils.php.substr(mem, start_offset + (idx - 1 << 2), 4);
+          buf = _utils.php.strings.substr(mem, start_offset + (idx - 1 << 2), 4);
           trans = _utils.php.unpack('V', buf)[0];
         }
       }
@@ -2575,7 +2574,7 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
 
       if (readAnnot) {
         // read annot trans
-        buf = _utils.php.substr(mem, fsa_start + ((trans >> 11 & 0x1FFFFF) << 2), 4);
+        buf = _utils.php.strings.substr(mem, fsa_start + ((trans >> 11 & 0x1FFFFF) << 2), 4);
         trans = _utils.php.unpack('V', buf)[0];
 
         if ((trans & 0x0100) == 0) {
@@ -2634,12 +2633,12 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.call_user_func(callback, path, annot)) {
-          if (!_utils.php.call_user_func(callback, null, annot)) {
+          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          if (!_utils.php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(trans >> 11 & 0x1FFFFF);
@@ -2652,7 +2651,7 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.substr(path, 0, -1);
+        //path = php.strings.substr(path, 0, -1);
       }
     } while (!!stack.length);
 
@@ -2666,13 +2665,13 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
 
     let offset = fsa_start + (index << 2);
     // read first trans
-    let buf = _utils.php.substr(mem, offset, 4);
+    let buf = _utils.php.strings.substr(mem, offset, 4);
     let trans = _utils.php.unpack('V', buf)[0];
 
     // check if first trans is pointer to annot, and not single in state
     if (trans & 0x0100 && !(trans & 0x0200 || trans & 0x0400)) {
       result.push(trans);
-      buf = _utils.php.substr(mem, offset, 4);
+      buf = _utils.php.strings.substr(mem, offset, 4);
       trans = _utils.php.unpack('V', buf)[0];
       offset += 4;
     }
@@ -2689,7 +2688,7 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
       result.push(trans);
 
       if (expect > 1) {
-        buf = _utils.php.substr(mem, offset, 4);
+        buf = _utils.php.strings.substr(mem, offset, 4);
         trans = _utils.php.unpack('V', buf)[0];
         offset += 4;
       }
@@ -2719,13 +2718,13 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
     const fh = this.resource;
     const fsa_start = this.fsa_start;
 
-    let buf = _utils.php.substr(fh, fsa_start + 0, 4);
+    let buf = _utils.php.strings.substr(fh, fsa_start + 0, 4);
     return _utils.php.unpack('V', buf)[0];
   }
 
   readAlphabet() {
     const fh = this.resource;
-    let buf = _utils.php.substr(fh, this.header['alphabet_offset'], this.header['alphabet_size']);
+    let buf = _utils.php.strings.substr(fh, this.header['alphabet_offset'], this.header['alphabet_size']);
 
     return buf.toString();
   }
@@ -2739,10 +2738,10 @@ class Morphy_Fsa_Tree_Mem extends _fsa.Morphy_Fsa {
     const offset = this.header['annot_offset'] + ((trans & 0xFF) << 21 | trans >> 11 & 0x1FFFFF);
 
     let annot;
-    let buf = _utils.php.substr(fh, offset, 1);
-    let len = _utils.php.ord(buf);
+    let buf = _utils.php.strings.substr(fh, offset, 1);
+    let len = _utils.php.strings.ord(buf);
     if (len) {
-      buf = _utils.php.substr(fh, offset + 1, len);
+      buf = _utils.php.strings.substr(fh, offset + 1, len);
       annot = buf;
     } else {
       annot = null;
@@ -2897,7 +2896,7 @@ class Morphy_GramInfo_File extends _graminfo.Morphy_GramInfo {
     const fh = this.resource;
     let offset = info['offset'] + 20;
 
-    if (_utils.php.isset(info['affixes_offset'])) {
+    if (_utils.php.var.isset(info['affixes_offset'])) {
       offset += info['affixes_offset'];
     } else {
       offset += info['forms_count'] * 2 + info['packed_forms_count'] * 2;
@@ -3075,7 +3074,7 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
 
   readGramInfoHeader(offset) {
     const mem = this.resource;
-    const result = _utils.php.unpack(['vid', 'vfreq', 'vforms_count', 'vpacked_forms_count', 'vancodes_count', 'vancodes_offset', 'vancodes_map_offset', 'vaffixes_offset', 'vaffixes_size', 'vbase_size'].join('/'), _utils.php.substr(mem, offset, 20));
+    const result = _utils.php.unpack(['vid', 'vfreq', 'vforms_count', 'vpacked_forms_count', 'vancodes_count', 'vancodes_offset', 'vancodes_map_offset', 'vaffixes_offset', 'vaffixes_size', 'vbase_size'].join('/'), _utils.php.strings.substr(mem, offset, 20));
 
     result['offset'] = offset;
 
@@ -3088,7 +3087,7 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
     // TODO: this can be wrong due to aligning ancodes map section
     const offset = info['offset'] + 20 + info['forms_count'] * 2;
 
-    return _utils.php.unpack('v' + forms_count, _utils.php.substr(mem, offset, forms_count * 2));
+    return _utils.php.unpack('v' + forms_count, _utils.php.strings.substr(mem, offset, forms_count * 2));
   }
 
   splitAncodes(ancodes, map) {
@@ -3115,7 +3114,7 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
     const forms_count = info['forms_count'];
     // TODO: this can be wrong due to aligning ancodes section
     const offset = info['offset'] + 20;
-    const ancodes = _utils.php.unpack('v' + forms_count, _utils.php.substr(mem, offset, forms_count * 2));
+    const ancodes = _utils.php.unpack('v' + forms_count, _utils.php.strings.substr(mem, offset, forms_count * 2));
     const map = this.readAncodesMap(info);
 
     return this.splitAncodes(ancodes, map);
@@ -3125,13 +3124,13 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
     const mem = this.resource;
     let offset = info['offset'] + 20;
 
-    if (_utils.php.isset(info['affixes_offset'])) {
+    if (_utils.php.var.isset(info['affixes_offset'])) {
       offset += info['affixes_offset'];
     } else {
       offset += info['forms_count'] * 2 + info['packed_forms_count'] * 2;
     }
 
-    return _utils.php.substr(mem, offset, info['affixes_size'] - this.ends_size).toString().split(this.ends.toString());
+    return _utils.php.strings.substr(mem, offset, info['affixes_size'] - this.ends_size).toString().split(this.ends.toString());
   }
 
   readAllGramInfoOffsets() {
@@ -3141,7 +3140,7 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
   readSectionIndex(offset, count) {
     const mem = this.resource;
 
-    return _utils.php.array_values(_utils.php.unpack('V' + count, _utils.php.substr(mem, offset, count * 4)));
+    return _utils.php.array.array_values(_utils.php.unpack('V' + count, _utils.php.strings.substr(mem, offset, count * 4)));
   }
 
   readAllFlexia() {
@@ -3172,10 +3171,10 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
     let res;
 
     _lodash2.default.forEach(this.readSectionIndexAsSize(this.header['poses_index_offset'], this.header['poses_count'], this.header['poses_size']), $size => {
-      res = _utils.php.unpack('vid/Cis_predict', _utils.php.substr(mem, offset, 3));
+      res = _utils.php.unpack('vid/Cis_predict', _utils.php.strings.substr(mem, offset, 3));
 
       result[res['id']] = {
-        name: this.cleanupCString(_utils.php.substr(mem, offset + 3, $size - 3)),
+        name: this.cleanupCString(_utils.php.strings.substr(mem, offset + 3, $size - 3)),
         is_predict: !!res['is_predict']
       };
 
@@ -3192,11 +3191,11 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
     let res;
 
     _lodash2.default.forEach(this.readSectionIndexAsSize(this.header['grammems_index_offset'], this.header['grammems_count'], this.header['grammems_size']), size => {
-      res = _utils.php.unpack('vid/Cshift', _utils.php.substr(mem, offset, 3));
+      res = _utils.php.unpack('vid/Cshift', _utils.php.strings.substr(mem, offset, 3));
 
       result[res['id']] = {
         'shift': res['shift'],
-        'name': this.cleanupCString(_utils.php.substr(mem, offset + 3, size - 3))
+        'name': this.cleanupCString(_utils.php.strings.substr(mem, offset + 3, size - 3))
       };
 
       offset += size;
@@ -3214,13 +3213,13 @@ class Morphy_GramInfo_Mem extends _graminfo.Morphy_GramInfo {
     let grammem_ids;
 
     for (let $i = 0; $i < this.header['ancodes_count']; $i++) {
-      res = _utils.php.unpack('vid/vpos_id', _utils.php.substr(mem, offset, 4));
+      res = _utils.php.unpack('vid/vpos_id', _utils.php.strings.substr(mem, offset, 4));
       offset += 4;
 
-      grammems_count = _utils.php.unpack('v', _utils.php.substr(mem, offset, 2))[1];
+      grammems_count = _utils.php.unpack('v', _utils.php.strings.substr(mem, offset, 2))[1];
       offset += 2;
 
-      grammem_ids = grammems_count ? _utils.php.array_values(_utils.php.unpack('v' + grammems_count, _utils.php.substr(mem, offset, grammems_count * 2))) : [];
+      grammem_ids = grammems_count ? _utils.php.array.array_values(_utils.php.unpack('v' + grammems_count, _utils.php.strings.substr(mem, offset, grammems_count * 2))) : [];
 
       result[res['id']] = {
         offset,
@@ -3500,7 +3499,7 @@ class Morphy_AnnotDecoder_Base extends Morphy_AnnotDecoder_Interface {
   getUnpackBlockSize() {}
 
   decode(annotRawBuf, withBase) {
-    if (_utils.php.empty(annotRawBuf)) {
+    if (_utils.php.var.empty(annotRawBuf)) {
       throw new Error("Empty annot given");
     }
 
@@ -3514,7 +3513,7 @@ class Morphy_AnnotDecoder_Base extends Morphy_AnnotDecoder_Interface {
     let start;
 
     if (result === false) {
-      throw new Error(`Invalid annot string '${ annotRaw }'`);
+      throw new Error(`Invalid annot string '${annotRaw}'`);
     }
 
     if (result['common_ancode'] == Morphy_AnnotDecoder_Base.INVALID_ANCODE_ID) {
@@ -3600,7 +3599,7 @@ class Morphy_AnnotDecoder_Factory {
   static create(eos) {
     const instances = Morphy_AnnotDecoder_Factory.instances;
 
-    if (!_utils.php.isset(instances[eos])) {
+    if (!_utils.php.var.isset(instances[eos])) {
       instances[eos] = new Morphy_AnnotDecoder_Factory(eos);
     }
 
@@ -3612,7 +3611,7 @@ class Morphy_AnnotDecoder_Factory {
   }
 
   getCommonDecoder() {
-    if (!_utils.php.isset(this.cache_common)) {
+    if (!_utils.php.var.isset(this.cache_common)) {
       this.cache_common = this.instantinate('common');
     }
 
@@ -3620,7 +3619,7 @@ class Morphy_AnnotDecoder_Factory {
   }
 
   getPredictDecoder() {
-    if (!_utils.php.isset(this.cache_predict)) {
+    if (!_utils.php.var.isset(this.cache_predict)) {
       this.cache_predict = this.instantinate('predict');
     }
 
@@ -3628,7 +3627,7 @@ class Morphy_AnnotDecoder_Factory {
   }
 
   instantinate(type) {
-    const className = 'Morphy_AnnotDecoder_' + _utils.php.ucfirst(type.toLowerCase());
+    const className = 'Morphy_AnnotDecoder_' + _utils.php.strings.ucfirst(type.toLowerCase());
 
     return new Morphy_AnnotDecoder_Factory.AnnotDecoders[className](this.eos);
   }
@@ -3655,7 +3654,7 @@ class Morphy_AncodesResolver_ToText extends Morphy_AncodesResolver_Interface {
   }
 
   resolve(ancodeId) {
-    if (!_utils.php.isset(ancodeId)) {
+    if (!_utils.php.var.isset(ancodeId)) {
       return null;
     }
 
@@ -3675,33 +3674,33 @@ class Morphy_AncodesResolver_ToDialingAncodes extends Morphy_AncodesResolver_Int
    */
   constructor(ancodesMap) {
     super();
-    this.ancodes_map = _utils.php.unserialize(ancodesMap.read(0, ancodesMap.getFileSize()).toString());
+    this.ancodes_map = _utils.php.var.unserialize(ancodesMap.read(0, ancodesMap.getFileSize()).toString());
     if (this.ancodes_map === false) {
       throw new Error("Can`t open phpMorphy => Dialing ancodes map");
     }
 
-    this.reverse_map = _utils.php.array_flip(this.ancodes_map);
+    this.reverse_map = _utils.php.array.array_flip(this.ancodes_map);
   }
 
   unresolve(ancode) {
-    if (!_utils.php.isset(ancode)) {
+    if (!_utils.php.var.isset(ancode)) {
       return null;
     }
 
-    if (!_utils.php.isset(this.reverse_map[ancode])) {
-      throw new Error(`Unknown ancode found '${ ancode }'`);
+    if (!_utils.php.var.isset(this.reverse_map[ancode])) {
+      throw new Error(`Unknown ancode found '${ancode}'`);
     }
 
     return this.reverse_map[ancode];
   }
 
   resolve(ancodeId) {
-    if (!_utils.php.isset(ancodeId)) {
+    if (!_utils.php.var.isset(ancodeId)) {
       return null;
     }
 
-    if (!_utils.php.isset(this.ancodes_map[ancodeId])) {
-      throw new Error(`Unknown ancode id found '${ ancodeId }'`);
+    if (!_utils.php.var.isset(this.ancodes_map[ancodeId])) {
+      throw new Error(`Unknown ancode id found '${ancodeId}'`);
     }
 
     return this.ancodes_map[ancodeId];
@@ -3869,7 +3868,7 @@ class Morphy_Morphier_Helper {
   }
 
   hasAnnotDecoder() {
-    return _utils.php.isset(this.annot_decoder);
+    return _utils.php.var.isset(this.annot_decoder);
   }
 
   getAnnotDecoder() {
@@ -3936,16 +3935,16 @@ class Morphy_Morphier_Helper {
     let prefix;
 
     if (flen) {
-      base = _utils.php.substr(wordBuf, cplen + plen, -flen);
+      base = _utils.php.strings.substr(wordBuf, cplen + plen, -flen);
     } else {
       if (cplen || plen) {
-        base = _utils.php.substr(wordBuf, cplen + plen);
+        base = _utils.php.strings.substr(wordBuf, cplen + plen);
       } else {
         base = wordBuf;
       }
     }
 
-    prefix = cplen ? _utils.php.substr(wordBuf, 0, cplen) : '';
+    prefix = cplen ? _utils.php.strings.substr(wordBuf, 0, cplen) : '';
     base = base.toString();
     prefix = prefix.toString();
 
@@ -3988,7 +3987,7 @@ class Morphy_Morphier_Helper {
       result[base] = 1;
     });
 
-    return _utils.php.array_keys(result);
+    return _utils.php.array.array_keys(result);
   }
 
   getAllForms(word, annots) {
@@ -4021,7 +4020,7 @@ class Morphy_Morphier_Helper {
      */
 
     grammems = _lodash2.default.toArray(grammems);
-    partOfSpeech = _utils.php.isset(partOfSpeech) ? partOfSpeech + '' : null;
+    partOfSpeech = _utils.php.var.isset(partOfSpeech) ? partOfSpeech + '' : null;
 
     /**
      * Проверено:
@@ -4034,7 +4033,7 @@ class Morphy_Morphier_Helper {
       const all_ancodes = this.graminfo.readAncodes(annot);
       const flexias = this.graminfo.readFlexiaData(annot);
       const common_ancode = annot['common_ancode'];
-      const common_grammems = _utils.php.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
+      const common_grammems = _utils.php.var.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
 
       var _getBaseAndPrefix = this.getBaseAndPrefix(word, annot['cplen'], annot['plen'], annot['flen']),
           _getBaseAndPrefix2 = _slicedToArray(_getBaseAndPrefix, 2);
@@ -4058,7 +4057,7 @@ class Morphy_Morphier_Helper {
       _lodash2.default.forEach(all_ancodes, form_ancodes => {
         _lodash2.default.forEach(form_ancodes, ancode => {
           const form_pos = this.gramtab.getPartOfSpeech(ancode);
-          const form_grammems = _utils.php.array_merge(this.gramtab.getGrammems(ancode), common_grammems);
+          const form_grammems = _utils.php.array.array_merge(this.gramtab.getGrammems(ancode), common_grammems);
           const form = [prefix, flexias[i], base, flexias[i + 1]].join('');
 
           if (_lodash2.default.isFunction(callback)) {
@@ -4067,12 +4066,12 @@ class Morphy_Morphier_Helper {
               return;
             }
           } else {
-            if (_utils.php.isset(partOfSpeech) && form_pos !== partOfSpeech) {
+            if (_utils.php.var.isset(partOfSpeech) && form_pos !== partOfSpeech) {
               form_no++;
               return;
             }
 
-            if (_lodash2.default.size(_utils.php.array_diff(grammems, form_grammems)) > 0) {
+            if (_lodash2.default.size(_utils.php.array.array_diff(grammems, form_grammems)) > 0) {
               form_no++;
               return;
             }
@@ -4096,7 +4095,7 @@ class Morphy_Morphier_Helper {
       });
     });
 
-    return returnWords ? _utils.php.array_keys(result) : result;
+    return returnWords ? _utils.php.array.array_keys(result) : result;
   }
 
   getAncode(annots) {
@@ -4110,7 +4109,7 @@ class Morphy_Morphier_Helper {
 
       result.push({
         common: this.ancodes_resolver.resolve(annot['common_ancode']),
-        all: _utils.php.array_map([this.ancodes_resolver, 'resolve'], all_ancodes[annot['form_no']])
+        all: _utils.php.array.array_map([this.ancodes_resolver, 'resolve'], all_ancodes[annot['form_no']])
       });
     });
 
@@ -4127,14 +4126,14 @@ class Morphy_Morphier_Helper {
       const all_ancodes = this.graminfo.readAncodes(annot);
       const common_ancode = annot['common_ancode'];
       const form_no = annot['form_no'];
-      let grammems = _utils.php.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
+      let grammems = _utils.php.var.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
       let forms_count = 0;
 
       let ancodeId;
       _lodash2.default.forEach(all_ancodes[form_no], ancode => {
         ancodeId = ancode;
 
-        grammems = _utils.php.array_merge(grammems, this.gramtab.getGrammems(ancode));
+        grammems = _utils.php.array.array_merge(grammems, this.gramtab.getGrammems(ancode));
         forms_count++;
       });
 
@@ -4163,12 +4162,12 @@ class Morphy_Morphier_Helper {
     _lodash2.default.forEach(this.decodeAnnot(annots, false), annot => {
       const all_ancodes = this.graminfo.readAncodes(annot);
       const common_ancode = annot['common_ancode'];
-      const common_grammems = _utils.php.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
+      const common_grammems = _utils.php.var.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
       const info = [];
       const form_no = annot['form_no'];
 
       _lodash2.default.forEach(all_ancodes[form_no], ancode => {
-        let grammems = _utils.php.array_merge(common_grammems, this.gramtab.getGrammems(ancode));
+        let grammems = _utils.php.array.array_merge(common_grammems, this.gramtab.getGrammems(ancode));
         grammems = _lodash2.default.sortBy(grammems, this.resolve_pos ? JSON.stringify : _lodash2.default.toInteger);
 
         let info_item = {
@@ -4242,7 +4241,7 @@ class Morphy_Morphier_Helper {
       }
     });
 
-    return _utils.php.array_keys(result);
+    return _utils.php.array.array_keys(result);
   }
 
   composeForms(word, annots) {
@@ -4262,7 +4261,7 @@ class Morphy_Morphier_Helper {
       }
     });
 
-    return _utils.php.array_keys(result);
+    return _utils.php.array.array_keys(result);
   }
 
   composeFormsWithResolvedAncodes(word, annots) {
@@ -4345,7 +4344,7 @@ class Morphy_Morphier_Helper {
   }
 
   decodeAnnot(annotsRaw, withBase) {
-    if (_utils.php.is_array(annotsRaw)) {
+    if (_utils.php.var.is_array(annotsRaw)) {
       return annotsRaw;
     }
 
@@ -4357,7 +4356,7 @@ class Morphy_Morphier_Helper {
 class Morphy_WordForm {
 
   static compareGrammems(a, b) {
-    return _lodash2.default.size(a) == _lodash2.default.size(b) && _lodash2.default.size(_utils.php.array_diff(a, b)) == 0;
+    return _lodash2.default.size(a) == _lodash2.default.size(b) && _lodash2.default.size(_utils.php.array.array_diff(a, b)) == 0;
   }
 
   constructor(word, form_no, pos_id, grammems) {
@@ -4381,7 +4380,7 @@ class Morphy_WordForm {
     grammems = !_lodash2.default.isArray(grammems) ? [grammems] : grammems;
     const grammes_count = _lodash2.default.size(grammems);
 
-    return grammes_count && _lodash2.default.size(_utils.php.array_intersect(grammems, this.grammems)) == grammes_count;
+    return grammes_count && _lodash2.default.size(_utils.php.array.array_intersect(grammems, this.grammems)) == grammes_count;
   }
 
   getWord() {
@@ -4423,7 +4422,7 @@ class Morphy_WordDescriptor extends Array {
   }
 
   getPseudoRoot() {
-    if (!_utils.php.isset(this.cached_pseudo_root)) {
+    if (!_utils.php.var.isset(this.cached_pseudo_root)) {
       this.cached_pseudo_root = this.helper.getPseudoRoot(this.word, this.annot)[0];
     }
 
@@ -4431,7 +4430,7 @@ class Morphy_WordDescriptor extends Array {
   }
 
   getBaseForm() {
-    if (!_utils.php.isset(this.cached_base)) {
+    if (!_utils.php.var.isset(this.cached_base)) {
       this.cached_base = this.helper.getBaseForm(this.word, this.annot)[0];
     }
 
@@ -4439,7 +4438,7 @@ class Morphy_WordDescriptor extends Array {
   }
 
   getAllForms() {
-    if (!_utils.php.isset(this.cached_forms)) {
+    if (!_utils.php.var.isset(this.cached_forms)) {
       this.cached_forms = this.helper.getAllForms(this.word, this.annot);
     }
 
@@ -4458,17 +4457,17 @@ class Morphy_WordDescriptor extends Array {
     let pos_id;
     let all_grammems;
 
-    if (!_utils.php.isset(this.common_ancode_grammems)) {
+    if (!_utils.php.var.isset(this.common_ancode_grammems)) {
       common_ancode = this.annot[0]['common_ancode'];
 
-      this.common_ancode_grammems = _utils.php.isset(common_ancode) ? this.helper.getGrammems(common_ancode) : {};
+      this.common_ancode_grammems = _utils.php.var.isset(common_ancode) ? this.helper.getGrammems(common_ancode) : {};
     }
 
     grammemsAndPartOfSpeech = this.helper.getGrammemsAndPartOfSpeech(ancode);
     pos_id = grammemsAndPartOfSpeech[0];
     all_grammems = grammemsAndPartOfSpeech[1];
 
-    return new Morphy_WordForm(word, form_no, pos_id, _utils.php.array_merge(this.common_ancode_grammems, all_grammems));
+    return new Morphy_WordForm(word, form_no, pos_id, _utils.php.array.array_merge(this.common_ancode_grammems, all_grammems));
   }
 
   readAllForms() {
@@ -4667,7 +4666,7 @@ class Morphy_Morphier_Finder_Predict_Suffix extends Morphy_Morphier_Finder_Commo
     let i = 1;
     let c = word_len - this.min_suf_len;
     for (; i < c; i++) {
-      word = _utils.php.substr(word, this.unicode.firstCharSize(word));
+      word = _utils.php.strings.substr(word, this.unicode.firstCharSize(word));
       result = super.doFindWord(word);
 
       if (result !== false) {
@@ -4719,7 +4718,7 @@ class Morphy_Morphier_PredictCollector extends _fsa.Morphy_Fsa_WordsCollector {
       annot['cplen'] = annot['plen'] = 0;
       pos_id = annot['pos_id'];
 
-      if (_utils.php.isset(this.used_poses[pos_id])) {
+      if (_utils.php.var.isset(this.used_poses[pos_id])) {
         result_idx = this.used_poses[pos_id];
 
         if (annot['freq'] > this.items[result_idx]['freq']) {
@@ -4797,7 +4796,7 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
       }
     }
 
-    if (!_utils.php.is_array(annots)) {
+    if (!_utils.php.var.is_array(annots)) {
       annots = this.collector.decodeAnnot(annots);
     }
 
@@ -4835,8 +4834,8 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
       plen = prefix.length;
       slen = suffix.length;
 
-      const partOfWordInPlaceOfPrefix = _utils.php.substr(word, 0, plen);
-      const partOfWordInPlaceOfSuffix = _utils.php.substr(word, -slen);
+      const partOfWordInPlaceOfPrefix = _utils.php.strings.substr(word, 0, plen);
+      const partOfWordInPlaceOfSuffix = _utils.php.strings.substr(word, -slen);
 
       if ((!plen || partOfWordInPlaceOfPrefix && partOfWordInPlaceOfPrefix.equals(prefix)) && (!slen || partOfWordInPlaceOfSuffix && partOfWordInPlaceOfSuffix.equals(suffix))) {
         result.push(annot);
@@ -5258,7 +5257,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
       }
 
       if (is_final) {
-        if (trans !== false && _utils.php.isset(result['annot'])) {
+        if (trans !== false && _utils.php.var.isset(result['annot'])) {
           annots[result['annot']] = annots[result['annot']] || {
             annots: result['annot'],
             data: []
@@ -5317,16 +5316,16 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
           let form;
 
           if (flen) {
-            base = _utils.php.substr(word, cplen + plen, -flen);
+            base = _utils.php.strings.substr(word, cplen + plen, -flen);
           } else {
             if (cplen || plen) {
-              base = _utils.php.substr(word, cplen + plen);
+              base = _utils.php.strings.substr(word, cplen + plen);
             } else {
               base = word;
             }
           }
 
-          prefix = cplen ? _utils.php.substr(word, 0, cplen) : '';
+          prefix = cplen ? _utils.php.strings.substr(word, 0, cplen) : '';
           result[word] = result[word] || {};
 
           if (pseudoRoot) {
@@ -5360,11 +5359,11 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
   }
 
   buildPatriciaTrie(words) {
-    if (!_utils.php.is_array(words)) {
+    if (!_utils.php.var.is_array(words)) {
       throw new Error('Words must be array');
     }
 
-    //words = php.sort(words);
+    //words = php.array.sort(words);
     words = words.length && Buffer.isBuffer(words[0]) ? words.sort(Buffer.compare) : words.sort();
 
     let stack = [];
@@ -5465,17 +5464,17 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
           new_node_id_2 = new_node_id_1 + 1;
 
           // new_node_1
-          state_labels.push(_utils.php.substr(node_key_buf, trim_size));
+          state_labels.push(_utils.php.strings.substr(node_key_buf, trim_size));
           state_finals.push(state_finals[node]);
           state_dests.push(state_dests[node]);
 
           // adjust old node
-          state_labels[node] = _utils.php.substr(node_key_buf, 0, trim_size);
+          state_labels[node] = _utils.php.strings.substr(node_key_buf, 0, trim_size);
           state_finals[node] = 0;
           state_dests[node] = [new_node_id_1];
 
           // append new node, new_node_2
-          state_labels.push(_utils.php.substr(wordBuf, lcp));
+          state_labels.push(_utils.php.strings.substr(wordBuf, lcp));
           state_finals.push(1);
           state_dests.push(false);
 
@@ -5485,7 +5484,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
         } else {
           new_node_id = _lodash2.default.size(state_labels);
 
-          state_labels.push(_utils.php.substr(wordBuf, lcp));
+          state_labels.push(_utils.php.strings.substr(wordBuf, lcp));
           state_finals.push(1);
           state_dests.push(false);
 
@@ -5555,67 +5554,51 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-__webpack_require__(61);
+__webpack_require__(34);
 
-__webpack_require__(67);
+__webpack_require__(39);
+
+__webpack_require__(42);
 
 __webpack_require__(43);
 
-__webpack_require__(44);
+__webpack_require__(37);
 
-__webpack_require__(28);
+__webpack_require__(40);
 
-__webpack_require__(29);
+__webpack_require__(38);
 
-__webpack_require__(30);
-
-__webpack_require__(31);
-
-__webpack_require__(32);
-
-__webpack_require__(33);
-
-__webpack_require__(34);
+__webpack_require__(41);
 
 __webpack_require__(35);
 
 __webpack_require__(36);
 
-__webpack_require__(37);
+__webpack_require__(30);
 
-__webpack_require__(38);
+__webpack_require__(32);
 
-__webpack_require__(39);
-
-__webpack_require__(40);
-
-__webpack_require__(62);
-
-__webpack_require__(42);
-
-__webpack_require__(60);
-
-__webpack_require__(41);
-
-__webpack_require__(59);
+__webpack_require__(44);
 
 __webpack_require__(45);
 
-__webpack_require__(70);
+__webpack_require__(31);
 
-__webpack_require__(68);
+__webpack_require__(33);
 
-__webpack_require__(69);
+__webpack_require__(29);
 
-__webpack_require__(47);
+__webpack_require__(28);
+
+__webpack_require__(48);
 
 __webpack_require__(46);
+
+__webpack_require__(47);
 
 __webpack_require__(50);
 
 __webpack_require__(49);
-
-__webpack_require__(48);
 
 var _lodash = __webpack_require__(0);
 
@@ -6102,7 +6085,7 @@ class Morphy_FilesBundle {
   genFileName(token, extraExt) {
     extraExt = !_lodash2.default.isUndefined(extraExt) ? extraExt : null;
 
-    return _path2.default.join(this.dir, [token, '.', this.lang, _utils.php.isset(extraExt) ? '.' + extraExt : '', '.bin'].join(''));
+    return _path2.default.join(this.dir, [token, '.', this.lang, _utils.php.var.isset(extraExt) ? '.' + extraExt : '', '.bin'].join(''));
   }
 
 }
@@ -6149,7 +6132,7 @@ class Morphy_WordDescriptor_Collection_Serializer {
    */
   serializeGramInfo(wordForm, asText = false) {
     if (asText) {
-      return wordForm.getPartOfSpeech() + ' ' + _utils.php.implode(',', wordForm.getGrammems());
+      return wordForm.getPartOfSpeech() + ' ' + _utils.php.strings.implode(',', wordForm.getGrammems());
     }
 
     return {
@@ -6261,7 +6244,7 @@ class phpMorphy {
   findWord(word, type = _constants.NORMAL) {
     const result = {};
 
-    if (_utils.php.is_array(word)) {
+    if (_utils.php.var.is_array(word)) {
       word.forEach(w => result[w] = this.invoke('getWordDescriptor', (0, _utils.toBuffer)(w), type));
       return result;
     }
@@ -6352,7 +6335,7 @@ class phpMorphy {
       return false;
     }
 
-    if (_utils.php.is_array(word)) {
+    if (_utils.php.var.is_array(word)) {
       const out = {};
       _lodash2.default.forEach(result, (r, w) => {
         if (false !== r) {
@@ -6429,8 +6412,8 @@ class phpMorphy {
     const ancode_id = resolver.unresolve(ancode);
     const data = this.helper.getGrammemsAndPartOfSpeech(ancode_id);
 
-    if (_utils.php.isset(common_ancode_id)) {
-      data[1] = _utils.php.array_merge(data[1], this.helper.getGrammems(common_ancode_id));
+    if (_utils.php.var.isset(common_ancode_id)) {
+      data[1] = _utils.php.array.array_merge(data[1], this.helper.getGrammems(common_ancode_id));
     }
 
     return this.castFormByGramInfo(word, data[0], data[1], returnOnlyWord, callback, type);
@@ -6484,12 +6467,12 @@ class phpMorphy {
         const pos = grammar['pos'];
         const essential_grammems = grammemsProvider.getGrammems(pos);
 
-        const grammems = essential_grammems !== false ? _utils.php.array_intersect(grammar['grammems'], essential_grammems) : grammar['grammems'];
+        const grammems = essential_grammems !== false ? _utils.php.array.array_intersect(grammar['grammems'], essential_grammems) : grammar['grammems'];
 
         const res = this.helper.castFormByGramInfo(word, word_annot, pos, grammems, returnOnlyWord, callback, type);
 
         if (res.length) {
-          result = _utils.php.array_merge(result, res);
+          result = _utils.php.array.array_merge(result, res);
         }
       });
     });
@@ -6514,7 +6497,7 @@ class phpMorphy {
     let not_found;
 
     if (type === _constants.ONLY_PREDICT) {
-      if (_utils.php.is_array(word)) {
+      if (_utils.php.var.is_array(word)) {
         result = {};
         _lodash2.default.forEach(word, w => result[w] = this.predictWord(method, w));
 
@@ -6524,7 +6507,7 @@ class phpMorphy {
       }
     }
 
-    if (_utils.php.is_array(word)) {
+    if (_utils.php.var.is_array(word)) {
       result = this.__bulk_morphier[method](word);
       not_found = this.__bulk_morphier.getNotFoundWords();
 
@@ -6572,7 +6555,7 @@ class phpMorphy {
       case _constants.SOURCE_FSA:
         return new _source.Morphy_Source_Fsa(this.common_fsa);
       default:
-        throw new Error(`Unknown source type given '${ type }'`);
+        throw new Error(`Unknown source type given '${type}'`);
     }
   }
 
@@ -7067,7 +7050,7 @@ class Morphy_GramTab_Empty extends Morphy_GramTab_Interface {
   }
 
   resolveGrammemIds(ids) {
-    return _utils.php.is_array(ids) ? {} : '';
+    return _utils.php.var.is_array(ids) ? {} : '';
   }
 
   resolvePartOfSpeechId(id) {
@@ -7164,7 +7147,7 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
   constructor(storage) {
     super();
 
-    this.data = _utils.php.unserialize(storage.read(0, storage.getFileSize()).toString());
+    this.data = _utils.php.var.unserialize(storage.read(0, storage.getFileSize()).toString());
     if (this.data == false) {
       throw new Error('Broken gramtab data');
     }
@@ -7176,28 +7159,28 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
   }
 
   getGrammems(ancodeId) {
-    if (!_utils.php.isset(this.ancodes[ancodeId])) {
-      throw new Error(`Invalid ancode id '${ ancodeId }'`);
+    if (!_utils.php.var.isset(this.ancodes[ancodeId])) {
+      throw new Error(`Invalid ancode id '${ancodeId}'`);
     }
 
     return this.ancodes[ancodeId]['grammem_ids'];
   }
 
   getPartOfSpeech(ancodeId) {
-    if (!_utils.php.isset(this.ancodes[ancodeId])) {
-      throw new Error(`Invalid ancode id '${ ancodeId } '`);
+    if (!_utils.php.var.isset(this.ancodes[ancodeId])) {
+      throw new Error(`Invalid ancode id '${ancodeId} '`);
     }
 
     return this.ancodes[ancodeId].pos_id;
   }
 
   resolveGrammemIds(ids) {
-    if (_utils.php.is_array(ids)) {
+    if (_utils.php.var.is_array(ids)) {
       const result = [];
 
       _lodash2.default.forEach(ids, id => {
-        if (!_utils.php.isset(this.grammems[id])) {
-          throw new Error(`Invalid grammem id '${ id }'`);
+        if (!_utils.php.var.isset(this.grammems[id])) {
+          throw new Error(`Invalid grammem id '${id}'`);
         }
 
         result.push(this.grammems[id]['name']);
@@ -7206,16 +7189,16 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
       return result;
     }
 
-    if (!_utils.php.isset(this.grammems[ids])) {
-      throw new Error(`Invalid grammem id '${ ids }'`);
+    if (!_utils.php.var.isset(this.grammems[ids])) {
+      throw new Error(`Invalid grammem id '${ids}'`);
     }
 
     return this.grammems[ids]['name'];
   }
 
   resolvePartOfSpeechId(id) {
-    if (!_utils.php.isset(this.poses[id])) {
-      throw new Error(`Invalid part of speech id '${ id }'`);
+    if (!_utils.php.var.isset(this.poses[id])) {
+      throw new Error(`Invalid part of speech id '${id}'`);
     }
 
     return this.poses[id]['name'];
@@ -7229,7 +7212,7 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
   ancodeToString(ancodeId, commonAncode) {
     commonAncode = !_lodash2.default.isUndefined(commonAncode) ? commonAncode : null;
 
-    if (_utils.php.isset(commonAncode)) {
+    if (_utils.php.var.isset(commonAncode)) {
       commonAncode = this.getGrammems(commonAncode).join(',') + ',';
     }
 
@@ -7239,12 +7222,12 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
   findAncode(partOfSpeech, grammems) {}
 
   stringToAncode(string) {
-    if (!_utils.php.isset(string)) {
+    if (!_utils.php.var.isset(string)) {
       return null;
     }
 
-    if (!_utils.php.isset(this.__ancodes_map[string])) {
-      throw new Error(`Ancode with '${ string }' graminfo not found`);
+    if (!_utils.php.var.isset(this.__ancodes_map[string])) {
+      throw new Error(`Ancode with '${string}' graminfo not found`);
     }
 
     return this.__ancodes_map[string];
@@ -7256,7 +7239,7 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
    * @returns {string}
    */
   toString(partOfSpeechId, grammemIds) {
-    return partOfSpeechId + ' ' + _utils.php.implode(',', grammemIds);
+    return partOfSpeechId + ' ' + _utils.php.strings.implode(',', grammemIds);
   }
 
   buildAncodesMap() {
@@ -7675,18 +7658,18 @@ class Morphy_Storage {
    */
   read(offset, len, exactLength = true) {
     if (offset >= this.getFileSize()) {
-      throw new Error(`Can't read ${ len } bytes beyond end of '${ this.getFileName() }' file, offset = ${ offset }, file_size = ${ this.getFileSize() }`);
+      throw new Error(`Can't read ${len} bytes beyond end of '${this.getFileName()}' file, offset = ${offset}, file_size = ${this.getFileSize()}`);
     }
 
     let result;
     try {
       result = this.readUnsafe(offset, len);
     } catch (e) {
-      throw new Error(`Can't read ${ len } bytes at ${ offset } offset, from '${ this.getFileName() }' file: ${ e.message }`);
+      throw new Error(`Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file: ${e.message}`);
     }
 
     if (exactLength && result.length < len) {
-      throw new Error(`Can't read ${ len } bytes at ${ offset } offset, from '${ this.getFileName() }' file`);
+      throw new Error(`Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file`);
     }
 
     return result;
@@ -7767,7 +7750,7 @@ class Morphy_Storage_File extends Morphy_Storage {
   getFileSize() {
     const stat = _fs2.default.fstatSync(this.resource);
     if (stat === false) {
-      throw new Error(`Can't invoke fs.fstatSync for '${ this.file_name }' file`);
+      throw new Error(`Can't invoke fs.fstatSync for '${this.file_name}' file`);
     }
 
     return stat['size'];
@@ -7783,7 +7766,7 @@ class Morphy_Storage_File extends Morphy_Storage {
   open(fileName) {
     const fh = _fs2.default.openSync(fileName, 'r');
     if (fh === false) {
-      throw new Error(`Can't open '${ this.file_name }' file`);
+      throw new Error(`Can't open '${this.file_name}' file`);
     }
 
     return fh;
@@ -7806,14 +7789,14 @@ class Morphy_Storage_Mem extends Morphy_Storage {
   }
 
   readUnsafe(offset, len) {
-    return _utils.php.substr(this.resource, offset, len);
+    return _utils.php.strings.substr(this.resource, offset, len);
     //return this.resource.slice(offset, offset + len - 1);
   }
 
   open(fileName) {
     const buffer = _fs2.default.readFileSync(fileName);
     if (buffer === false) {
-      throw new Error(`Can't read '${ fileName }' file`);
+      throw new Error(`Can't read '${fileName}' file`);
     }
 
     return buffer;
@@ -7837,14 +7820,14 @@ class Morphy_Storage_Factory {
       case _constants.STORAGE_MEM:
         break;
       default:
-        throw new Error(`Invalid storage type '${ type }' specified`);
+        throw new Error(`Invalid storage type '${type}' specified`);
     }
 
     if (lazy) {
       return new Morphy_Storage_Proxy(type, fileName, this);
     }
 
-    const className = 'Morphy_Storage_' + _utils.php.ucfirst(type.toLowerCase());
+    const className = 'Morphy_Storage_' + _utils.php.strings.ucfirst(type.toLowerCase());
 
     return new Morphy_Storage_Factory.storages[className](fileName);
   }
@@ -7917,7 +7900,7 @@ class Morphy_UnicodeHelper {
 
 
     encoding = encoding.toLowerCase();
-    if (_utils.php.isset(cache[encoding])) {
+    if (_utils.php.var.isset(cache[encoding])) {
       return cache[encoding];
     }
 
@@ -7941,14 +7924,14 @@ class Morphy_UnicodeHelper {
       switch (utf_type) {
         case 'utf':
           if ([8, 16, 32].indexOf(utf_base) < 0) {
-            // if (!php.in_array(utf_base, [8, 16, 32])) {
+            // if (!php.array.in_array(utf_base, [8, 16, 32])) {
             throw new Error('Invalid utf base');
           }
 
           break;
         case 'ucs':
           if ([2, 4].indexOf(utf_base) < 0) {
-            // if (!php.in_array(utf_base, [2, 4])) {
+            // if (!php.array.in_array(utf_base, [2, 4])) {
             throw new Error('Invalid ucs base');
           }
 
@@ -7958,11 +7941,11 @@ class Morphy_UnicodeHelper {
       }
 
       if (utf_base > 8 || 'ucs' === utf_type) {
-        if (_utils.php.isset(matches[5])) {
+        if (_utils.php.var.isset(matches[5])) {
           endiannes = matches[5] == 'be' ? 'be' : 'le';
         } else {
-          tmp = _utils.php.pack('L', 1);
-          endiannes = _utils.php.ord(tmp) == 0 ? 'be' : 'le';
+          tmp = _utils.php.misc.pack('L', 1);
+          endiannes = _utils.php.strings.ord(tmp) == 0 ? 'be' : 'le';
         }
       }
 
@@ -7972,7 +7955,7 @@ class Morphy_UnicodeHelper {
         encoding_name = utf_type + '-' + utf_base;
       }
 
-      className = `Morphy_UnicodeHelper_${ _utils.php.str_replace('-', '_', encoding_name) }`;
+      className = `Morphy_UnicodeHelper_${_utils.php.strings.str_replace('-', '_', encoding_name)}`;
 
       return new Morphy_UnicodeHelper.unicodeHelpers[className](encoding_name);
     } else {
@@ -8019,18 +8002,18 @@ class Morphy_UnicodeHelper_MultiByteFixed extends Morphy_UnicodeHelper_Base {
   }
 
   strrev(str) {
-    return _utils.php.implode('', _utils.php.array_reverse(_utils.php.str_split(str, this.size)));
+    return _utils.php.strings.implode('', _utils.php.array.array_reverse(_utils.php.strings.str_split(str, this.size)));
   }
 
   php_strlen(str) {
-    return _utils.php.strlen(str) / this.size;
+    return _utils.php.strings.strlen(str) / this.size;
   }
 
   fixTrailing(str) {
-    const len = _utils.php.strlen(str);
+    const len = _utils.php.strings.strlen(str);
 
     if (len % this.size > 0) {
-      return _utils.php.substr(str, 0, Math.floor(len / this.size) * this.size);
+      return _utils.php.strings.substr(str, 0, Math.floor(len / this.size) * this.size);
     }
 
     return str;
@@ -8078,7 +8061,7 @@ class Morphy_UnicodeHelper_utf_8 extends Morphy_UnicodeHelper_Base {
   }
 
   firstCharSize(str) {
-    return 1 + this.tails_length[_utils.php.ord(str)];
+    return 1 + this.tails_length[_utils.php.strings.ord(str)];
   }
 
   strrev(str) {
@@ -8150,9 +8133,9 @@ class Morphy_UnicodeHelper_utf_16_Base extends Morphy_UnicodeHelper_Base {
   }
 
   strrev(str) {
-    const count = _utils.php.strlen(str);
+    const count = _utils.php.strings.strlen(str);
     const fmt = this.char_fmt + count;
-    const words = _utils.php.array_reverse(_utils.php.unpack(fmt, str));
+    const words = _utils.php.array.array_reverse(_utils.php.unpack(fmt, str));
 
     let ord;
     let t;
@@ -8170,37 +8153,37 @@ class Morphy_UnicodeHelper_utf_16_Base extends Morphy_UnicodeHelper_Base {
       }
     }
 
-    _utils.php.array_unshift(words, fmt);
+    _utils.php.array.array_unshift(words, fmt);
 
-    return _utils.php.pack(...words);
+    return _utils.php.misc.pack(...words);
   }
 
   fixTrailing(str) {
-    let strlen = _utils.php.strlen(str);
+    let strlen = _utils.php.strings.strlen(str);
 
     if (strlen & 1) {
       strlen--;
-      str = _utils.php.substr(str, 0, strlen);
+      str = _utils.php.strings.substr(str, 0, strlen);
     }
 
     if (strlen < 2) {
       return '';
     }
 
-    let ord = _utils.php.unpack(this.char_fmt, _utils.php.substr(str, -2, 2))[1];
+    let ord = _utils.php.unpack(this.char_fmt, _utils.php.strings.substr(str, -2, 2))[1];
 
     if (this.isSurrogate(ord)) {
       if (strlen < 4) {
         return '';
       }
 
-      ord = _utils.php.unpack(this.char_fmt, _utils.php.substr(str, -4, 2))[1];
+      ord = _utils.php.unpack(this.char_fmt, _utils.php.strings.substr(str, -4, 2))[1];
 
       if (this.isSurrogate(ord)) {
         // full surrogate pair
         return str;
       } else {
-        return _utils.php.substr(str, 0, -2);
+        return _utils.php.strings.substr(str, 0, -2);
       }
     }
 
@@ -8208,7 +8191,7 @@ class Morphy_UnicodeHelper_utf_16_Base extends Morphy_UnicodeHelper_Base {
   }
 
   php_strlen(str) {
-    let count = _utils.php.strlen(str) / 2;
+    let count = _utils.php.strings.strlen(str) / 2;
     const fmt = this.char_fmt + count;
 
     _lodash2.default.forEach(_utils.php.unpack(fmt, str), ord => {
@@ -8421,145 +8404,145 @@ webpackContext.id = 27;
 /* 28 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.apply");
+module.exports = require("core-js/modules/es6.array.from");
 
 /***/ },
 /* 29 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.construct");
+module.exports = require("core-js/modules/es6.function.name");
 
 /***/ },
 /* 30 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.define-property");
+module.exports = require("core-js/modules/es6.map");
 
 /***/ },
 /* 31 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.delete-property");
+module.exports = require("core-js/modules/es6.promise");
 
 /***/ },
 /* 32 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.get");
+module.exports = require("core-js/modules/es6.set");
 
 /***/ },
 /* 33 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.get-own-property-descriptor");
+module.exports = require("core-js/modules/es6.symbol");
 
 /***/ },
 /* 34 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.get-prototype-of");
+module.exports = require("core-js/modules/es6.typed.array-buffer");
 
 /***/ },
 /* 35 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.has");
+module.exports = require("core-js/modules/es6.typed.float32-array");
 
 /***/ },
 /* 36 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.is-extensible");
+module.exports = require("core-js/modules/es6.typed.float64-array");
 
 /***/ },
 /* 37 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.own-keys");
+module.exports = require("core-js/modules/es6.typed.int16-array");
 
 /***/ },
 /* 38 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.prevent-extensions");
+module.exports = require("core-js/modules/es6.typed.int32-array");
 
 /***/ },
 /* 39 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.set");
+module.exports = require("core-js/modules/es6.typed.int8-array");
 
 /***/ },
 /* 40 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.reflect.set-prototype-of");
+module.exports = require("core-js/modules/es6.typed.uint16-array");
 
 /***/ },
 /* 41 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.regexp.flags");
+module.exports = require("core-js/modules/es6.typed.uint32-array");
 
 /***/ },
 /* 42 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.symbol");
+module.exports = require("core-js/modules/es6.typed.uint8-array");
 
 /***/ },
 /* 43 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.weak-map");
+module.exports = require("core-js/modules/es6.typed.uint8-clamped-array");
 
 /***/ },
 /* 44 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es6.weak-set");
+module.exports = require("core-js/modules/es6.weak-map");
 
 /***/ },
 /* 45 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es7.array.includes");
+module.exports = require("core-js/modules/es6.weak-set");
 
 /***/ },
 /* 46 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es7.string.pad-end");
+module.exports = require("core-js/modules/es7.object.entries");
 
 /***/ },
 /* 47 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/es7.string.pad-start");
+module.exports = require("core-js/modules/es7.object.get-own-property-descriptors");
 
 /***/ },
 /* 48 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/web.dom.iterable");
+module.exports = require("core-js/modules/es7.object.values");
 
 /***/ },
 /* 49 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/web.immediate");
+module.exports = require("core-js/modules/es7.string.pad-end");
 
 /***/ },
 /* 50 */
 /***/ function(module, exports) {
 
-module.exports = require("core-js/modules/web.timers");
+module.exports = require("core-js/modules/es7.string.pad-start");
 
 /***/ },
 /* 51 */
 /***/ function(module, exports) {
 
-module.exports = require("phpjs");
+module.exports = require("locutus/php");
 
 /***/ },
 /* 52 */
@@ -8582,59 +8565,6 @@ module.exports = require("util");
 
 module.exports = __webpack_require__(17);
 
-
-/***/ },
-/* 58 */,
-/* 59 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es6.array.from");
-
-/***/ },
-/* 60 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es6.function.name");
-
-/***/ },
-/* 61 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es6.map");
-
-/***/ },
-/* 62 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es6.promise");
-
-/***/ },
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es6.set");
-
-/***/ },
-/* 68 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es7.object.entries");
-
-/***/ },
-/* 69 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es7.object.get-own-property-descriptors");
-
-/***/ },
-/* 70 */
-/***/ function(module, exports) {
-
-module.exports = require("core-js/modules/es7.object.values");
 
 /***/ }
 /******/ ]);

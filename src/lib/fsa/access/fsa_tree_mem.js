@@ -52,7 +52,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     let c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
-      char = php.ord(wordBuf, i);
+      char = php.strings.ord(wordBuf, i);
 
       /////////////////////////////////
       // find char in state begin
@@ -61,7 +61,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       start_offset = fsa_start + (((trans >> 11) & 0x1FFFFF) << 2);
 
       // read first trans in state
-      buf = php.substr(mem, start_offset, 4);
+      buf = php.strings.substr(mem, start_offset, 4);
       trans = php.unpack('V', buf)[0];
 
       // If first trans is term(i.e. pointing to annot) then skip it
@@ -71,7 +71,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
           result = false;
         } else {
           start_offset += 4;
-          buf = php.substr(mem, start_offset, 4);
+          buf = php.strings.substr(mem, start_offset, 4);
           trans = php.unpack('V', buf)[0];
         }
       }
@@ -107,7 +107,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
           }
 
           // read next trans
-          buf = php.substr(mem, start_offset + ((idx - 1) << 2), 4);
+          buf = php.strings.substr(mem, start_offset + ((idx - 1) << 2), 4);
           trans = php.unpack('V', buf)[0];
         }
       }
@@ -131,7 +131,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
 
       if (readAnnot) {
         // read annot trans
-        buf = php.substr(mem, fsa_start + (((trans >> 11) & 0x1FFFFF) << 2), 4);
+        buf = php.strings.substr(mem, fsa_start + (((trans >> 11) & 0x1FFFFF) << 2), 4);
         trans = php.unpack('V', buf)[0];
 
         if ((trans & 0x0100) == 0) {
@@ -190,12 +190,12 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.call_user_func(callback, path, annot)) {
-          if (!php.call_user_func(callback, null, annot)) {
+          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          if (!php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.chr((trans & 0xFF));
+          //path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState(((trans) >> 11) & 0x1FFFFF);
@@ -208,7 +208,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.substr(path, 0, -1);
+        //path = php.strings.substr(path, 0, -1);
       }
     } while (!!stack.length);
 
@@ -222,13 +222,13 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
 
     let offset = fsa_start + ((index) << 2);
     // read first trans
-    let buf = php.substr(mem, offset, 4);
+    let buf = php.strings.substr(mem, offset, 4);
     let trans = php.unpack('V', buf)[0];
 
     // check if first trans is pointer to annot, and not single in state
     if ((trans & 0x0100) && !((trans & 0x0200) || (trans & 0x0400))) {
       result.push(trans);
-      buf = php.substr(mem, offset, 4);
+      buf = php.strings.substr(mem, offset, 4);
       trans = php.unpack('V', buf)[0];
       offset += 4;
     }
@@ -245,7 +245,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       result.push(trans);
 
       if (expect > 1) {
-        buf = php.substr(mem, offset, 4);
+        buf = php.strings.substr(mem, offset, 4);
         trans = php.unpack('V', buf)[0];
         offset += 4;
       }
@@ -275,13 +275,13 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     const fh = this.resource;
     const fsa_start = this.fsa_start;
 
-    let buf = php.substr(fh, fsa_start + 0, 4);
+    let buf = php.strings.substr(fh, fsa_start + 0, 4);
     return php.unpack('V', buf)[0];
   }
 
   readAlphabet () {
     const fh = this.resource;
-    let buf = php.substr(fh, this.header['alphabet_offset'], this.header['alphabet_size']);
+    let buf = php.strings.substr(fh, this.header['alphabet_offset'], this.header['alphabet_size']);
 
     return buf.toString();
   }
@@ -295,10 +295,10 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     const offset = this.header['annot_offset'] + (((trans & 0xFF) << 21) | ((trans >> 11) & 0x1FFFFF));
   
     let annot;
-    let buf = php.substr(fh, offset, 1);
-    let len = php.ord(buf);
+    let buf = php.strings.substr(fh, offset, 1);
+    let len = php.strings.ord(buf);
     if (len) {
-      buf = php.substr(fh, offset + 1, len);
+      buf = php.strings.substr(fh, offset + 1, len);
       annot = buf;
     } else {
       annot = null;

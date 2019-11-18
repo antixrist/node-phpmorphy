@@ -184,7 +184,7 @@ class Morphy_Storage_Mem extends Morphy_Storage {
   }
 
   readUnsafe (offset, len) {
-    return php.substr(this.resource, offset, len);
+    return php.strings.substr(this.resource, offset, len);
     //return this.resource.slice(offset, offset + len - 1);
   }
 
@@ -222,7 +222,7 @@ class Morphy_Storage_Factory {
       return new Morphy_Storage_Proxy(type, fileName, this);
     }
 
-    const className = 'Morphy_Storage_' + php.ucfirst(type.toLowerCase());
+    const className = 'Morphy_Storage_' + php.strings.ucfirst(type.toLowerCase());
 
     return new Morphy_Storage_Factory.storages[className](fileName);
   }
