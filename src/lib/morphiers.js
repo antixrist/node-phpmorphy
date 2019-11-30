@@ -28,75 +28,72 @@ import { Morphy_Fsa_WordsCollector } from './fsa/fsa';
 // Morphier interface
 // ----------------------------
 class Morphy_Morphier_Interface {
+  getAnnot(word) {}
 
-  getAnnot (word) {}
+  getBaseForm(word) {}
 
-  getBaseForm (word) {}
+  getAllForms(word) {}
 
-  getAllForms (word) {}
+  getPseudoRoot(word) {}
 
-  getPseudoRoot (word) {}
+  getPartOfSpeech(word) {}
 
-  getPartOfSpeech (word) {}
+  getWordDescriptor(word) {}
 
-  getWordDescriptor (word) {}
+  getAllFormsWithAncodes(word) {}
 
-  getAllFormsWithAncodes (word) {}
-  
-  getAncode (word) {}
+  getAncode(word) {}
 
-  getGrammarInfoMergeForms (word) {}
+  getGrammarInfoMergeForms(word) {}
 
-  getGrammarInfo (word) {}
-
+  getGrammarInfo(word) {}
 }
 
 class Morphy_Morphier_Empty extends Morphy_Morphier_Interface {
-
-  getAnnot (word) {
+  getAnnot(word) {
     return false;
   }
 
-  getBaseForm (word) {
+  getBaseForm(word) {
     return false;
   }
 
-  getAllForms (word) {
+  getAllForms(word) {
     return false;
   }
 
-  getAllFormsWithGramInfo (word) {
+  getAllFormsWithGramInfo(word) {
     return false;
   }
 
-  getPseudoRoot (word) {
+  getPseudoRoot(word) {
     return false;
   }
 
-  getPartOfSpeech (word) {
+  getPartOfSpeech(word) {
     return false;
   }
 
-  getWordDescriptor (word) {
+  getWordDescriptor(word) {
     return false;
   }
 
-  getAllFormsWithAncodes (word) {
+  getAllFormsWithAncodes(word) {
     return false;
   }
 
-  getAncode (word) {
+  getAncode(word) {
     return false;
   }
 
-  getGrammarInfoMergeForms (word) {
+  getGrammarInfoMergeForms(word) {
     return false;
   }
 
-  getGrammarInfo (word) {
+  getGrammarInfo(word) {
     return false;
   }
-  
+
   /**
    * @param word
    * @param partOfSpeech
@@ -105,27 +102,24 @@ class Morphy_Morphier_Empty extends Morphy_Morphier_Interface {
    * @param {*} [callback=null]
    * @returns {boolean}
    */
-  castFormByGramInfo (word, partOfSpeech, grammems, returnWords, callback) {
+  castFormByGramInfo(word, partOfSpeech, grammems, returnWords, callback) {
     return false;
   }
-
 }
 
 // ----------------------------
 // Annot decoder
 // ----------------------------
 class Morphy_AnnotDecoder_Interface {
-
-  decode (annotsRaw, withBase) {}
-
+  decode(annotsRaw, withBase) {}
 }
 
 class Morphy_AnnotDecoder_Base extends Morphy_AnnotDecoder_Interface {
-  static get INVALID_ANCODE_ID () {
-    return 0xFFFF;
+  static get INVALID_ANCODE_ID() {
+    return 0xffff;
   }
 
-  constructor (ends) {
+  constructor(ends) {
     super();
     this.ends = ends;
 
@@ -133,15 +127,15 @@ class Morphy_AnnotDecoder_Base extends Morphy_AnnotDecoder_Interface {
     this.block_size = this.getUnpackBlockSize();
   }
 
-  getUnpackString () {}
+  getUnpackString() {}
 
-  getUnpackBlockSize () {}
+  getUnpackBlockSize() {}
 
-  decode (annotRawBuf, withBase) {
+  decode(annotRawBuf, withBase) {
     if (php.var.empty(annotRawBuf)) {
-      throw new Error("Empty annot given");
+      throw new Error('Empty annot given');
     }
-  
+
     const annotRaw = annotRawBuf.toString();
     const unpack_size = this.block_size;
     const unpack_str = this.unpack_str;
@@ -152,7 +146,7 @@ class Morphy_AnnotDecoder_Base extends Morphy_AnnotDecoder_Interface {
     let start;
 
     if (result === false) {
-      throw new Error(`Invalid annot string '${ annotRaw }'`);
+      throw new Error(`Invalid annot string '${annotRaw}'`);
     }
 
     if (result['common_ancode'] == Morphy_AnnotDecoder_Base.INVALID_ANCODE_ID) {
@@ -177,7 +171,10 @@ class Morphy_AnnotDecoder_Base extends Morphy_AnnotDecoder_Interface {
 
     if (withBase) {
       start = 4 + count * unpack_size;
-      items = annotRawBuf.slice(start).toString().split(this.ends.toString());
+      items = annotRawBuf
+        .slice(start)
+        .toString()
+        .split(this.ends.toString());
       for (let i = 0; i < count; i++) {
         result[i]['base_prefix'] = items[i * 2];
         result[i]['base_suffix'] = items[i * 2 + 1];
@@ -186,16 +183,14 @@ class Morphy_AnnotDecoder_Base extends Morphy_AnnotDecoder_Interface {
 
     return result;
   }
-
 }
 
 class Morphy_AnnotDecoder_Common extends Morphy_AnnotDecoder_Base {
-
-  constructor () {
+  constructor() {
     super(...arguments);
   }
 
-  getUnpackString () {
+  getUnpackString() {
     return [
       'Voffset',
       'vcplen',
@@ -206,47 +201,43 @@ class Morphy_AnnotDecoder_Common extends Morphy_AnnotDecoder_Base {
       'vpacked_forms_count',
       'vaffixes_size',
       'vform_no',
-      'vpos_id'
+      'vpos_id',
     ].join('/');
   }
 
-  getUnpackBlockSize () {
+  getUnpackBlockSize() {
     return 22;
   }
-
 }
 
 class Morphy_AnnotDecoder_Predict extends Morphy_AnnotDecoder_Common {
-
-  constructor () {
+  constructor() {
     super(...arguments);
   }
 
-  getUnpackString () {
+  getUnpackString() {
     return [super.getUnpackString(), 'vfreq'].join('/');
   }
 
-  getUnpackBlockSize () {
+  getUnpackBlockSize() {
     return super.getUnpackBlockSize() + 2;
   }
-
 }
 
 const Morphy_AnnotDecoder_Factory_instances = {};
 class Morphy_AnnotDecoder_Factory {
-  
-  static get instances () {
+  static get instances() {
     return Morphy_AnnotDecoder_Factory_instances;
   }
-  
-  static get AnnotDecoders () {
+
+  static get AnnotDecoders() {
     return {
       Morphy_AnnotDecoder_Common,
-      Morphy_AnnotDecoder_Predict
+      Morphy_AnnotDecoder_Predict,
     };
   }
 
-  static create (eos) {
+  static create(eos) {
     const { instances } = Morphy_AnnotDecoder_Factory;
     if (!php.var.isset(instances[eos])) {
       instances[eos] = new Morphy_AnnotDecoder_Factory(eos);
@@ -255,11 +246,11 @@ class Morphy_AnnotDecoder_Factory {
     return instances[eos];
   }
 
-  constructor (eos) {
+  constructor(eos) {
     this.eos = eos;
   }
 
-  getCommonDecoder () {
+  getCommonDecoder() {
     if (!php.var.isset(this.cache_common)) {
       this.cache_common = this.instantinate('common');
     }
@@ -267,7 +258,7 @@ class Morphy_AnnotDecoder_Factory {
     return this.cache_common;
   }
 
-  getPredictDecoder () {
+  getPredictDecoder() {
     if (!php.var.isset(this.cache_predict)) {
       this.cache_predict = this.instantinate('predict');
     }
@@ -275,34 +266,30 @@ class Morphy_AnnotDecoder_Factory {
     return this.cache_predict;
   }
 
-  instantinate (type) {
-    const className = 'Morphy_AnnotDecoder_'+ php.strings.ucfirst(type.toLowerCase());
+  instantinate(type) {
+    const className = 'Morphy_AnnotDecoder_' + php.strings.ucfirst(type.toLowerCase());
 
     return new Morphy_AnnotDecoder_Factory.AnnotDecoders[className](this.eos);
   }
-
 }
 
 class Morphy_AncodesResolver_Interface {
+  resolve(ancodeId) {}
 
-  resolve (ancodeId) {}
-
-  unresolve (ancode) {}
-
+  unresolve(ancode) {}
 }
 
 class Morphy_AncodesResolver_ToText extends Morphy_AncodesResolver_Interface {
-
   /**
    * @param {Morphy_GramTab_Interface} gramtab
    * @private
    */
-  constructor (gramtab) {
+  constructor(gramtab) {
     super();
     this.gramtab = gramtab;
   }
 
-  resolve (ancodeId) {
+  resolve(ancodeId) {
     if (!php.var.isset(ancodeId)) {
       return null;
     }
@@ -310,101 +297,96 @@ class Morphy_AncodesResolver_ToText extends Morphy_AncodesResolver_Interface {
     return this.gramtab.ancodeToString(ancodeId);
   }
 
-  unresolve (ancode) {
+  unresolve(ancode) {
     return this.gramtab.stringToAncode(ancode);
   }
-
 }
 
 class Morphy_AncodesResolver_ToDialingAncodes extends Morphy_AncodesResolver_Interface {
-
   /**
    * @param {Morphy_Storage} ancodesMap
    */
-  constructor (ancodesMap) {
+  constructor(ancodesMap) {
     super();
     this.ancodes_map = php.var.unserialize(ancodesMap.read(0, ancodesMap.getFileSize()).toString());
     if (this.ancodes_map === false) {
-      throw new Error("Can`t open phpMorphy => Dialing ancodes map");
+      throw new Error('Can`t open phpMorphy => Dialing ancodes map');
     }
 
     this.reverse_map = php.array.array_flip(this.ancodes_map);
   }
 
-  unresolve (ancode) {
+  unresolve(ancode) {
     if (!php.var.isset(ancode)) {
       return null;
     }
 
     if (!php.var.isset(this.reverse_map[ancode])) {
-      throw new Error(`Unknown ancode found '${ ancode }'`);
+      throw new Error(`Unknown ancode found '${ancode}'`);
     }
 
     return this.reverse_map[ancode];
   }
 
-  resolve (ancodeId) {
+  resolve(ancodeId) {
     if (!php.var.isset(ancodeId)) {
       return null;
     }
 
     if (!php.var.isset(this.ancodes_map[ancodeId])) {
-      throw new Error(`Unknown ancode id found '${ ancodeId }'`);
+      throw new Error(`Unknown ancode id found '${ancodeId}'`);
     }
 
     return this.ancodes_map[ancodeId];
   }
-
 }
 
 class Morphy_AncodesResolver_AsIs extends Morphy_AncodesResolver_Interface {
-
-  constructor () {
+  constructor() {
     super();
   }
-  
-  resolve (ancodeId) {
+
+  resolve(ancodeId) {
     return ancodeId;
   }
 
-  unresolve (ancode) {
+  unresolve(ancode) {
     return ancode;
   }
-
 }
 
 class Morphy_AncodesResolver_Proxy extends Morphy_AncodesResolver_Interface {
-  static get AncodesResolvers () {
+  static get AncodesResolvers() {
     return {
       Morphy_AncodesResolver_ToText,
       Morphy_AncodesResolver_ToDialingAncodes,
-      Morphy_AncodesResolver_AsIs
-    }
+      Morphy_AncodesResolver_AsIs,
+    };
   }
-  
-  static instantinate (className, args) {
+
+  static instantinate(className, args) {
     const { AncodesResolvers } = Morphy_AncodesResolver_Proxy;
 
     return new AncodesResolvers[className](...args);
     // return new (Function.prototype.bind.apply(AncodesResolvers[className], args));
   }
 
-  constructor (className, ctorArgs) {
+  constructor(className, ctorArgs) {
     super();
     this.className = className;
-    this.args      = ctorArgs;
-    this.___obj    = null;
+    this.args = ctorArgs;
+    this.___obj = null;
   }
 
-  unresolve (ancode) {
+  unresolve(ancode) {
     return this.__obj.unresolve(ancode);
   }
 
-  resolve (ancodeId) {
+  resolve(ancodeId) {
     return this.__obj.resolve(ancodeId);
   }
 
-  get __obj () {
+  get __obj() {
     if (!this.___obj) {
       this.___obj = Morphy_AncodesResolver_Proxy.instantinate(this.className, this.args);
 
@@ -414,11 +396,10 @@ class Morphy_AncodesResolver_Proxy extends Morphy_AncodesResolver_Interface {
 
     return this.___obj;
   }
-  
-  set __obj (value) {
-    this.___obj = (!_.isUndefined(value)) ? value : null;
-  }
 
+  set __obj(value) {
+    this.___obj = !_.isUndefined(value) ? value : null;
+  }
 }
 
 // ----------------------------
@@ -430,16 +411,17 @@ class Morphy_AncodesResolver_Proxy extends Morphy_AncodesResolver_Interface {
  * @augments Array
  */
 class Morphy_WordDescriptor_Collection extends Array {
-
   // https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes#Species
-  static get [Symbol.species]() { return Array; }
-  
+  static get [Symbol.species]() {
+    return Array;
+  }
+
   /**
    * @param {*} word
    * @param {*} annots
    * @param {Morphy_Morphier_Helper} helper
    */
-  constructor (word, annots, helper) {
+  constructor(word, annots, helper) {
     super();
 
     this.word = (word || '') + '';
@@ -456,11 +438,11 @@ class Morphy_WordDescriptor_Collection extends Array {
    * @param {*} annot
    * @param {Morphy_Morphier_Helper} helper
    */
-  createDescriptor (word, annot, helper) {
+  createDescriptor(word, annot, helper) {
     return new Morphy_WordDescriptor(word, annot, helper);
   }
 
-  getByPartOfSpeech (poses) {
+  getByPartOfSpeech(poses) {
     poses = castArray(poses);
     const result = [];
 
@@ -472,21 +454,19 @@ class Morphy_WordDescriptor_Collection extends Array {
 
     return result;
   }
-
 }
 
 // ----------------------------
 // Helper
 // ----------------------------
 class Morphy_Morphier_Helper {
-
   /**
    * @param {Morphy_GramInfo_Interface} graminfo
    * @param {Morphy_GramTab_Interface} gramtab
    * @param {Morphy_AncodesResolver_Interface} ancodesResolver
    * @param {*} resolvePartOfSpeech
    */
-  constructor (graminfo, gramtab, ancodesResolver, resolvePartOfSpeech) {
+  constructor(graminfo, gramtab, ancodesResolver, resolvePartOfSpeech) {
     this.graminfo = graminfo;
     this.gramtab = gramtab;
     this.resolve_pos = !!resolvePartOfSpeech;
@@ -500,60 +480,57 @@ class Morphy_Morphier_Helper {
   /**
    * @param {Morphy_AnnotDecoder_Interface} annotDecoder
    */
-  setAnnotDecoder (annotDecoder) {
+  setAnnotDecoder(annotDecoder) {
     this.annot_decoder = annotDecoder;
   }
 
   // getters
-  getEndOfString () {
+  getEndOfString() {
     return this.ends;
   }
 
-  getCharSize () {
+  getCharSize() {
     return this.char_size;
   }
 
-  hasAnnotDecoder () {
+  hasAnnotDecoder() {
     return php.var.isset(this.annot_decoder);
   }
 
-  getAnnotDecoder () {
+  getAnnotDecoder() {
     return this.annot_decoder;
   }
 
-  getAncodesResolver () {
+  getAncodesResolver() {
     return this.ancodes_resolver;
   }
 
-  getGramInfo () {
+  getGramInfo() {
     return this.graminfo;
   }
 
-  getGramTab () {
+  getGramTab() {
     return this.gramtab;
   }
 
-  isResolvePartOfSpeech () {
+  isResolvePartOfSpeech() {
     return this.resolve_pos;
   }
 
   // other
-  resolvePartOfSpeech (posId) {
+  resolvePartOfSpeech(posId) {
     return this.gramtab.resolvePartOfSpeechId(posId);
   }
 
-  getGrammems (ancodeId) {
+  getGrammems(ancodeId) {
     return this.gramtab.getGrammems(ancodeId);
   }
 
-  getGrammemsAndPartOfSpeech (ancodeId) {
-    return [
-      this.gramtab.getPartOfSpeech(ancodeId),
-      this.gramtab.getGrammems(ancodeId)
-    ];
+  getGrammemsAndPartOfSpeech(ancodeId) {
+    return [this.gramtab.getPartOfSpeech(ancodeId), this.gramtab.getGrammems(ancodeId)];
   }
 
-  extractPartOfSpeech (annot) {
+  extractPartOfSpeech(annot) {
     if (this.resolve_pos) {
       return this.resolvePartOfSpeech(annot['pos_id']);
     }
@@ -561,7 +538,7 @@ class Morphy_Morphier_Helper {
     return annot['pos_id'];
   }
 
-  includeGramTabConsts () {
+  includeGramTabConsts() {
     if (this.isResolvePartOfSpeech()) {
       this.gramtab.includeConsts();
     }
@@ -570,7 +547,7 @@ class Morphy_Morphier_Helper {
   }
 
   // getters
-  getWordDescriptor (word, annots) {
+  getWordDescriptor(word, annots) {
     if (!this.gramtab_consts_included) {
       this.includeGramTabConsts();
     }
@@ -578,7 +555,7 @@ class Morphy_Morphier_Helper {
     return new Morphy_WordDescriptor_Collection(word, annots, this);
   }
 
-  getBaseAndPrefix (word, cplen, plen, flen) {
+  getBaseAndPrefix(word, cplen, plen, flen) {
     const wordBuf = Buffer.from(word);
     let base;
     let prefix;
@@ -600,20 +577,23 @@ class Morphy_Morphier_Helper {
     return [base, prefix];
   }
 
-  getPartOfSpeech (word, annots) {
+  getPartOfSpeech(word, annots) {
     if (annots === false) {
       return false;
     }
 
     let result = {};
-    _.forEach(this.decodeAnnot(annots, false), annot => result[this.extractPartOfSpeech(annot)] = 1);
+    _.forEach(
+      this.decodeAnnot(annots, false),
+      annot => (result[this.extractPartOfSpeech(annot)] = 1),
+    );
     result = _.keys(result);
     result = this.resolve_pos ? result : result.map(_.toInteger);
-  
+
     return result;
   }
 
-  getBaseForm (word, annots) {
+  getBaseForm(word, annots) {
     if (annots === false) {
       return false;
     }
@@ -623,11 +603,11 @@ class Morphy_Morphier_Helper {
     return this.composeBaseForms(word, annots);
   }
 
-  getPseudoRoot (word, annots) {
+  getPseudoRoot(word, annots) {
     if (annots == false) {
       return false;
     }
-  
+
     const result = {};
     annots = this.decodeAnnot(annots, false);
     _.forEach(annots, annot => {
@@ -639,7 +619,7 @@ class Morphy_Morphier_Helper {
     return php.array.array_keys(result);
   }
 
-  getAllForms (word, annots) {
+  getAllForms(word, annots) {
     if (annots === false) {
       return false;
     }
@@ -658,32 +638,39 @@ class Morphy_Morphier_Helper {
    * @param {*} [callback=null]
    * @returns {*}
    */
-  castFormByGramInfo (word, annots, partOfSpeech, grammems, returnWords = false, callback = null) {
+  castFormByGramInfo(word, annots, partOfSpeech, grammems, returnWords = false, callback = null) {
     if (annots === false) {
       return false;
     }
-    
+
     /**
      * @todo: вот сюда данные приходят правильные (как в php),
      * а выходят не правильные (не как в php)
      */
-    
+
     grammems = _.toArray(grammems);
     partOfSpeech = php.var.isset(partOfSpeech) ? partOfSpeech + '' : null;
-  
+
     /**
      * Проверено:
      * grammems
      * partOfSpeech
      * this.decodeAnnot(annots, false)
      */
-    const result = (!!returnWords) ? {} : [];
+    const result = !!returnWords ? {} : [];
     _.forEach(this.decodeAnnot(annots, false), annot => {
       const all_ancodes = this.graminfo.readAncodes(annot);
       const flexias = this.graminfo.readFlexiaData(annot);
       const common_ancode = annot['common_ancode'];
-      const common_grammems = php.var.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
-      const [ base, prefix ] = this.getBaseAndPrefix(word, annot['cplen'], annot['plen'], annot['flen']);
+      const common_grammems = php.var.isset(common_ancode)
+        ? this.gramtab.getGrammems(common_ancode)
+        : [];
+      const [base, prefix] = this.getBaseAndPrefix(
+        word,
+        annot['cplen'],
+        annot['plen'],
+        annot['flen'],
+      );
       let form_no = 0;
       let i = 0;
 
@@ -696,17 +683,15 @@ class Morphy_Morphier_Helper {
        * base
        * prefix
        */
-  
+
       _.forEach(all_ancodes, form_ancodes => {
         _.forEach(form_ancodes, ancode => {
           const form_pos = this.gramtab.getPartOfSpeech(ancode);
-          const form_grammems = php.array.array_merge(this.gramtab.getGrammems(ancode), common_grammems);
-          const form = [
-            prefix,
-            flexias[i],
-            base,
-            flexias[i + 1]
-          ].join('');
+          const form_grammems = php.array.array_merge(
+            this.gramtab.getGrammems(ancode),
+            common_grammems,
+          );
+          const form = [prefix, flexias[i], base, flexias[i + 1]].join('');
 
           if (_.isFunction(callback)) {
             if (!callback(form, form_pos, form_grammems, form_no)) {
@@ -732,7 +717,7 @@ class Morphy_Morphier_Helper {
               form,
               form_no,
               pos: form_pos,
-              grammems: form_grammems
+              grammems: form_grammems,
             });
           }
 
@@ -746,7 +731,7 @@ class Morphy_Morphier_Helper {
     return returnWords ? php.array.array_keys(result) : result;
   }
 
-  getAncode (annots) {
+  getAncode(annots) {
     if (annots === false) {
       return false;
     }
@@ -757,14 +742,14 @@ class Morphy_Morphier_Helper {
 
       result.push({
         common: this.ancodes_resolver.resolve(annot['common_ancode']),
-        all: php.array.array_map([this.ancodes_resolver, 'resolve'], all_ancodes[annot['form_no']])
+        all: php.array.array_map([this.ancodes_resolver, 'resolve'], all_ancodes[annot['form_no']]),
       });
     });
-    
+
     return _.uniqWith(result, _.isEqual);
   }
 
-  getGrammarInfoMergeForms (annots) {
+  getGrammarInfoMergeForms(annots) {
     if (annots === false) {
       return false;
     }
@@ -780,7 +765,7 @@ class Morphy_Morphier_Helper {
       let ancodeId;
       _.forEach(all_ancodes[form_no], ancode => {
         ancodeId = ancode;
-        
+
         grammems = php.array.array_merge(grammems, this.gramtab.getGrammems(ancode));
         forms_count++;
       });
@@ -801,34 +786,36 @@ class Morphy_Morphier_Helper {
     return _.uniqWith(result, _.isEqual);
   }
 
-  getGrammarInfo (annots) {
+  getGrammarInfo(annots) {
     if (annots == false) {
       return false;
     }
-    
+
     const result = [];
     _.forEach(this.decodeAnnot(annots, false), annot => {
       const all_ancodes = this.graminfo.readAncodes(annot);
       const common_ancode = annot['common_ancode'];
-      const common_grammems = php.var.isset(common_ancode) ? this.gramtab.getGrammems(common_ancode) : [];
+      const common_grammems = php.var.isset(common_ancode)
+        ? this.gramtab.getGrammems(common_ancode)
+        : [];
       const info = [];
       const form_no = annot['form_no'];
-      
+
       _.forEach(all_ancodes[form_no], ancode => {
         let grammems = php.array.array_merge(common_grammems, this.gramtab.getGrammems(ancode));
         grammems = _.sortBy(grammems, this.resolve_pos ? JSON.stringify : _.toInteger);
-  
+
         let info_item = {
           pos: this.gramtab.getPartOfSpeech(ancode),
           grammems,
-          form_no
+          form_no,
         };
 
         info.push(info_item);
       });
-  
+
       let unique_info = _.sortedUniq(_.sortBy(info, JSON.stringify));
-  
+
       result.push(unique_info);
     });
 
@@ -841,17 +828,17 @@ class Morphy_Morphier_Helper {
    * @param {string} [resolveType='no_resolve']
    * @returns {boolean}
    */
-  getAllFormsWithResolvedAncodes (word, annots, resolveType = 'no_resolve') {
+  getAllFormsWithResolvedAncodes(word, annots, resolveType = 'no_resolve') {
     if (annots == false) {
       return false;
     }
-  
+
     annots = this.decodeAnnot(annots, false);
 
     return this.composeFormsWithResolvedAncodes(word, annots);
   }
 
-  getAllFormsWithAncodes (word, annots, foundFormNo) {
+  getAllFormsWithAncodes(word, annots, foundFormNo) {
     if (annots === false) {
       return false;
     }
@@ -861,7 +848,7 @@ class Morphy_Morphier_Helper {
     return this.composeFormsWithAncodes(word, annots);
   }
 
-  getAllAncodes (word, annots) {
+  getAllAncodes(word, annots) {
     if (annots === false) {
       return false;
     }
@@ -873,40 +860,45 @@ class Morphy_Morphier_Helper {
     return result;
   }
 
-  composeBaseForms (word, annots) {
+  composeBaseForms(word, annots) {
     const result = {};
 
     _.forEach(annots, annot => {
       if (annot['form_no'] > 0) {
-        const baseAndPrefix = this.getBaseAndPrefix(word, annot['cplen'], annot['plen'], annot['flen']);
+        const baseAndPrefix = this.getBaseAndPrefix(
+          word,
+          annot['cplen'],
+          annot['plen'],
+          annot['flen'],
+        );
         const base = baseAndPrefix[0];
         const prefix = baseAndPrefix[1];
-        const form = [
-          prefix,
-          annot['base_prefix'],
-          base,
-          annot['base_suffix']
-        ].join('');
+        const form = [prefix, annot['base_prefix'], base, annot['base_suffix']].join('');
 
         result[form] = 1;
       } else {
         result[word] = 1;
       }
     });
-    
+
     return php.array.array_keys(result);
   }
 
-  composeForms (word, annots) {
+  composeForms(word, annots) {
     const result = {};
 
     _.forEach(annots, annot => {
-      const baseAndPrefix = this.getBaseAndPrefix(word, annot['cplen'], annot['plen'], annot['flen']);
+      const baseAndPrefix = this.getBaseAndPrefix(
+        word,
+        annot['cplen'],
+        annot['plen'],
+        annot['flen'],
+      );
       const base = baseAndPrefix[0];
       const prefix = baseAndPrefix[1];
       // read flexia
       const flexias = this.graminfo.readFlexiaData(annot);
-      
+
       let form;
       for (let i = 0, c = _.size(flexias); i < c; i += 2) {
         form = [prefix, flexias[i], base, flexias[i + 1]].join('');
@@ -917,9 +909,9 @@ class Morphy_Morphier_Helper {
     return php.array.array_keys(result);
   }
 
-  composeFormsWithResolvedAncodes (word, annots) {
+  composeFormsWithResolvedAncodes(word, annots) {
     const result = [];
-    
+
     _.forEach(annots, (annot, annotIdx) => {
       const words = [];
       const ancodes = [];
@@ -931,14 +923,14 @@ class Morphy_Morphier_Helper {
         word,
         annot['cplen'],
         annot['plen'],
-        annot['flen']
+        annot['flen'],
       );
       const base = baseAndPrefix[0];
       const prefix = baseAndPrefix[1];
-  
+
       let form;
       let current_ancodes;
-  
+
       for (let i = 0, c = _.size(flexias); i < c; i += 2) {
         form = [prefix, flexias[i], base, flexias[i + 1]].join('');
         current_ancodes = all_ancodes[i / 2];
@@ -952,36 +944,43 @@ class Morphy_Morphier_Helper {
       result.push({
         all: ancodes,
         forms: words,
-        common: this.ancodes_resolver.resolve(common_ancode)
+        common: this.ancodes_resolver.resolve(common_ancode),
       });
     });
 
     return result;
   }
 
-  composeFormsWithAncodes (word, annots, foundFormNo) {
+  composeFormsWithAncodes(word, annots, foundFormNo) {
     const result = [];
 
     _.forEach(annots, (annot, annotIdx) => {
-      const baseAndPrefix = this.getBaseAndPrefix(word, annot['cplen'], annot['plen'], annot['flen']);
+      const baseAndPrefix = this.getBaseAndPrefix(
+        word,
+        annot['cplen'],
+        annot['plen'],
+        annot['flen'],
+      );
       const base = baseAndPrefix[0];
       const prefix = baseAndPrefix[1];
       // read flexia
       const flexias = this.graminfo.readFlexiaData(annot);
       const ancodes = this.graminfo.readAncodes(annot);
       const found_form_no = annot['form_no'];
-  
+
       let count;
       let form_no;
 
-      foundFormNo = (!_.isArray(foundFormNo)) ? [] : foundFormNo;
+      foundFormNo = !_.isArray(foundFormNo) ? [] : foundFormNo;
 
       for (let i = 0, c = _.size(flexias); i < c; i += 2) {
         form_no = i / 2;
         word = [prefix, flexias[i], base, flexias[i + 1]].join('');
 
         if (found_form_no == form_no) {
-          foundFormNo[annotIdx] = _.isPlainObject(foundFormNo[annotIdx]) ? foundFormNo[annotIdx] : {};
+          foundFormNo[annotIdx] = _.isPlainObject(foundFormNo[annotIdx])
+            ? foundFormNo[annotIdx]
+            : {};
           count = _.size(result);
           foundFormNo[annotIdx]['low'] = count;
           foundFormNo[annotIdx]['high'] = count + _.size(ancodes[form_no]) - 1;
@@ -993,27 +992,25 @@ class Morphy_Morphier_Helper {
 
     return {
       foundFormNo,
-      forms: result
+      forms: result,
     };
   }
 
-  decodeAnnot (annotsRaw, withBase) {
+  decodeAnnot(annotsRaw, withBase) {
     if (php.var.is_array(annotsRaw)) {
       return annotsRaw;
     }
 
     return this.annot_decoder.decode(annotsRaw, withBase);
   }
-
 }
 
 class Morphy_WordForm {
-
-  static compareGrammems (a, b) {
+  static compareGrammems(a, b) {
     return _.size(a) == _.size(b) && _.size(php.array.array_diff(a, b)) == 0;
   }
 
-  constructor (word, form_no, pos_id, grammems) {
+  constructor(word, form_no, pos_id, grammems) {
     grammems = _.values(grammems);
 
     this.word = word + '';
@@ -1021,48 +1018,49 @@ class Morphy_WordForm {
     this.pos_id = pos_id;
     this.grammems = grammems.length
       ? _.sortBy(grammems, _.isNumber(grammems[0]) ? _.toInteger : JSON.stringify)
-      : grammems
-    ;
+      : grammems;
   }
 
-  getPartOfSpeech () {
+  getPartOfSpeech() {
     return this.pos_id;
   }
 
-  getGrammems () {
+  getGrammems() {
     return this.grammems;
   }
 
-  hasGrammems (grammems) {
-    grammems = (!_.isArray(grammems)) ? [grammems] : grammems;
+  hasGrammems(grammems) {
+    grammems = !_.isArray(grammems) ? [grammems] : grammems;
     const grammes_count = _.size(grammems);
 
-    return grammes_count && _.size(php.array.array_intersect(grammems, this.grammems)) == grammes_count;
+    return (
+      grammes_count && _.size(php.array.array_intersect(grammems, this.grammems)) == grammes_count
+    );
   }
 
-  getWord () {
+  getWord() {
     return this.word;
   }
 
-  getFormNo () {
+  getFormNo() {
     return this.form_no;
   }
-
 }
 
 class Morphy_WordDescriptor extends Array {
-
   // https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Classes#Species
-  static get [Symbol.species]() { return Array; }
+  static get [Symbol.species]() {
+    return Array;
+  }
 
   /**
    * @param word
    * @param annot
    * @param {Morphy_Morphier_Helper} helper
    */
-  constructor (word, annot, helper) {
+  constructor(word, annot, helper) {
     super();
-    
+
     this.word = word;
     this.annot = [annot];
     this.helper = helper;
@@ -1076,7 +1074,7 @@ class Morphy_WordDescriptor extends Array {
     this.readAllForms();
   }
 
-  getPseudoRoot () {
+  getPseudoRoot() {
     if (!php.var.isset(this.cached_pseudo_root)) {
       this.cached_pseudo_root = this.helper.getPseudoRoot(this.word, this.annot)[0];
     }
@@ -1084,7 +1082,7 @@ class Morphy_WordDescriptor extends Array {
     return this.cached_pseudo_root;
   }
 
-  getBaseForm () {
+  getBaseForm() {
     if (!php.var.isset(this.cached_base)) {
       this.cached_base = this.helper.getBaseForm(this.word, this.annot)[0];
     }
@@ -1092,7 +1090,7 @@ class Morphy_WordDescriptor extends Array {
     return this.cached_base;
   }
 
-  getAllForms () {
+  getAllForms() {
     if (!php.var.isset(this.cached_forms)) {
       this.cached_forms = this.helper.getAllForms(this.word, this.annot);
     }
@@ -1100,13 +1098,13 @@ class Morphy_WordDescriptor extends Array {
     return this.cached_forms;
   }
 
-  getWordForm (index) {
+  getWordForm(index) {
     this.readAllForms();
 
     return this.slice(index, index + 1)[0];
   }
 
-  createWordForm (word, form_no, ancode) {
+  createWordForm(word, form_no, ancode) {
     let common_ancode;
     let grammemsAndPartOfSpeech;
     let pos_id;
@@ -1124,10 +1122,15 @@ class Morphy_WordDescriptor extends Array {
     pos_id = grammemsAndPartOfSpeech[0];
     all_grammems = grammemsAndPartOfSpeech[1];
 
-    return new Morphy_WordForm(word, form_no, pos_id, php.array.array_merge(this.common_ancode_grammems, all_grammems));
+    return new Morphy_WordForm(
+      word,
+      form_no,
+      pos_id,
+      php.array.array_merge(this.common_ancode_grammems, all_grammems),
+    );
   }
 
-  readAllForms () {
+  readAllForms() {
     const forms = [];
     let form_no = 0;
     let formsWithAncodes;
@@ -1151,19 +1154,19 @@ class Morphy_WordDescriptor extends Array {
     return this;
   }
 
-  getFoundFormNoLow () {
+  getFoundFormNoLow() {
     this.readAllForms();
 
     return this.found_form_no['low'];
   }
 
-  getFoundFormNoHigh () {
+  getFoundFormNoHigh() {
     this.readAllForms();
 
     return this.found_form_no['high'];
   }
 
-  getFoundWordForm () {
+  getFoundWordForm() {
     const result = [];
     for (let i = this.getFoundFormNoLow(), c = this.getFoundFormNoHigh() + 1; i < c; i++) {
       result.push(this.getWordForm(i));
@@ -1172,13 +1175,13 @@ class Morphy_WordDescriptor extends Array {
     return result;
   }
 
-  hasGrammems (grammems) {
+  hasGrammems(grammems) {
     grammems = castArray(grammems);
 
     return _.some(this, wf => wf.hasGrammems(grammems));
   }
 
-  getWordFormsByGrammems (grammems) {
+  getWordFormsByGrammems(grammems) {
     grammems = castArray(grammems);
     const result = [];
 
@@ -1192,7 +1195,7 @@ class Morphy_WordDescriptor extends Array {
     //return count(result) ? result : false;
   }
 
-  hasPartOfSpeech (poses) {
+  hasPartOfSpeech(poses) {
     poses = castArray(poses);
 
     return _.some(this, wf => {
@@ -1201,13 +1204,13 @@ class Morphy_WordDescriptor extends Array {
     });
   }
 
-  getWordFormsByPartOfSpeech (poses) {
+  getWordFormsByPartOfSpeech(poses) {
     poses = castArray(poses);
     const result = [];
 
     _.forEach(this, wf => {
       if (poses.indexOf(wf.getPartOfSpeech()) >= 0) {
-      // if (poses.includes(wf.getPartOfSpeech())) {
+        // if (poses.includes(wf.getPartOfSpeech())) {
         result.push(wf);
       }
     });
@@ -1215,35 +1218,31 @@ class Morphy_WordDescriptor extends Array {
     return result;
     //return count(result) ? result : false;
   }
-
 }
 
 // ----------------------------
 // Finders
 // ----------------------------
 class Morphy_Morphier_Finder_Interface {
+  findWord(word) {}
 
-  findWord (word) {}
+  decodeAnnot(raw, withBase) {}
 
-  decodeAnnot (raw, withBase) {}
-
-  getAnnotDecoder () {}
-
+  getAnnotDecoder() {}
 }
 
 class Morphy_Morphier_Finder_Base extends Morphy_Morphier_Finder_Interface {
-
   /**
    * @param {Morphy_AnnotDecoder_Interface} annotDecoder
    */
-  constructor (annotDecoder) {
+  constructor(annotDecoder) {
     super();
     this.annot_decoder = annotDecoder;
     this.prev_word = null;
     this.prev_result = false;
   }
 
-  findWord (word) {
+  findWord(word) {
     if (this.prev_word === word) {
       return this.prev_result;
     }
@@ -1256,36 +1255,34 @@ class Morphy_Morphier_Finder_Base extends Morphy_Morphier_Finder_Interface {
     return result;
   }
 
-  getAnnotDecoder () {
+  getAnnotDecoder() {
     return this.annot_decoder;
   }
 
-  decodeAnnot (raw, withBase) {
+  decodeAnnot(raw, withBase) {
     return this.annot_decoder.decode(raw, withBase);
   }
 
-  doFindWord (word) {}
-
+  doFindWord(word) {}
 }
 
 class Morphy_Morphier_Finder_Common extends Morphy_Morphier_Finder_Base {
-  
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param {Morphy_AnnotDecoder_Interface} annotDecoder
    */
-  constructor (fsa, annotDecoder) {
+  constructor(fsa, annotDecoder) {
     super(annotDecoder);
 
     this.fsa = fsa;
     this.root = this.fsa.getRootTrans();
   }
 
-  getFsa () {
+  getFsa() {
     return this.fsa;
   }
 
-  doFindWord (word) {
+  doFindWord(word) {
     const result = this.fsa.walk(this.root, word);
 
     if (!result['result'] || result['annot'] === null) {
@@ -1294,32 +1291,30 @@ class Morphy_Morphier_Finder_Common extends Morphy_Morphier_Finder_Base {
 
     return result['annot'];
   }
-
 }
 
 class Morphy_Morphier_Finder_Predict_Suffix extends Morphy_Morphier_Finder_Common {
-
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param {Morphy_AnnotDecoder_Interface} annotDecoder
    * @param {string} encoding
    * @param {number} [minimalSuffixLength=4]
    */
-  constructor (fsa, annotDecoder, encoding, minimalSuffixLength = 4) {
+  constructor(fsa, annotDecoder, encoding, minimalSuffixLength = 4) {
     super(fsa, annotDecoder);
 
     this.min_suf_len = minimalSuffixLength;
     this.unicode = Morphy_UnicodeHelper.create(encoding);
   }
 
-  doFindWord (word) {
+  doFindWord(word) {
     const word_len = this.unicode.strlen(word);
     let result;
 
     if (!word_len) {
       return false;
     }
-  
+
     let i = 1;
     let c = word_len - this.min_suf_len;
     for (; i < c; i++) {
@@ -1338,29 +1333,27 @@ class Morphy_Morphier_Finder_Predict_Suffix extends Morphy_Morphier_Finder_Commo
     return false;
   }
 
-  fixAnnots (annots, len) {
-    _.forEach(annots, annot => annot['cplen'] = len);
+  fixAnnots(annots, len) {
+    _.forEach(annots, annot => (annot['cplen'] = len));
 
     return annots;
   }
-
 }
 
 class Morphy_Morphier_PredictCollector extends Morphy_Fsa_WordsCollector {
-
   /**
    * @param {*} limit
    * @param {Morphy_AnnotDecoder_Interface} annotDecoder
    */
-  constructor (limit, annotDecoder) {
+  constructor(limit, annotDecoder) {
     super(limit);
-  
+
     this.collected = 0;
     this.used_poses = {};
     this.annot_decoder = annotDecoder;
   }
 
-  collect (path, annotRaw) {
+  collect(path, annotRaw) {
     if (this.collected > this.limit) {
       return false;
     }
@@ -1386,7 +1379,7 @@ class Morphy_Morphier_PredictCollector extends Morphy_Fsa_WordsCollector {
         this.used_poses[pos_id] = itemsSize;
         // оригинал:
         // $this->items[] = annot;
-        nextItemsIndex = (itemsSize) ? _.max(_.keys(this.items)) : -1;
+        nextItemsIndex = itemsSize ? _.max(_.keys(this.items)) : -1;
 
         this.items[parseInt(nextItemsIndex, 10) + 1] = annot;
       }
@@ -1397,20 +1390,18 @@ class Morphy_Morphier_PredictCollector extends Morphy_Fsa_WordsCollector {
     return true;
   }
 
-  clear () {
+  clear() {
     super.clear();
     this.collected = 0;
     this.used_poses = {};
   }
 
-  decodeAnnot (annotRaw) {
+  decodeAnnot(annotRaw) {
     return this.annot_decoder.decode(annotRaw, true);
   }
-
 }
 
 class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Common {
-
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param {Morphy_AnnotDecoder_Interface} annotDecoder
@@ -1419,7 +1410,7 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
    * @param {number} [minPostfixMatch=2]
    * @param {number} [collectLimit=32]
    */
-  constructor (fsa, annotDecoder, encoding, graminfo, minPostfixMatch = 2, collectLimit = 32) {
+  constructor(fsa, annotDecoder, encoding, graminfo, minPostfixMatch = 2, collectLimit = 32) {
     super(fsa, annotDecoder);
 
     this.graminfo = graminfo;
@@ -1428,13 +1419,13 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
     this.unicode = Morphy_UnicodeHelper.create(encoding);
   }
 
-  createAnnotDecoder () {
+  createAnnotDecoder() {
     // todo: какая-то херня
     //return phpmorphy_annot_decoder_new('predict');
     return Morphy_AnnotDecoder_Factory.create('predict');
   }
 
-  doFindWord (word) {
+  doFindWord(word) {
     word = toBuffer(word);
 
     const rev_word = this.unicode.strrev(word);
@@ -1445,7 +1436,9 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
     if (result['result'] && null !== result['annot']) {
       annots = result['annot'];
     } else {
-      match_len = this.unicode.strlen(this.unicode.fixTrailing(rev_word.slice(0, result['walked'])));
+      match_len = this.unicode.strlen(
+        this.unicode.fixTrailing(rev_word.slice(0, result['walked'])),
+      );
       annots = this.determineAnnots(result['last_trans'], match_len);
 
       if (annots === null) {
@@ -1460,7 +1453,7 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
     return this.fixAnnots(word, annots);
   }
 
-  determineAnnots (trans, matchLen) {
+  determineAnnots(trans, matchLen) {
     let annots = this.fsa.getAnnot(trans);
     if (annots == null && matchLen >= this.min_postfix_match) {
       this.collector.clear();
@@ -1471,7 +1464,7 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
     return annots;
   }
 
-  fixAnnots (word, annots) {
+  fixAnnots(word, annots) {
     word = toBuffer(word);
 
     const result = [];
@@ -1490,10 +1483,10 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
 
       plen = prefix.length;
       slen = suffix.length;
-      
+
       const partOfWordInPlaceOfPrefix = php.strings.substr(word, 0, plen);
-      const partOfWordInPlaceOfSuffix = php.strings.substr(word,   -slen);
-      
+      const partOfWordInPlaceOfSuffix = php.strings.substr(word, -slen);
+
       if (
         (!plen || (partOfWordInPlaceOfPrefix && partOfWordInPlaceOfPrefix.equals(prefix))) &&
         (!slen || (partOfWordInPlaceOfSuffix && partOfWordInPlaceOfSuffix.equals(suffix)))
@@ -1505,22 +1498,20 @@ class Morphy_Morphier_Finder_Predict_Database extends Morphy_Morphier_Finder_Com
     return _.size(result) ? result : false;
   }
 
-  createCollector (limit) {
+  createCollector(limit) {
     return new Morphy_Morphier_PredictCollector(limit, this.getAnnotDecoder());
   }
-
 }
 
 // ----------------------------
 // Morphiers
 // ----------------------------
 class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
-
   /**
    * @param {Morphy_Morphier_Finder_Interface} finder
    * @param {Morphy_Morphier_Helper} helper
    */
-  constructor (finder, helper) {
+  constructor(finder, helper) {
     super();
     this.finder = finder;
     this.helper = _.cloneDeep(helper);
@@ -1530,18 +1521,18 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
   /**
    * @return Morphy_Morphier_Finder_Interface
    */
-  getFinder () {
+  getFinder() {
     return this.finder;
   }
 
   /**
    * @return Morphy_Morphier_Helper
    */
-  getHelper () {
+  getHelper() {
     return this.helper;
   }
 
-  getAnnot (word) {
+  getAnnot(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1550,7 +1541,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.decodeAnnot(annots, true);
   }
 
-  getWordDescriptor (word) {
+  getWordDescriptor(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1559,16 +1550,16 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.getWordDescriptor(word, annots);
   }
 
-  getAllFormsWithAncodes (word) {
+  getAllFormsWithAncodes(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
     }
-    
+
     return this.helper.getAllFormsWithResolvedAncodes(word, annots);
   }
 
-  getPartOfSpeech (word) {
+  getPartOfSpeech(word) {
     const annots = this.finder.findWord(word);
     if (annots == false) {
       return false;
@@ -1577,7 +1568,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.getPartOfSpeech(word, annots);
   }
 
-  getBaseForm (word) {
+  getBaseForm(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1586,7 +1577,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.getBaseForm(word, annots);
   }
 
-  getPseudoRoot (word) {
+  getPseudoRoot(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1595,7 +1586,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.getPseudoRoot(word, annots);
   }
 
-  getAllForms (word) {
+  getAllForms(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1604,7 +1595,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.getAllForms(word, annots);
   }
 
-  getAncode (word) {
+  getAncode(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1613,7 +1604,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.getAncode(annots);
   }
 
-  getGrammarInfo (word) {
+  getGrammarInfo(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1622,7 +1613,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
     return this.helper.getGrammarInfo(annots);
   }
 
-  getGrammarInfoMergeForms (word) {
+  getGrammarInfoMergeForms(word) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1639,7 +1630,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
    * @param {*} [callback=null]
    * @returns {boolean}
    */
-  castFormByGramInfo (word, partOfSpeech, grammems, returnOnlyWord = false, callback = null) {
+  castFormByGramInfo(word, partOfSpeech, grammems, returnOnlyWord = false, callback = null) {
     const annots = this.finder.findWord(word);
     if (annots === false) {
       return false;
@@ -1655,7 +1646,7 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
    * @param {*} [callback=null]
    * @returns {boolean}
    */
-  castFormByPattern (word, patternWord, returnOnlyWord = false, callback = null) {
+  castFormByPattern(word, patternWord, returnOnlyWord = false, callback = null) {
     const orig_annots = this.finder.findWord(word);
     if (orig_annots === false) {
       return false;
@@ -1666,74 +1657,78 @@ class Morphy_Morphier_Base extends Morphy_Morphier_Interface {
       return false;
     }
 
-    return this.helper.castFormByPattern(word, orig_annots, patternWord, pattern_annots, returnOnlyWord, callback);
+    return this.helper.castFormByPattern(
+      word,
+      orig_annots,
+      patternWord,
+      pattern_annots,
+      returnOnlyWord,
+      callback,
+    );
   }
-
 }
 
 class Morphy_Morphier_Common extends Morphy_Morphier_Base {
-  
   /**
    * @param {Morphy_Morphier_Helper} helper
    * @returns {Morphy_AnnotDecoder_Interface}
    */
-  static createAnnotDecoder (helper) {
+  static createAnnotDecoder(helper) {
     return Morphy_AnnotDecoder_Factory.create(helper.getGramInfo().getEnds()).getCommonDecoder();
   }
-  
+
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param {Morphy_Morphier_Helper} helper
    */
-  constructor (fsa, helper) {
-    super(new Morphy_Morphier_Finder_Common(fsa, Morphy_Morphier_Common.createAnnotDecoder(helper)), helper);
+  constructor(fsa, helper) {
+    super(
+      new Morphy_Morphier_Finder_Common(fsa, Morphy_Morphier_Common.createAnnotDecoder(helper)),
+      helper,
+    );
   }
-
 }
 
 class Morphy_Morphier_Predict_Suffix extends Morphy_Morphier_Base {
-  
   /**
    * @param {Morphy_Morphier_Helper} helper
    * @returns {Morphy_AnnotDecoder_Interface}
    */
-  static createAnnotDecoder (helper) {
+  static createAnnotDecoder(helper) {
     return Morphy_AnnotDecoder_Factory.create(helper.getGramInfo().getEnds()).getCommonDecoder();
   }
-  
+
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param {Morphy_Morphier_Helper} helper
    */
-  constructor (fsa, helper) {
+  constructor(fsa, helper) {
     super(
       new Morphy_Morphier_Finder_Predict_Suffix(
         fsa,
         Morphy_Morphier_Predict_Suffix.createAnnotDecoder(helper),
         helper.getGramInfo().getEncoding(),
-        4
+        4,
       ),
-      helper
+      helper,
     );
   }
-
 }
 
 class Morphy_Morphier_Predict_Database extends Morphy_Morphier_Base {
-  
   /**
    * @param {Morphy_Morphier_Helper} helper
    * @returns {Morphy_AnnotDecoder_Interface}
    */
-  static createAnnotDecoder (helper) {
+  static createAnnotDecoder(helper) {
     return Morphy_AnnotDecoder_Factory.create(helper.getGramInfo().getEnds()).getPredictDecoder();
   }
-  
+
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param {Morphy_Morphier_Helper} helper
    */
-  constructor (fsa, helper) {
+  constructor(fsa, helper) {
     super(
       new Morphy_Morphier_Finder_Predict_Database(
         fsa,
@@ -1741,23 +1736,21 @@ class Morphy_Morphier_Predict_Database extends Morphy_Morphier_Base {
         helper.getGramInfo().getEncoding(),
         helper.getGramInfo(),
         2,
-        32
+        32,
       ),
-      helper
+      helper,
     );
   }
-
 }
 
 class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
-
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param {Morphy_Morphier_Helper} helper
    */
-  constructor (fsa, helper) {
+  constructor(fsa, helper) {
     super();
-    
+
     this.fsa = fsa;
     this.root_trans = fsa.getRootTrans();
     this.helper = _.cloneDeep(helper);
@@ -1766,19 +1759,19 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     this.notfound = [];
   }
 
-  getFsa () {
+  getFsa() {
     return this.fsa;
   }
 
-  getHelper () {
+  getHelper() {
     return this.helper;
   }
 
-  getGraminfo () {
+  getGraminfo() {
     return this.graminfo;
   }
 
-  getNotFoundWords () {
+  getNotFoundWords() {
     return this.notfound;
   }
 
@@ -1786,18 +1779,18 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
    * @param {Morphy_Morphier_Helper} helper
    * @returns {*}
    */
-  createAnnotDecoder (helper) {
+  createAnnotDecoder(helper) {
     return new Morphy_AnnotDecoder_Common(helper.getGramInfo().getEnds());
   }
 
-  getAnnot (word) {
+  getAnnot(word) {
     const result = {};
 
     _.forEach(this.findWord(word), item => {
       const words = item.data;
       let annot = item.annots;
       annot = this.helper.decodeAnnot(annot, true);
-      
+
       _.forEach(words, word => {
         result[word] = result[word] || [];
         result[word].push(annot);
@@ -1807,25 +1800,25 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     return result;
   }
 
-  getBaseForm (words) {
+  getBaseForm(words) {
     const annots = this.findWord(words);
 
     return this.composeForms(annots, true, false, false);
   }
 
-  getAllForms (words) {
+  getAllForms(words) {
     const annots = this.findWord(words);
 
     return this.composeForms(annots, false, false, false);
   }
 
-  getPseudoRoot (words) {
+  getPseudoRoot(words) {
     const annots = this.findWord(words);
 
     return this.composeForms(annots, false, true, false);
   }
 
-  getPartOfSpeech (words) {
+  getPartOfSpeech(words) {
     const annots = this.findWord(words);
 
     return this.composeForms(annots, false, false, true);
@@ -1837,7 +1830,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
    * @param {boolean} [callWithWord=false]
    * @returns {*}
    */
-  processAnnotsWithHelper (words, method, callWithWord = false) {
+  processAnnotsWithHelper(words, method, callWithWord = false) {
     const result = {};
     let annot_raw;
     let result_for_annot;
@@ -1851,37 +1844,37 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
       }
 
       if (callWithWord) {
-        _.forEach(words, word => result[word] = this.helper[method](word, annot_raw));
+        _.forEach(words, word => (result[word] = this.helper[method](word, annot_raw)));
       } else {
         result_for_annot = this.helper[method](annot_raw);
-        _.forEach(words, word => result[word] = result_for_annot);
+        _.forEach(words, word => (result[word] = result_for_annot));
       }
     });
 
     return result;
   }
 
-  getAncode (words) {
+  getAncode(words) {
     return this.processAnnotsWithHelper(words, 'getAncode');
   }
 
-  getGrammarInfoMergeForms (words) {
+  getGrammarInfoMergeForms(words) {
     return this.processAnnotsWithHelper(words, 'getGrammarInfoMergeForms');
   }
 
-  getGrammarInfo (words) {
+  getGrammarInfo(words) {
     return this.processAnnotsWithHelper(words, 'getGrammarInfo');
   }
 
-  getAllFormsWithAncodes (words) {
+  getAllFormsWithAncodes(words) {
     return this.processAnnotsWithHelper(words, 'getAllFormsWithResolvedAncodes', true);
   }
 
-  getWordDescriptor (words) {
+  getWordDescriptor(words) {
     return this.processAnnotsWithHelper(words, 'getWordDescriptor', true);
   }
 
-  findWord (words) {
+  findWord(words) {
     this.notfound = [];
 
     const patriciaTrie = this.buildPatriciaTrie(words);
@@ -1891,7 +1884,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     const annots = {};
     const stack = [0, Buffer.from(''), this.root_trans];
     const fsa = this.fsa;
-    
+
     let n;
     let path;
     let trans;
@@ -1926,7 +1919,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
         if (trans !== false && php.var.isset(result['annot'])) {
           annots[result['annot']] = annots[result['annot']] || {
             annots: result['annot'],
-            data: []
+            data: [],
           };
           annots[result['annot']].data.push(path);
         } else {
@@ -1947,7 +1940,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
     return annots;
   }
 
-  composeForms (annotsRaw, onlyBase, pseudoRoot, partOfSpeech) {
+  composeForms(annotsRaw, onlyBase, pseudoRoot, partOfSpeech) {
     const result = {};
     let key;
     let annot_raw;
@@ -2001,27 +1994,15 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
 
           if (pseudoRoot) {
             result[word][base] = 1;
-          } else
-          if (onlyBase) {
-            form = [
-              prefix,
-              annot['base_prefix'],
-              base,
-              annot['base_suffix']
-            ].join('');
+          } else if (onlyBase) {
+            form = [prefix, annot['base_prefix'], base, annot['base_suffix']].join('');
 
             result[word][form] = 1;
-          } else
-          if (partOfSpeech) {
+          } else if (partOfSpeech) {
             result[word][pos_id] = 1;
           } else {
             for (let i = 0, c = _.size(flexias); i < c; i += 2) {
-              form = [
-                prefix,
-                flexias[i],
-                base,
-                flexias[i + 1]
-              ].join('');
+              form = [prefix, flexias[i], base, flexias[i + 1]].join('');
 
               result[word][form] = 1;
             }
@@ -2029,25 +2010,25 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
         });
       });
     });
-  
+
     _.keys(result).forEach(key => {
       result[key] = _.keys(result[key]);
-      
+
       if (result[key].length && isStringifyedNumber(result[key][0])) {
         result[key] = result[key].map(_.toInteger);
       }
     });
-    
+
     return result;
   }
 
-  buildPatriciaTrie (words) {
+  buildPatriciaTrie(words) {
     if (!php.var.is_array(words)) {
       throw new Error('Words must be array');
     }
 
     //words = php.array.sort(words);
-    words = (words.length && Buffer.isBuffer(words[0])) ? words.sort(Buffer.compare) : words.sort();
+    words = words.length && Buffer.isBuffer(words[0]) ? words.sort(Buffer.compare) : words.sort();
 
     let stack = [];
     let prev_word = '';
@@ -2099,8 +2080,7 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
         if (lcp == prev_lcp) {
           need_split = false;
           node = stack[_.size(stack) - 1];
-        } else
-        if (lcp > prev_lcp) {
+        } else if (lcp > prev_lcp) {
           if (lcp == prev_word_len) {
             need_split = false;
           } else {
@@ -2111,9 +2091,9 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
           stack.push(node);
         } else {
           trim_size = prev_wordBuf.length - lcp;
-  
+
           let stack_size = _.size(stack) - 1;
-          for (;; --stack_size) {
+          for (; ; --stack_size) {
             trim_size -= state_labels[node].length;
 
             if (trim_size <= 0) {
@@ -2190,7 +2170,6 @@ class Morphy_Morphier_Bulk extends Morphy_Morphier_Interface {
 
     return [state_labels, state_finals.join(''), state_dests];
   }
-
 }
 
 export {

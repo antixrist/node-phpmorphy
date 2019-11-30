@@ -1,16 +1,18 @@
 <?php
-
-// `mbstring` должен быть раскомментирован в `php.ini`
-
 error_reporting(E_ERROR);
 //ini_set('display_errors', 'Off');
 
 function result ($words, $success = true, $message = '') {
-  die(json_encode([
+  print_r(array(
     "success" => $success,
     "message" => $message,
     "words" => $words
-  ]));
+  ));
+//  die(json_encode([
+//    "success" => $success,
+//    "message" => $message,
+//    "words" => $words
+//  ]));
 };
 
 $params = [
@@ -45,21 +47,25 @@ $args = [
   'opts' => $parsed_opts
 ];
 
-if (
-  $err_message ||
-  !(is_string($args['words']) || is_array($args['words'])) ||
-  !is_array($args['opts'])
-) {
-  $err_message = $err_message ? ':' . PHP_EOL . $err_message : '';
-  $err_message = 'Invalid cli arguments' . $err_message;
-
-  result($args, false, $err_message);
-}
+//if (
+//  $err_message ||
+//  !(is_string($args['words']) || is_array($args['words'])) ||
+//  !is_array($args['opts'])
+//) {
+//  $err_message = $err_message ? ':' . PHP_EOL . $err_message : '';
+//  $err_message = 'Invalid cli arguments' . $err_message;
+//
+//  result($args, false, $err_message);
+//}
 
 $opts = $parsed_opts;
-$words = $parsed_words;
-$words = is_array($words) ? $words : array($words);
+//$words = $parsed_words;
+$words = ["ет", "глокая", "душа", "красный", "спать", "мурелки", "шлепают", "пельсиски", "стакелках", "светится", "мычай"];
 $words = array_map('mb_strtoupper', $words);
+
+echo "<<<WORDS".PHP_EOL;
+print_r($words);
+echo "END WORDS>>>".PHP_EOL;
 
 $dir = getcwd() .'/dicts';
 $lang = $opts['lang'] ? $opts['lang'] : 'ru_RU';
@@ -68,7 +74,15 @@ require_once(getcwd() .'/phpmorphy/src/common.php');
 
 /** Create phpMorphy instance */
 try {
-  $morphy = new phpMorphy($dir, $lang, $opts);
+//  $morphy = new phpMorphy($dir, $lang, $opts);
+  $morphy = new phpMorphy($dir, $lang, array(
+    "storage" => PHPMORPHY_STORAGE_MEM,
+    "predict_by_suffix" => true,
+    "predict_by_db" => true,
+    "graminfo_as_text" => true,
+    "use_ancodes_cache" => false,
+    "resolve_ancodes" => phpMorphy::RESOLVE_ANCODES_AS_TEXT,
+  ));
 } catch (phpMorphy_Exception $e) {
   $err_message = 'Error occured while creating phpMorphy instance: ' . PHP_EOL . $e->getMessage();
   result($args, false, $err_message);
@@ -135,6 +149,7 @@ $tests['lemmatize && getBaseForm'] = function () use ($words, $morphy) {
   $result = ['lemmatize' => [], 'getBaseForm' => []];
 
   foreach ($words as $word) {
+    echo $word . PHP_EOL;
     $result['lemmatize'][$word] = $morphy->lemmatize($word);
   }
   foreach ($words as $word) {

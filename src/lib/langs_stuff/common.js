@@ -3,44 +3,41 @@ import encoding from 'encoding';
 import { php } from '../../utils';
 
 class Morphy_GrammemsProvider_Interface {
-  getGrammems (partOfSpeech) {}
+  getGrammems(partOfSpeech) {}
 }
 
 class Morphy_GrammemsProvider_Decorator extends Morphy_GrammemsProvider_Interface {
-
   /**
    * @param {Morphy_GrammemsProvider_Interface} inner
    */
-  constructor (inner) {
+  constructor(inner) {
     super(...arguments);
 
     this.inner = inner;
   }
 
-  getGrammems (partOfSpeech) {
+  getGrammems(partOfSpeech) {
     return this.inner.getGrammems(partOfSpeech);
   }
-
 }
 
 class Morphy_GrammemsProvider_Base extends Morphy_GrammemsProvider_Interface {
-  
-  static flatizeArray (array) {
+  static flatizeArray(array) {
     return _.flatten(_.values(array));
   }
 
-  constructor () {
+  constructor() {
     super(...arguments);
-  
+
     this.grammems = {};
     this.all_grammems = Morphy_GrammemsProvider_Base.flatizeArray(this.getAllGrammemsGrouped());
   }
 
-  getAllGrammemsGrouped () {}
+  getAllGrammemsGrouped() {}
 
-  includeGroups (partOfSpeech, names) {
+  includeGroups(partOfSpeech, names) {
     const grammems = this.getAllGrammemsGrouped();
-    names = (!_.isArray(names)) ? [names] : names;
+    names = !_.isArray(names) ? [names] : names;
     names = php.array.array_flip(names);
 
     _.forEach(php.array.array_keys(grammems), key => {
@@ -54,61 +51,57 @@ class Morphy_GrammemsProvider_Base extends Morphy_GrammemsProvider_Interface {
     return this;
   }
 
-  excludeGroups (partOfSpeech, names) {
+  excludeGroups(partOfSpeech, names) {
     const grammems = this.getAllGrammemsGrouped();
-    names = (!_.isArray(names)) ? [names] : names;
+    names = !_.isArray(names) ? [names] : names;
 
     _.forEach(names, key => delete grammems[key]);
-    
+
     this.grammems[partOfSpeech] = Morphy_GrammemsProvider_Base.flatizeArray(grammems);
 
     return this;
   }
 
-  resetGroups (partOfSpeech) {
+  resetGroups(partOfSpeech) {
     delete this.grammems[partOfSpeech];
 
     return this;
   }
 
-  resetGroupsForAll () {
+  resetGroupsForAll() {
     this.grammems = {};
 
     return this;
   }
 
-  getGrammems (partOfSpeech) {
+  getGrammems(partOfSpeech) {
     if (php.var.isset(this.grammems[partOfSpeech])) {
       return this.grammems[partOfSpeech];
     }
 
     return this.all_grammems;
   }
-
 }
 
 class Morphy_GrammemsProvider_Empty extends Morphy_GrammemsProvider_Base {
-
-  constructor () {
+  constructor() {
     super(...arguments);
   }
 
-  getAllGrammemsGrouped () {
+  getAllGrammemsGrouped() {
     return {};
   }
 
-  getGrammems (partOfSpeech) {
+  getGrammems(partOfSpeech) {
     return false;
   }
-
 }
 
 class Morphy_GrammemsProvider_ForFactory extends Morphy_GrammemsProvider_Base {
-
-  constructor (enc) {
+  constructor(enc) {
     super(...arguments);
     this.encoded_grammems = this.encodeGrammems(this.getGrammemsMap(), enc);
-  
+
     // а как по-другому?
     // кроме как копипастой кода родительского конструктора
     // и чтобы аккуратно - никак
@@ -116,13 +109,13 @@ class Morphy_GrammemsProvider_ForFactory extends Morphy_GrammemsProvider_Base {
     this.all_grammems = Morphy_GrammemsProvider_Base.flatizeArray(this.getAllGrammemsGrouped());
   }
 
-  getGrammemsMap () {}
+  getGrammemsMap() {}
 
-  getAllGrammemsGrouped () {
+  getAllGrammemsGrouped() {
     return this.encoded_grammems;
   }
 
-  encodeGrammems (grammems, enc) {
+  encodeGrammems(grammems, enc) {
     const from_enc = this.getSelfEncoding();
     const result = {};
 
@@ -148,43 +141,42 @@ class Morphy_GrammemsProvider_ForFactory extends Morphy_GrammemsProvider_Base {
 
     return result;
   }
-
 }
 
-const Morphy_GrammemsProvider_Factory_included = new Map;
+const Morphy_GrammemsProvider_Factory_included = new Map();
 
 class Morphy_GrammemsProvider_Factory {
   /**
    * @param {phpMorphy} morphy
    * @returns {*}
    */
-  static create (morphy) {
+  static create(morphy) {
     const locale = morphy.getLocale().toLowerCase();
-  
+
     if (!Morphy_GrammemsProvider_Factory_included.has(morphy)) {
       Morphy_GrammemsProvider_Factory_included.set(morphy, {});
     }
-    
+
     const included = Morphy_GrammemsProvider_Factory_included.get(morphy);
-    
+
     if (_.isUndefined(included[locale])) {
-      const className = `Morphy_GrammemsProvider_${ locale }`;
+      const className = `Morphy_GrammemsProvider_${locale}`;
       let grammemsProviders = {};
-      
+
       try {
-        grammemsProviders = require('./'+ locale);
+        grammemsProviders = require('./' + locale);
       } catch (err) {
         included[locale] = new Morphy_GrammemsProvider_Empty(morphy);
         return included[locale];
       }
-  
+
       if (_.isFunction(grammemsProviders[className])) {
         included[locale] = grammemsProviders[className].instance(morphy);
       } else {
         throw new Error("Class '" + className + "' not found");
       }
     }
-  
+
     return included[locale];
   }
 }
@@ -195,5 +187,5 @@ export {
   Morphy_GrammemsProvider_Base,
   Morphy_GrammemsProvider_Empty,
   Morphy_GrammemsProvider_ForFactory,
-  Morphy_GrammemsProvider_Factory
+  Morphy_GrammemsProvider_Factory,
 };

@@ -22,108 +22,103 @@
 import _ from 'lodash';
 import { php } from '../utils';
 
-class Morphy_GramTab_Interface  {
+class Morphy_GramTab_Interface {
+  getGrammems(ancodeId) {}
 
-  getGrammems (ancodeId) {}
+  getPartOfSpeech(ancodeId) {}
 
-  getPartOfSpeech (ancodeId) {}
+  resolveGrammemIds(ids) {}
 
-  resolveGrammemIds (ids) {}
+  resolvePartOfSpeechId(id) {}
 
-  resolvePartOfSpeechId (id) {}
+  includeConsts() {}
 
-  includeConsts () {}
-  
   /**
    * @param ancodeId
    * @param {*} [commonAncode=null]
    */
-  ancodeToString (ancodeId, commonAncode = null) {}
+  ancodeToString(ancodeId, commonAncode = null) {}
 
-  stringToAncode (string) {}
+  stringToAncode(string) {}
 
-  toString (partOfSpeechId, grammemIds) {}
-
+  toString(partOfSpeechId, grammemIds) {}
 }
 
 class Morphy_GramTab_Empty extends Morphy_GramTab_Interface {
-
-  getGrammems (ancodeId) {
+  getGrammems(ancodeId) {
     return [];
   }
 
-  getPartOfSpeech (ancodeId) {
+  getPartOfSpeech(ancodeId) {
     return 0;
   }
 
-  resolveGrammemIds (ids) {
+  resolveGrammemIds(ids) {
     return php.var.is_array(ids) ? {} : '';
   }
 
-  resolvePartOfSpeechId (id) {
+  resolvePartOfSpeechId(id) {
     return '';
   }
 
-  includeConsts () {}
+  includeConsts() {}
 
-  ancodeToString (ancodeId, commonAncode) {
+  ancodeToString(ancodeId, commonAncode) {
     return '';
   }
 
-  stringToAncode (string) {
+  stringToAncode(string) {
     return null;
   }
 
-  toString (partOfSpeechId, grammemIds) {
+  toString(partOfSpeechId, grammemIds) {
     return '';
   }
-
 }
 
 class Morphy_GramTab_Proxy extends Morphy_GramTab_Interface {
-
   /**
    * @param {Morphy_Storage} storage
    */
-  constructor (storage) {
+  constructor(storage) {
     super();
     this.storage = storage;
-    this.___obj  = null;
+    this.___obj = null;
   }
 
-  getGrammems (...args) {
+  getGrammems(...args) {
     return this.__obj.getGrammems(...args);
   }
 
-  getPartOfSpeech (...args) {
+  getPartOfSpeech(...args) {
     return this.__obj.getPartOfSpeech(...args);
   }
 
-  resolveGrammemIds (...args) {
+  resolveGrammemIds(...args) {
     return this.__obj.resolveGrammemIds(...args);
   }
 
-  resolvePartOfSpeechId (...args) {
+  resolvePartOfSpeechId(...args) {
     return this.__obj.resolvePartOfSpeechId(...args);
   }
 
-  includeConsts (...args) {
+  includeConsts(...args) {
     return this.__obj.includeConsts(...args);
   }
 
-  ancodeToString (...args) {
+  ancodeToString(...args) {
     return this.__obj.ancodeToString(...args);
   }
 
-  stringToAncode (...args) {
+  stringToAncode(...args) {
     return this.__obj.stringToAncode(...args);
   }
 
-  toString (...args) {
+  toString(...args) {
     return this.__obj.toString(...args);
   }
 
-  get __obj () {
+  get __obj() {
     if (!this.___obj) {
       this.___obj = Morphy_GramTab.create(this.storage);
       delete this.storage;
@@ -131,63 +126,61 @@ class Morphy_GramTab_Proxy extends Morphy_GramTab_Interface {
 
     return this.___obj;
   }
-  
-  set __obj (value) {
-    this.___obj = (!_.isUndefined(value)) ? value : null;
-  }
 
+  set __obj(value) {
+    this.___obj = !_.isUndefined(value) ? value : null;
+  }
 }
 
 class Morphy_GramTab extends Morphy_GramTab_Interface {
-
   /**
    * @param {Morphy_Storage} $storage
    * @returns {Morphy_GramTab}
    */
-  static create ($storage) {
+  static create($storage) {
     return new Morphy_GramTab($storage);
   }
 
   /**
    * @param {Morphy_Storage} storage
    */
-  constructor (storage) {
+  constructor(storage) {
     super();
-    
+
     this.data = php.var.unserialize(storage.read(0, storage.getFileSize()).toString());
     if (this.data == false) {
       throw new Error('Broken gramtab data');
     }
 
-    this.grammems       = this.data['grammems'];
-    this.poses          = this.data['poses'];
-    this.ancodes        = this.data['ancodes'];
+    this.grammems = this.data['grammems'];
+    this.poses = this.data['poses'];
+    this.ancodes = this.data['ancodes'];
     this.___ancodes_map = null;
   }
 
-  getGrammems (ancodeId) {
+  getGrammems(ancodeId) {
     if (!php.var.isset(this.ancodes[ancodeId])) {
-      throw new Error(`Invalid ancode id '${ ancodeId }'`);
+      throw new Error(`Invalid ancode id '${ancodeId}'`);
     }
-    
+
     return this.ancodes[ancodeId]['grammem_ids'];
   }
 
-  getPartOfSpeech (ancodeId) {
+  getPartOfSpeech(ancodeId) {
     if (!php.var.isset(this.ancodes[ancodeId])) {
-      throw new Error(`Invalid ancode id '${ ancodeId} '`);
+      throw new Error(`Invalid ancode id '${ancodeId} '`);
     }
-    
+
     return this.ancodes[ancodeId].pos_id;
   }
 
-  resolveGrammemIds (ids) {
+  resolveGrammemIds(ids) {
     if (php.var.is_array(ids)) {
       const result = [];
 
       _.forEach(ids, id => {
         if (!php.var.isset(this.grammems[id])) {
-          throw new Error(`Invalid grammem id '${ id }'`);
+          throw new Error(`Invalid grammem id '${id}'`);
         }
 
         result.push(this.grammems[id]['name']);
@@ -197,27 +190,27 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
     }
 
     if (!php.var.isset(this.grammems[ids])) {
-      throw new Error(`Invalid grammem id '${ ids }'`);
+      throw new Error(`Invalid grammem id '${ids}'`);
     }
 
     return this.grammems[ids]['name'];
   }
 
-  resolvePartOfSpeechId (id) {
+  resolvePartOfSpeechId(id) {
     if (!php.var.isset(this.poses[id])) {
-      throw new Error(`Invalid part of speech id '${ id }'`);
+      throw new Error(`Invalid part of speech id '${id}'`);
     }
 
     return this.poses[id]['name'];
   }
 
-  includeConsts () {
+  includeConsts() {
     /** todo: вот те самые константы */
     return require('./gramtab_consts');
   }
 
-  ancodeToString (ancodeId, commonAncode) {
-    commonAncode = (!_.isUndefined(commonAncode)) ? commonAncode : null;
+  ancodeToString(ancodeId, commonAncode) {
+    commonAncode = !_.isUndefined(commonAncode) ? commonAncode : null;
 
     if (php.var.isset(commonAncode)) {
       commonAncode = this.getGrammems(commonAncode).join(',') + ',';
@@ -226,20 +219,20 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
     return [
       this.getPartOfSpeech(ancodeId),
       ' ',
-      (commonAncode ? commonAncode : ''),
-      this.getGrammems(ancodeId).join(',')
+      commonAncode ? commonAncode : '',
+      this.getGrammems(ancodeId).join(','),
     ].join('');
   }
 
-  findAncode (partOfSpeech, grammems) {}
+  findAncode(partOfSpeech, grammems) {}
 
-  stringToAncode (string) {
+  stringToAncode(string) {
     if (!php.var.isset(string)) {
       return null;
     }
 
     if (!php.var.isset(this.__ancodes_map[string])) {
-      throw new Error(`Ancode with '${ string }' graminfo not found`);
+      throw new Error(`Ancode with '${string}' graminfo not found`);
     }
 
     return this.__ancodes_map[string];
@@ -250,11 +243,11 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
    * @param grammemIds
    * @returns {string}
    */
-  toString (partOfSpeechId, grammemIds) {
+  toString(partOfSpeechId, grammemIds) {
     return partOfSpeechId + ' ' + php.strings.implode(',', grammemIds);
   }
 
-  buildAncodesMap () {
+  buildAncodesMap() {
     const result = {};
 
     _.forEach(this.ancodes, (data, ancode_id) => {
@@ -266,7 +259,7 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
     return result;
   }
 
-  get __ancodes_map () {
+  get __ancodes_map() {
     if (!this.___ancodes_map) {
       this.___ancodes_map = this.buildAncodesMap();
     }
@@ -274,15 +267,9 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
     return this.___ancodes_map;
   }
 
-  set __ancodes_map (value) {
-    this.___ancodes_map = (!_.isUndefined(value)) ? value : null;
+  set __ancodes_map(value) {
+    this.___ancodes_map = !_.isUndefined(value) ? value : null;
   }
-
 }
 
-export {
-  Morphy_GramTab_Interface,
-  Morphy_GramTab_Empty,
-  Morphy_GramTab_Proxy,
-  Morphy_GramTab
-};
+export { Morphy_GramTab_Interface, Morphy_GramTab_Empty, Morphy_GramTab_Proxy, Morphy_GramTab };

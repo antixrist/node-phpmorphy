@@ -25,43 +25,45 @@ import { php } from '../../../utils';
 import { Morphy_GramInfo } from '../graminfo';
 
 class Morphy_GramInfo_File extends Morphy_GramInfo {
-
-  constructor (...args) {
+  constructor(...args) {
     super(...args);
 
     // todo: вместо магической константы, хаотично распиханной по методам, подставить эту переменную
     this.header_size = 20;
   }
 
-  getGramInfoHeaderSize () {
+  getGramInfoHeaderSize() {
     return 20;
   }
 
-  readGramInfoHeader (offset) {
+  readGramInfoHeader(offset) {
     const fh = this.resource;
     let buf = Buffer.alloc(20);
-    
+
     fs.readSync(fh, buf, 0, 20, offset);
 
-    const result = php.unpack([
-      'vid',
-      'vfreq',
-      'vforms_count',
-      'vpacked_forms_count',
-      'vancodes_count',
-      'vancodes_offset',
-      'vancodes_map_offset',
-      'vaffixes_offset',
-      'vaffixes_size',
-      'vbase_size'
-    ].join('/'), buf);
+    const result = php.unpack(
+      [
+        'vid',
+        'vfreq',
+        'vforms_count',
+        'vpacked_forms_count',
+        'vancodes_count',
+        'vancodes_offset',
+        'vancodes_map_offset',
+        'vaffixes_offset',
+        'vaffixes_size',
+        'vbase_size',
+      ].join('/'),
+      buf,
+    );
 
     result['offset'] = offset;
 
     return result;
   }
 
-  readAncodesMap (info) {
+  readAncodesMap(info) {
     const fh = this.resource;
     // TODO: this can be wrong due to aligning ancodes map section
     const offset = info['offset'] + 20 + info['forms_count'] * 2;
@@ -69,16 +71,16 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
     const buf = Buffer.alloc(forms_count * 2);
     fs.readSync(fh, buf, 0, forms_count * 2, offset);
 
-    return php.unpack('v'+ forms_count, buf);
+    return php.unpack('v' + forms_count, buf);
   }
 
-  splitAncodes (ancodes, map) {
+  splitAncodes(ancodes, map) {
     const result = [];
-  
+
     let k;
     let kc;
     let j = 0;
-    _.forEach(map, function (mapItem) {
+    _.forEach(map, function(mapItem) {
       const res = [];
 
       for (k = 0, kc = mapItem; k < kc; k++, j++) {
@@ -91,7 +93,7 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
     return result;
   }
 
-  readAncodes (info) {
+  readAncodes(info) {
     const fh = this.resource;
     // TODO: this can be wrong due to aligning ancodes section
     const offset = info['offset'] + 20;
@@ -107,7 +109,7 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
     return this.splitAncodes(ancodes, map);
   }
 
-  readFlexiaData (info) {
+  readFlexiaData(info) {
     const fh = this.resource;
     let offset = info['offset'] + 20;
 
@@ -123,18 +125,18 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
     return buf.toString().split(this.ends.toString());
   }
 
-  readAllGramInfoOffsets () {
+  readAllGramInfoOffsets() {
     return this.readSectionIndex(this.header['flex_index_offset'], this.header['flex_count']);
   }
 
-  readSectionIndex (offset, count) {
+  readSectionIndex(offset, count) {
     const buf = Buffer.alloc(count * 4);
     fs.readSync(this.resource, buf, 0, count * 4, offset);
 
-    return _.values(php.unpack('V'+ count, buf));
+    return _.values(php.unpack('V' + count, buf));
   }
 
-  readAllFlexia () {
+  readAllFlexia() {
     const result = {};
     let offset = this.header['flex_offset'];
 
@@ -142,7 +144,7 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
       this.readSectionIndexAsSize(
         this.header['flex_index_offset'],
         this.header['flex_count'],
-        this.header['flex_size']
+        this.header['flex_size'],
       ),
       size => {
         const header = this.readGramInfoHeader(offset);
@@ -151,19 +153,19 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
 
         // todo: проверить полученные переменные
         result[header['id']] = {
-          'header': header,
-          'affixes': affixes,
-          'ancodes': ancodes
+          header: header,
+          affixes: affixes,
+          ancodes: ancodes,
         };
-  
+
         offset += size;
-      }
+      },
     );
 
     return result;
   }
 
-  readAllPartOfSpeech () {
+  readAllPartOfSpeech() {
     const fh = this.resource;
     const result = {};
     let offset = this.header['poses_offset'];
@@ -174,30 +176,30 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
       this.readSectionIndexAsSize(
         this.header['poses_index_offset'],
         this.header['poses_count'],
-        this.header['poses_size']
+        this.header['poses_size'],
       ),
       size => {
         buf = Buffer.alloc(3);
         fs.readSync(fh, buf, 0, 3, offset);
         res = php.unpack('vid/Cis_predict', buf);
-  
+
         buf = Buffer.alloc(size - 3);
         fs.readSync(fh, buf, 0, size - 3, offset);
-  
+
         result[res['id']] = {
           name: this.cleanupCString(buf),
-          is_predict: !!res['is_predict']
+          is_predict: !!res['is_predict'],
         };
-  
+
         offset += size;
-      }
+      },
     );
 
     // todo: сверить result
     return result;
   }
 
-  readAllGrammems () {
+  readAllGrammems() {
     const fh = this.resource;
     const result = {};
     let offset = this.header['grammems_offset'];
@@ -208,29 +210,29 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
       this.readSectionIndexAsSize(
         this.header['grammems_index_offset'],
         this.header['grammems_count'],
-        this.header['grammems_size']
+        this.header['grammems_size'],
       ),
       size => {
         buf = Buffer.alloc(3);
         fs.readSync(fh, buf, 0, 3, offset);
         res = php.unpack('vid/Cshift', buf);
-  
+
         buf = Buffer.alloc(size - 3);
         fs.readSync(fh, buf, 0, size - 3, offset);
-  
+
         result[res['id']] = {
           name: this.cleanupCString(buf),
-          shift: res['shift']
+          shift: res['shift'],
         };
-  
+
         offset += size;
-      }
+      },
     );
 
     return result;
   }
 
-  readAllAncodes () {
+  readAllAncodes() {
     const fh = this.resource;
     const result = {};
     let offset = this.header['ancodes_offset'];
@@ -263,7 +265,7 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
       result[res['id']] = {
         pos_id: res['pos_id'],
         offset: offset,
-        grammem_ids: grammem_ids
+        grammem_ids: grammem_ids,
       };
 
       offset += grammems_count * 2;
@@ -271,7 +273,6 @@ class Morphy_GramInfo_File extends Morphy_GramInfo {
 
     return result;
   }
-
 }
 
 export { Morphy_GramInfo_File };

@@ -1,0 +1,12 @@
+# exluding all *.js files everywhere
+**/*.*
+
+# except any config files in project root (including dot-files) and files from 'src' directory
+!/*.js
+!/*.ts
+!/*.md
+!/*.json
+!/src/**/*.js
+!/src/**/*.ts
+!/src/**/*.md
+!/src/**/*.json

@@ -22,94 +22,87 @@
 import _ from 'lodash';
 
 class Morphy_Link_Base {
-
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param trans
    * @param rawTrans
    */
-  constructor (fsa, trans, rawTrans) {
-    this.fsa       = fsa;
-    this.trans     = trans;
+  constructor(fsa, trans, rawTrans) {
+    this.fsa = fsa;
+    this.trans = trans;
     this.raw_trans = rawTrans;
   }
 
-  isAnnotation () {}
+  isAnnotation() {}
 
-  getTrans () {
+  getTrans() {
     return this.trans;
   }
 
-  getFsa () {
+  getFsa() {
     return this.fsa;
   }
 
-  getRawTrans () {
+  getRawTrans() {
     return this.raw_trans;
   }
-
 }
 
 /**
  * This class represent "normal" link i.e. link that points to automat state
  */
 class Morphy_Link extends Morphy_Link_Base {
-
-  constructor (...args) {
+  constructor(...args) {
     super(...args);
   }
 
-  isAnnotation () {
+  isAnnotation() {
     return false;
   }
 
-  getDest () {
+  getDest() {
     return this.trans['dest'];
   }
 
-  getAttr () {
+  getAttr() {
     return this.trans['attr'];
   }
 
-  getTargetState () {
+  getTargetState() {
     return this.createState(this.trans['dest']);
   }
-  
-  createState (index) {
+
+  createState(index) {
     return new Morphy_State(this.fsa, index);
   }
-
 }
 
 class Morphy_Link_Annot extends Morphy_Link_Base {
-
-  constructor (...args) {
+  constructor(...args) {
     super(...args);
   }
 
-  isAnnotation () {
+  isAnnotation() {
     return true;
   }
 
-  getAnnotation () {
+  getAnnotation() {
     return this.fsa.getAnnot(this.raw_trans);
   }
-
 }
 
 class Morphy_State {
-
   /**
    * @param {Morphy_Fsa_Interface} fsa
    * @param index
    */
-  constructor (fsa, index) {
-    this.fsa         = fsa;
+  constructor(fsa, index) {
+    this.fsa = fsa;
     this.raw_transes = fsa.readState(index);
-    this.transes     = fsa.unpackTranses(this.raw_transes);
+    this.transes = fsa.unpackTranses(this.raw_transes);
   }
 
-  getLinks () {
+  getLinks() {
     let trans;
     const result = [];
 
@@ -126,23 +119,17 @@ class Morphy_State {
     return result;
   }
 
-  getSize () {
+  getSize() {
     return _.size(this.transes);
   }
 
-  createNormalLink (trans, raw) {
+  createNormalLink(trans, raw) {
     return new Morphy_Link(this.fsa, trans, raw);
   }
 
-  createAnnotLink (trans, raw) {
+  createAnnotLink(trans, raw) {
     return new Morphy_Link_Annot(this.fsa, trans, raw);
   }
-
 }
 
-export {
-  Morphy_Link_Base,
-  Morphy_Link,
-  Morphy_Link_Annot,
-  Morphy_State
-};
+export { Morphy_Link_Base, Morphy_Link, Morphy_Link_Annot, Morphy_State };

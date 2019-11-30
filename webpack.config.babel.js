@@ -28,12 +28,12 @@ const config = {
    * { 'entry1': './entry1.js', 'entry2': './entry2.jsx' }
    */
   entry: glob.sync(`${SCRIPTS_SOURCES}/!(_)*.js`).reduce((entries, file) => {
-    const entryName    = path.basename(file, path.extname(file));
+    const entryName = path.basename(file, path.extname(file));
     entries[entryName] = [
       // 'babel-polyfill',
-      './'+ file
+      './' + file,
     ];
-    
+
     return entries;
   }, {}),
   output: {
@@ -41,20 +41,20 @@ const config = {
     chunkFilename: `[name].js`,
     /** папка назначения */
     path: path.join(cwd, SCRIPTS_TARGET),
-    libraryTarget: "commonjs-module"
+    libraryTarget: 'commonjs-module',
   },
   node: {
     __dirname: false,
-    __filename: false
+    __filename: false,
   },
   devtool: 'source-map',
   resolve: {
     extensions: ['.js', '.json', '.json5', '.node'],
     modules: ['node_modules'],
-    alias: {}
+    alias: {},
   },
   resolveLoader: {
-    moduleExtensions: ['-loader']
+    moduleExtensions: ['-loader'],
   },
   module: {
     rules: [
@@ -62,42 +62,48 @@ const config = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-      }
+      },
     ],
   },
   externals: [
-    function (context, request, cb) {
+    function(context, request, cb) {
       const pathStart = request.split('/')[0];
       if (nodeModules.indexOf(pathStart) >= 0) {
-        return cb(null, "commonjs " + request);
+        return cb(null, 'commonjs ' + request);
       }
       cb();
-    }
+    },
   ],
   watchOptions: {
     aggregateTimeout: 200,
   },
   plugins: [
-    new CopyWebpackPlugin([{
-      context: SCRIPTS_SOURCES,
-      from: '**/*.!(js)',
-      to: ''
-    }]),
-    new CircularDependencyPlugin({ failOnError: false })
-  ].concat(isProduction ? [] : [
-    new BannerPlugin({
-      banner: `require('source-map-support').install({ environment: 'node' });`,
-      raw: true,
-      entryOnly: false
-    })
-  ]),
+    new CopyWebpackPlugin([
+      {
+        context: SCRIPTS_SOURCES,
+        from: '**/*.!(js)',
+        to: '',
+      },
+    ]),
+    new CircularDependencyPlugin({ failOnError: false }),
+  ].concat(
+    isProduction
+      ? []
+      : [
+          new BannerPlugin({
+            banner: `require('source-map-support').install({ environment: 'node' });`,
+            raw: true,
+            entryOnly: false,
+          }),
+        ],
+  ),
   stats: {
     colors: true,
     chunks: false,
     modules: false,
     origins: false,
     entrypoints: true,
-  }
+  },
 };
 
 export default config;

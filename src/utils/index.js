@@ -5,14 +5,6 @@ import util from 'util';
 import php from 'locutus/php';
 import phpunserialize from 'phpunserialize';
 
-/**
- * @param {function} cb
- */
-function onShutdown (cb) {
-  onShutdown.handlers.push(cb);
-}
-onShutdown.handlers = [];
-
 const logger = {};
 logger.log = console.log.bind(console);
 logger.trace = console.trace.bind(console);
@@ -24,10 +16,10 @@ logger.error = console.error.bind(console);
  * @param any
  * @returns {Array}
  */
-function castArray (any) {
-  any = (!_.isUndefined(any) && !_.isNull(any)) ? any : [];
+function castArray(any) {
+  any = !_.isUndefined(any) && !_.isNull(any) ? any : [];
   any = _.isArray(any) ? any : [any];
-  
+
   return any;
 }
 
@@ -36,11 +28,14 @@ function castArray (any) {
  * @param {{}} [opts]
  * @returns {string}
  */
-function inspect (object, opts = {
-  depth: null,
-  colors: true,
-  maxArrayLength: 1000
-}) {
+function inspect(
+  object,
+  opts = {
+    depth: null,
+    colors: true,
+    maxArrayLength: 1000,
+  },
+) {
   return util.inspect(object, opts);
 }
 
@@ -107,7 +102,7 @@ function inspect (object, opts = {
 //php.info.ini_set('unicode.semantics', 'on');
 php.info.ini_set('phpjs.objectsAsArrays', false);
 
-php.unpack = function unpack (format, buffer) {
+php.unpack = function unpack(format, buffer) {
   /**
    * Параметр format задается в виде строки и состоит из кодов формата и
    * опционального аргумента повторения. Аргумент может быть целочисленным,
@@ -117,31 +112,34 @@ php.unpack = function unpack (format, buffer) {
    * для всего остального число повторений определяет как много аргументов
    * данных было обработано и упаковано в результирующую бинарную строку.
    */
-  const codes  = {
-    'a': 'Строка (string) с NULL-заполнением',
-    'A': 'Строка (string) со SPACE-заполнением',
-    'h': 'Hex-строка (Hex string), с нижнего разряда',
-    'H': 'Hex-строка (Hex string), с верхнего разряда',
-    'c': 'знаковый символ (char)',
-    'C': 'беззнаковый символ (char)',
-    's': 'знаковый short (всегда 16 бит, машинный байтовый порядок)',
-    'S': 'беззнаковый short (всегда 16 бит, машинный байтовый порядок)',
-    'n': 'беззнаковый short (всегда 16 бит, порядок big endian)',
-    'v': 'беззнаковый short (всегда 16 бит, порядок little endian)',
-    'i': 'знаковый integer (машинно-зависимый размер и порядок)',
-    'I': 'беззнаковый integer (машинно-зависимый размер и порядок)',
-    'l': 'знаковый long (всегда 32 бит, машинный порядок)',
-    'L': 'беззнаковый long (всегда 32 бит, машинный порядок)',
-    'N': 'беззнаковый long (всегда 32 бит, порядок big endian)',
-    'V': 'беззнаковый long (всегда 32 бит, порядок little endian)',
-    'f': 'float (машинно-зависимые размер и прдставление)',
-    'd': 'double (машинно-зависимые размер и прдставление)',
-    'x': 'NUL байт',
-    'X': 'Резервирование одного байта',
-    '@': 'NUL-заполнение до абсолютной позиции'
+  const codes = {
+    a: 'Строка (string) с NULL-заполнением',
+    A: 'Строка (string) со SPACE-заполнением',
+    h: 'Hex-строка (Hex string), с нижнего разряда',
+    H: 'Hex-строка (Hex string), с верхнего разряда',
+    c: 'знаковый символ (char)',
+    C: 'беззнаковый символ (char)',
+    s: 'знаковый short (всегда 16 бит, машинный байтовый порядок)',
+    S: 'беззнаковый short (всегда 16 бит, машинный байтовый порядок)',
+    n: 'беззнаковый short (всегда 16 бит, порядок big endian)',
+    v: 'беззнаковый short (всегда 16 бит, порядок little endian)',
+    i: 'знаковый integer (машинно-зависимый размер и порядок)',
+    I: 'беззнаковый integer (машинно-зависимый размер и порядок)',
+    l: 'знаковый long (всегда 32 бит, машинный порядок)',
+    L: 'беззнаковый long (всегда 32 бит, машинный порядок)',
+    N: 'беззнаковый long (всегда 32 бит, порядок big endian)',
+    V: 'беззнаковый long (всегда 32 бит, порядок little endian)',
+    f: 'float (машинно-зависимые размер и прдставление)',
+    d: 'double (машинно-зависимые размер и прдставление)',
+    x: 'NUL байт',
+    X: 'Резервирование одного байта',
+    '@': 'NUL-заполнение до абсолютной позиции',
   };
-  const parts  = format.split('/');
-  let offset = 0, mod, lenStr, len;
+  const parts = format.split('/');
+  let offset = 0,
+    mod,
+    lenStr,
+    len;
   if (parts.length > 1) {
     let result = {};
     for (let idx = 0; idx < parts.length; idx++) {
@@ -168,7 +166,7 @@ php.unpack = function unpack (format, buffer) {
         }
       }
     }
-    
+
     return result;
   } else {
     let result = [];
@@ -198,20 +196,20 @@ php.unpack = function unpack (format, buffer) {
       }
       result.push(obj);
     } while (offset < buffer.length);
-    
+
     return result;
   }
 };
 
 php.var.unserialize = phpunserialize;
 
-php.strings.ord = function ord (str, idx) {
+php.strings.ord = function ord(str, idx) {
   if (!Buffer.isBuffer(str)) {
     str = Buffer.from(str);
   }
-  
-  idx = (!_.isUndefined(idx) && _.isNumber(idx) && idx < str.length) ? idx : 0;
-  
+
+  idx = !_.isUndefined(idx) && _.isNumber(idx) && idx < str.length ? idx : 0;
+
   return str[idx];
 };
 
@@ -222,17 +220,17 @@ php.strings._substr = php.strings.substr; // safe
  * @param {Number} [len]
  * @returns {string|Buffer|boolean}
  */
-php.strings.substr = function php$substr (str, start, len) {
+php.strings.substr = function php$substr(str, start, len) {
   let end;
-  
+
   if (Buffer.isBuffer(str)) {
     end = str.length;
-    start = (start < 0) ? start + end : start;
-    end = typeof len === 'undefined' ? end : (len < 0 ? len + end : len + start);
-    
-    return (start >= str.length || start < 0 || start > end) ? false : str.slice(start, end);
+    start = start < 0 ? start + end : start;
+    end = typeof len === 'undefined' ? end : len < 0 ? len + end : len + start;
+
+    return start >= str.length || start < 0 || start > end ? false : str.slice(start, end);
   }
-  
+
   return php.strings._substr.apply(php.strings._substr, arguments);
 };
 
@@ -258,13 +256,13 @@ php.strings.substr = function php$substr (str, start, len) {
  * @param any
  * @returns {boolean}
  */
-function isStringifyedNumber (any) {
+function isStringifyedNumber(any) {
   let int = _.toInteger(any);
-  
+
   if (int === 0 && any !== '0') {
     return false;
   }
-  
+
   return any == int;
 }
 /**
@@ -272,25 +270,22 @@ function isStringifyedNumber (any) {
  * @param [encoding='utf-8']
  * @returns {Buffer|*}
  */
-function toBuffer (something, encoding = 'utf-8') {
+function toBuffer(something, encoding = 'utf-8') {
   let retVal = something;
-  
+
   if (_.isArray(something)) {
     retVal = _.map(something, item => toBuffer(item, encoding));
-  } else
-  if (Buffer.isBuffer(something)) {
+  } else if (Buffer.isBuffer(something)) {
     retVal = something;
-  } else
-  if (_.isString(something)) {
+  } else if (_.isString(something)) {
     retVal = Buffer.from(something, encoding);
-  } else
-  if (_.isPlainObject(something)) {
+  } else if (_.isPlainObject(something)) {
     let obj = _.clone(something);
-    _.forEach(obj, (val, key) => obj[key] = toBuffer(val, encoding));
-    
+    _.forEach(obj, (val, key) => (obj[key] = toBuffer(val, encoding)));
+
     retVal = obj;
   }
-  
+
   return retVal;
 }
 
@@ -299,22 +294,22 @@ function toBuffer (something, encoding = 'utf-8') {
  * @param {String} [encoding='utf8']
  * @returns {string|*}
  */
-function buffer2str (something, encoding = 'utf8') {
-  return (Buffer.isBuffer(something)) ? something.toString(encoding) : something;
+function buffer2str(something, encoding = 'utf8') {
+  return Buffer.isBuffer(something) ? something.toString(encoding) : something;
 }
 
 /**
  * @param something
  * @returns {Array}
  */
-function str2ascii (something) {
+function str2ascii(something) {
   let retVal = [];
-  let buffer = (!Buffer.isBuffer(something)) ? Buffer.from(something, 'binary') : something;
-  
+  let buffer = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
+
   for (let i = 0, length = buffer.length; i < length; i++) {
     retVal.push(buffer[i]);
   }
-  
+
   return retVal;
 }
 
@@ -322,18 +317,17 @@ function str2ascii (something) {
  * @param something
  * @returns {String}
  */
-function str2hex (something) {
-  let retVal = (!Buffer.isBuffer(something)) ? Buffer.from(something, 'binary') : something;
-  
+function str2hex(something) {
+  let retVal = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
+
   return retVal.toString('hex');
 }
 
-function clone (instance) {
+function clone(instance) {
   return _.merge({}, Object.create(Object.getPrototypeOf(instance)), instance);
 }
 
 export {
-  onShutdown,
   castArray,
   logger,
   inspect,
@@ -346,5 +340,5 @@ export {
   buffer2str,
   str2ascii,
   str2hex,
-  clone
+  clone,
 };

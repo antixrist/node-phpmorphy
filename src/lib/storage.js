@@ -25,23 +25,22 @@ import { php } from '../utils';
 import { STORAGE_FILE, STORAGE_MEM } from './constants';
 
 class Morphy_Storage {
-
-  constructor (fileName = '') {
+  constructor(fileName = '') {
     if (fileName) {
       this.file_name = fileName;
       this.resource = this.open(fileName);
     }
   }
 
-  getFileName () {
+  getFileName() {
     return this.file_name;
   }
 
-  getResource () {
+  getResource() {
     return this.resource;
   }
 
-  getTypeAsString () {
+  getTypeAsString() {
     return this.getType();
   }
 
@@ -51,38 +50,44 @@ class Morphy_Storage {
    * @param {boolean} [exactLength=true]
    * @returns {*}
    */
-  read (offset, len, exactLength = true) {
+  read(offset, len, exactLength = true) {
     if (offset >= this.getFileSize()) {
-      throw new Error(`Can't read ${ len } bytes beyond end of '${ this.getFileName() }' file, offset = ${ offset }, file_size = ${ this.getFileSize() }`);
+      throw new Error(
+        `Can't read ${len} bytes beyond end of '${this.getFileName()}' file, offset = ${offset}, file_size = ${this.getFileSize()}`,
+      );
     }
 
     let result;
     try {
       result = this.readUnsafe(offset, len);
     } catch (e) {
-      throw new Error(`Can't read ${ len } bytes at ${ offset } offset, from '${ this.getFileName() }' file: ${ e.message }`);
+      throw new Error(
+        `Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file: ${
+          e.message
+        }`,
+      );
     }
 
     if (exactLength && result.length < len) {
-      throw new Error(`Can't read ${ len } bytes at ${ offset } offset, from '${ this.getFileName() }' file`);
+      throw new Error(
+        `Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file`,
+      );
     }
 
     return result;
   }
 
-  readUnsafe (offset, len) {}
+  readUnsafe(offset, len) {}
 
-  getFileSize () {}
+  getFileSize() {}
 
-  getType () {}
+  getType() {}
 
-  open (fileName) {}
-
+  open(fileName) {}
 }
 
 class Morphy_Storage_Proxy extends Morphy_Storage {
-
-  constructor (type, fileName, factory) {
+  constructor(type, fileName, factory) {
     super();
     this.file_name = fileName;
     this.type = type;
@@ -90,31 +95,31 @@ class Morphy_Storage_Proxy extends Morphy_Storage {
     this.___obj = null;
   }
 
-  getFileName () {
+  getFileName() {
     return this.__obj.getFileName();
   }
 
-  getResource () {
+  getResource() {
     return this.__obj.getResource();
   }
 
-  getFileSize () {
+  getFileSize() {
     return this.__obj.getFileSize();
   }
 
-  getType () {
+  getType() {
     return this.__obj.getType();
   }
 
-  readUnsafe (offset, len) {
+  readUnsafe(offset, len) {
     return this.__obj.readUnsafe(offset, len);
   }
 
-  open (fileName) {
+  open(fileName) {
     return this.__obj.open(fileName);
   }
 
-  get __obj () {
+  get __obj() {
     if (!this.___obj) {
       this.___obj = this.factory.open(this.type, this.file_name, false);
 
@@ -125,97 +130,91 @@ class Morphy_Storage_Proxy extends Morphy_Storage {
 
     return this.___obj;
   }
-  
-  set __obj (value) {
-    this.___obj = (!_.isUndefined(value)) ? value : null;
-  }
 
+  set __obj(value) {
+    this.___obj = !_.isUndefined(value) ? value : null;
+  }
 }
 
 class Morphy_Storage_File extends Morphy_Storage {
-
-  constructor () {
+  constructor() {
     super(...arguments);
   }
 
-  getType () {
+  getType() {
     return STORAGE_FILE;
   }
 
-  getFileSize () {
+  getFileSize() {
     const stat = fs.fstatSync(this.resource);
     if (stat === false) {
-      throw new Error(`Can't invoke fs.fstatSync for '${ this.file_name }' file`);
+      throw new Error(`Can't invoke fs.fstatSync for '${this.file_name}' file`);
     }
 
     return stat['size'];
   }
 
-  readUnsafe (offset, len) {
+  readUnsafe(offset, len) {
     const buf = Buffer.alloc(len);
     fs.readSync(this.resource, buf, 0, len, offset);
 
     return buf;
   }
 
-  open (fileName) {
+  open(fileName) {
     const fh = fs.openSync(fileName, 'r');
     if (fh === false) {
-      throw new Error(`Can't open '${ this.file_name }' file`);
+      throw new Error(`Can't open '${this.file_name}' file`);
     }
 
     return fh;
   }
-
 }
 
 class Morphy_Storage_Mem extends Morphy_Storage {
-
-  constructor () {
+  constructor() {
     super(...arguments);
   }
 
-  getType () {
+  getType() {
     return STORAGE_MEM;
   }
 
-  getFileSize () {
+  getFileSize() {
     return this.resource.length;
   }
 
-  readUnsafe (offset, len) {
+  readUnsafe(offset, len) {
     return php.strings.substr(this.resource, offset, len);
     //return this.resource.slice(offset, offset + len - 1);
   }
 
-  open (fileName) {
+  open(fileName) {
     const buffer = fs.readFileSync(fileName);
     if (buffer === false) {
-      throw new Error(`Can't read '${ fileName }' file`);
+      throw new Error(`Can't read '${fileName}' file`);
     }
 
     return buffer;
   }
-
 }
 
 class Morphy_Storage_Factory {
-  
-  static get storages () {
+  static get storages() {
     return {
       Morphy_Storage_File,
-      Morphy_Storage_Mem
+      Morphy_Storage_Mem,
     };
   }
 
-  open (type, fileName, lazy) {
+  open(type, fileName, lazy) {
     switch (type) {
       case STORAGE_FILE:
       // downfall
       case STORAGE_MEM:
         break;
       default:
-        throw new Error(`Invalid storage type '${ type }' specified`);
+        throw new Error(`Invalid storage type '${type}' specified`);
     }
 
     if (lazy) {
@@ -226,7 +225,6 @@ class Morphy_Storage_Factory {
 
     return new Morphy_Storage_Factory.storages[className](fileName);
   }
-
 }
 
 export {
@@ -234,5 +232,5 @@ export {
   Morphy_Storage_Proxy,
   Morphy_Storage_File,
   Morphy_Storage_Mem,
-  Morphy_Storage_Factory
+  Morphy_Storage_Factory,
 };
