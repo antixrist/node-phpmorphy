@@ -5,9 +5,10 @@
     "rebuilder": "cross-env NODE_ENV=development webpack --watch",
     "build": "cross-env NODE_ENV=production webpack",
     "dev": "cross-env NODE_ENV=development nodemon",
-    "test": "node ./build/test"
+    "test": "node ./dist/test",
+    "prepublish": "npm run build && npm run test"
   },
-  "main": "./build/index.js",
+  "main": "./dist/index.js",
   "dependencies": {
     "babel-polyfill": "^6.20.0",
     "core-js": "^2.5.7",

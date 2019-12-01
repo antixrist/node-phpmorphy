@@ -8,7 +8,7 @@ import CircularDependencyPlugin from 'circular-dependency-plugin';
 const cwd = process.cwd();
 const isProduction = process.env.NODE_ENV == 'production';
 const SCRIPTS_SOURCES = 'src';
-const SCRIPTS_TARGET = 'build';
+const SCRIPTS_TARGET = 'dist';
 
 /** список npm-зависимостей */
 const nodeModules = fs.readdirSync('node_modules').filter(x => !['.bin'].includes(x));
