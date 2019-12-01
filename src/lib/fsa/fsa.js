@@ -71,7 +71,9 @@ class FsaInterface {
 }
 
 class Fsa extends FsaInterface {
-  static HEADER_SIZE = 128;
+  static get HEADER_SIZE() {
+    return 128;
+  }
 
   /**
    * @param {Storage} storage

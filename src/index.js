@@ -26,20 +26,52 @@ const defaults = {
 };
 
 class Morphy {
-  static STORAGE_FILE = STORAGE_FILE;
-  static STORAGE_MEM = STORAGE_MEM;
-  static SOURCE_FSA = SOURCE_FSA;
+  static get STORAGE_FILE() {
+    return STORAGE_FILE;
+  }
 
-  static RESOLVE_ANCODES_AS_TEXT = RESOLVE_ANCODES_AS_TEXT;
-  static RESOLVE_ANCODES_AS_DIALING = RESOLVE_ANCODES_AS_DIALING;
-  static RESOLVE_ANCODES_AS_INT = RESOLVE_ANCODES_AS_INT;
+  static get STORAGE_MEM() {
+    return STORAGE_MEM;
+  }
 
-  static NORMAL = NORMAL;
-  static IGNORE_PREDICT = IGNORE_PREDICT;
-  static ONLY_PREDICT = ONLY_PREDICT;
-  static PREDICT_BY_NONE = PREDICT_BY_NONE;
-  static PREDICT_BY_SUFFIX = PREDICT_BY_SUFFIX;
-  static PREDICT_BY_DB = PREDICT_BY_DB;
+  static get SOURCE_FSA() {
+    return SOURCE_FSA;
+  }
+
+  static get RESOLVE_ANCODES_AS_TEXT() {
+    return RESOLVE_ANCODES_AS_TEXT;
+  }
+
+  static get RESOLVE_ANCODES_AS_DIALING() {
+    return RESOLVE_ANCODES_AS_DIALING;
+  }
+
+  static get RESOLVE_ANCODES_AS_INT() {
+    return RESOLVE_ANCODES_AS_INT;
+  }
+
+  static get NORMAL() {
+    return NORMAL;
+  }
+
+  static get IGNORE_PREDICT() {
+    return IGNORE_PREDICT;
+  }
+
+  static get ONLY_PREDICT() {
+    return ONLY_PREDICT;
+  }
+
+  static get PREDICT_BY_NONE() {
+    return PREDICT_BY_NONE;
+  }
+
+  static get PREDICT_BY_SUFFIX() {
+    return PREDICT_BY_SUFFIX;
+  }
+  static get PREDICT_BY_DB() {
+    return PREDICT_BY_DB;
+  }
 
   /**
    * @param {string|object} lang
