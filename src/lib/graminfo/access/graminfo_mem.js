@@ -50,18 +50,18 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
       php.strings.substr(mem, offset, 20),
     );
 
-    result['offset'] = offset;
+    result.offset = offset;
 
     return result;
   }
 
   readAncodesMap(info) {
     const mem = this.resource;
-    const forms_count = info['packed_forms_count'];
+    const forms_count = info.packed_forms_count;
     // TODO: this can be wrong due to aligning ancodes map section
-    const offset = info['offset'] + 20 + info['forms_count'] * 2;
+    const offset = info.offset + 20 + info.forms_count * 2;
 
-    return php.unpack('v' + forms_count, php.strings.substr(mem, offset, forms_count * 2));
+    return php.unpack(`v${forms_count}`, php.strings.substr(mem, offset, forms_count * 2));
   }
 
   splitAncodes(ancodes, map) {
@@ -85,10 +85,10 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
 
   readAncodes(info) {
     const mem = this.resource;
-    const forms_count = info['forms_count'];
+    const forms_count = info.forms_count;
     // TODO: this can be wrong due to aligning ancodes section
-    const offset = info['offset'] + 20;
-    const ancodes = php.unpack('v' + forms_count, php.strings.substr(mem, offset, forms_count * 2));
+    const offset = info.offset + 20;
+    const ancodes = php.unpack(`v${forms_count}`, php.strings.substr(mem, offset, forms_count * 2));
     const map = this.readAncodesMap(info);
 
     return this.splitAncodes(ancodes, map);
@@ -96,51 +96,45 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
 
   readFlexiaData(info) {
     const mem = this.resource;
-    let offset = info['offset'] + 20;
+    let offset = info.offset + 20;
 
-    if (php.var.isset(info['affixes_offset'])) {
-      offset += info['affixes_offset'];
+    if (php.var.isset(info.affixes_offset)) {
+      offset += info.affixes_offset;
     } else {
-      offset += info['forms_count'] * 2 + info['packed_forms_count'] * 2;
+      offset += info.forms_count * 2 + info.packed_forms_count * 2;
     }
 
     return php.strings
-      .substr(mem, offset, info['affixes_size'] - this.ends_size)
+      .substr(mem, offset, info.affixes_size - this.ends_size)
       .toString()
       .split(this.ends.toString());
   }
 
   readAllGramInfoOffsets() {
-    return this.readSectionIndex(this.header['flex_index_offset'], this.header['flex_count']);
+    return this.readSectionIndex(this.header.flex_index_offset, this.header.flex_count);
   }
 
   readSectionIndex(offset, count) {
     const mem = this.resource;
 
-    return php.array.array_values(
-      php.unpack('V' + count, php.strings.substr(mem, offset, count * 4)),
-    );
+    return php.array.array_values(php.unpack(`V${count}`, php.strings.substr(mem, offset, count * 4)));
   }
 
   readAllFlexia() {
     const result = {};
-    let offset = this.header['flex_offset'];
+    let offset = this.header.flex_offset;
 
     _.forEach(
-      this.readSectionIndexAsSize(
-        this.header['flex_index_offset'],
-        this.header['flex_count'],
-        this.header['flex_size'],
-      ),
+      this.readSectionIndexAsSize(this.header.flex_index_offset, this.header.flex_count, this.header.flex_size),
       size => {
         const header = this.readGramInfoHeader(offset);
         const affixes = this.readFlexiaData(header);
         const ancodes = this.readAncodes(header, true);
 
-        result[header['id']] = {
-          header: header,
-          affixes: affixes,
-          ancodes: ancodes,
+        result[header.id] = {
+          header,
+          affixes,
+          ancodes,
         };
 
         offset += size;
@@ -153,21 +147,17 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
   readAllPartOfSpeech() {
     const mem = this.resource;
     const result = {};
-    let offset = this.header['poses_offset'];
+    let offset = this.header.poses_offset;
     let res;
 
     _.forEach(
-      this.readSectionIndexAsSize(
-        this.header['poses_index_offset'],
-        this.header['poses_count'],
-        this.header['poses_size'],
-      ),
+      this.readSectionIndexAsSize(this.header.poses_index_offset, this.header.poses_count, this.header.poses_size),
       $size => {
         res = php.unpack('vid/Cis_predict', php.strings.substr(mem, offset, 3));
 
-        result[res['id']] = {
+        result[res.id] = {
           name: this.cleanupCString(php.strings.substr(mem, offset + 3, $size - 3)),
-          is_predict: !!res['is_predict'],
+          is_predict: !!res.is_predict,
         };
 
         offset += $size;
@@ -180,20 +170,20 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
   readAllGrammems() {
     const mem = this.resource;
     const result = {};
-    let offset = this.header['grammems_offset'];
+    let offset = this.header.grammems_offset;
     let res;
 
     _.forEach(
       this.readSectionIndexAsSize(
-        this.header['grammems_index_offset'],
-        this.header['grammems_count'],
-        this.header['grammems_size'],
+        this.header.grammems_index_offset,
+        this.header.grammems_count,
+        this.header.grammems_size,
       ),
       size => {
         res = php.unpack('vid/Cshift', php.strings.substr(mem, offset, 3));
 
-        result[res['id']] = {
-          shift: res['shift'],
+        result[res.id] = {
+          shift: res.shift,
           name: this.cleanupCString(php.strings.substr(mem, offset + 3, size - 3)),
         };
 
@@ -207,12 +197,12 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
   readAllAncodes() {
     const mem = this.resource;
     const result = {};
-    let offset = this.header['ancodes_offset'];
+    let offset = this.header.ancodes_offset;
     let res;
     let grammems_count;
     let grammem_ids;
 
-    for (let $i = 0; $i < this.header['ancodes_count']; $i++) {
+    for (let $i = 0; $i < this.header.ancodes_count; $i++) {
       res = php.unpack('vid/vpos_id', php.strings.substr(mem, offset, 4));
       offset += 4;
 
@@ -220,15 +210,13 @@ class Morphy_GramInfo_Mem extends Morphy_GramInfo {
       offset += 2;
 
       grammem_ids = grammems_count
-        ? php.array.array_values(
-            php.unpack('v' + grammems_count, php.strings.substr(mem, offset, grammems_count * 2)),
-          )
+        ? php.array.array_values(php.unpack(`v${grammems_count}`, php.strings.substr(mem, offset, grammems_count * 2)))
         : [];
 
-      result[res['id']] = {
+      result[res.id] = {
         offset,
         grammem_ids,
-        pos_id: res['pos_id'],
+        pos_id: res.pos_id,
       };
 
       offset += grammems_count * 2;

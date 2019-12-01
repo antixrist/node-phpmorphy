@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import util from 'util';
+import _ from 'lodash';
 import php from 'locutus/php';
 import phpunserialize from 'phpunserialize';
 
@@ -42,7 +42,7 @@ export function inspect(
  * @returns {boolean}
  */
 export function isStringifyedNumber(any) {
-  let int = _.toInteger(any);
+  const int = _.toInteger(any);
 
   if (int === 0 && any !== '0') {
     return false;
@@ -65,7 +65,7 @@ export function toBuffer(something, encoding = 'utf-8') {
   } else if (_.isString(something)) {
     retVal = Buffer.from(something, encoding);
   } else if (_.isPlainObject(something)) {
-    let obj = _.clone(something);
+    const obj = _.clone(something);
     _.forEach(obj, (val, key) => (obj[key] = toBuffer(val, encoding)));
 
     retVal = obj;
@@ -88,8 +88,8 @@ export function buffer2str(something, encoding = 'utf8') {
  * @returns {Array}
  */
 export function str2ascii(something) {
-  let retVal = [];
-  let buffer = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
+  const retVal = [];
+  const buffer = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
 
   for (let i = 0, length = buffer.length; i < length; i++) {
     retVal.push(buffer[i]);
@@ -103,7 +103,7 @@ export function str2ascii(something) {
  * @returns {String}
  */
 export function str2hex(something) {
-  let retVal = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
+  const retVal = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
 
   return retVal.toString('hex');
 }
@@ -112,9 +112,14 @@ export function clone(instance) {
   return _.merge({}, Object.create(Object.getPrototypeOf(instance)), instance);
 }
 
-//php.info.ini_set('unicode.semantics', 'on');
+// php.info.ini_set('unicode.semantics', 'on');
 php.info.ini_set('phpjs.objectsAsArrays', false);
 
+/**
+ * @param {string} format
+ * @param {Buffer} buffer
+ * @returns {{}|[]}
+ */
 php.unpack = function unpack(format, buffer) {
   /**
    * Параметр format задается в виде строки и состоит из кодов формата и
@@ -149,69 +154,68 @@ php.unpack = function unpack(format, buffer) {
     '@': 'NUL-заполнение до абсолютной позиции',
   };
   const parts = format.split('/');
-  let offset = 0,
-    mod,
-    lenStr,
-    len;
+  let offset = 0;
+  let mod;
+  let lenStr;
+  let len;
   if (parts.length > 1) {
-    let result = {};
-    for (let idx = 0; idx < parts.length; idx++) {
-      mod = parts[idx][0];
+    const result = {};
+    for (const part of parts) {
+      mod = part[0];
       if (mod in codes) {
         switch (mod) {
           case 'V':
-            result[parts[idx].slice(1)] = buffer.readUInt32LE(offset);
+            result[part.slice(1)] = buffer.readUInt32LE(offset);
             offset += 4;
             break;
           case 'v':
-            result[parts[idx].slice(1)] = buffer.readUInt16LE(offset);
+            result[part.slice(1)] = buffer.readUInt16LE(offset);
             offset += 2;
             break;
           case 'a':
-            lenStr = /\d+/g.exec(parts[idx])[0];
+            lenStr = /\d+/g.exec(part)[0];
             len = parseInt(lenStr, 10);
-            result[parts[idx].slice(1 + lenStr.length)] = buffer.toString('ascii', offset, len);
+            result[part.slice(1 + lenStr.length)] = buffer.toString('ascii', offset, len);
             offset += len;
             break;
           default:
-            util.puts(parts[idx] + ' ' + offset);
+            util.puts(`${part} ${offset}`);
             break;
         }
       }
     }
 
     return result;
-  } else {
-    let result = [];
-    do {
-      let obj = {};
-      mod = format[0];
-      if (mod in codes) {
-        switch (mod) {
-          case 'V':
-            obj = buffer.readUInt32LE(offset);
-            offset += 4;
-            break;
-          case 'v':
-            obj = buffer.readUInt16LE(offset);
-            offset += 2;
-            break;
-          case 'a':
-            lenStr = /\d+/g.exec(format)[0];
-            len = parseInt(lenStr, 10);
-            obj = buffer.toString('ascii', offset, len);
-            offset += len;
-            break;
-          default:
-            util.puts(format);
-            break;
-        }
-      }
-      result.push(obj);
-    } while (offset < buffer.length);
-
-    return result;
   }
+  const result = [];
+  do {
+    let obj = {};
+    mod = format[0];
+    if (mod in codes) {
+      switch (mod) {
+        case 'V':
+          obj = buffer.readUInt32LE(offset);
+          offset += 4;
+          break;
+        case 'v':
+          obj = buffer.readUInt16LE(offset);
+          offset += 2;
+          break;
+        case 'a':
+          lenStr = /\d+/g.exec(format)[0];
+          len = parseInt(lenStr, 10);
+          obj = buffer.toString('ascii', offset, len);
+          offset += len;
+          break;
+        default:
+          util.puts(format);
+          break;
+      }
+    }
+    result.push(obj);
+  } while (offset < buffer.length);
+
+  return result;
 };
 
 php.var.unserialize = phpunserialize;

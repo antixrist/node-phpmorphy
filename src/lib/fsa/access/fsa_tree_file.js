@@ -19,8 +19,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-import _ from 'lodash';
 import fs from 'fs';
+import _ from 'lodash';
 import { php, castArray } from '../../../utils';
 import { Morphy_Fsa } from '../fsa';
 
@@ -49,12 +49,12 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
     let annot;
 
     let i = 0;
-    let c = wordBuf.length;
+    const c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
       char = php.strings.ord(wordBuf, i);
 
-      /////////////////////////////////
+      // ///////////////////////////////
       // find char in state begin
       // tree version
       result = true;
@@ -95,7 +95,7 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
               break;
             }
 
-            idx = idx << 1;
+            idx <<= 1;
           } else {
             if (trans & 0x0400) {
               result = false;
@@ -116,7 +116,7 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
         }
       }
       // find char in state end
-      /////////////////////////////////
+      // ///////////////////////////////
 
       if (!result) {
         trans = prev_trans;
@@ -180,7 +180,7 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
 
     do {
       let i = start_idx;
-      let c = _.size(state);
+      const c = _.size(state);
       for (; i < c; i++) {
         trans = state[i];
 
@@ -197,7 +197,7 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
             return total;
           }
         } else {
-          //path += php.strings.chr((trans & 0xFF));
+          // path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState((trans >> 11) & 0x1fffff);
@@ -210,9 +210,9 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.strings.substr(path, 0, -1);
+        // path = php.strings.substr(path, 0, -1);
       }
-    } while (!!stack.length);
+    } while (stack.length);
 
     return total;
   }
@@ -284,15 +284,15 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
     const fh = this.resource;
     const fsa_start = this.fsa_start;
 
-    let buf = Buffer.alloc(4);
+    const buf = Buffer.alloc(4);
     fs.readSync(fh, buf, 0, 4, fsa_start + 0);
     return php.unpack('V', buf)[0];
   }
 
   readAlphabet() {
     const fh = this.resource;
-    let buf = Buffer.alloc(this.header['alphabet_size']);
-    fs.readSync(fh, buf, 0, this.header['alphabet_size'], this.header['alphabet_offset']);
+    const buf = Buffer.alloc(this.header.alphabet_size);
+    fs.readSync(fh, buf, 0, this.header.alphabet_size, this.header.alphabet_offset);
 
     return buf.toString();
   }
@@ -303,14 +303,13 @@ class Morphy_Fsa_Tree_File extends Morphy_Fsa {
     }
 
     const fh = this.resource;
-    const offset =
-      this.header['annot_offset'] + (((trans & 0xff) << 21) | ((trans >> 11) & 0x1fffff));
+    const offset = this.header.annot_offset + (((trans & 0xff) << 21) | ((trans >> 11) & 0x1fffff));
 
     let annot;
     let buf = Buffer.alloc(1);
     fs.readSync(fh, buf, 0, 1, offset);
 
-    let len = php.strings.ord(buf);
+    const len = php.strings.ord(buf);
     if (len) {
       buf = Buffer.alloc(len);
       fs.readSync(fh, buf, 0, len, null);

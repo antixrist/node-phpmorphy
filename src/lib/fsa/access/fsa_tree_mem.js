@@ -48,12 +48,12 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     let annot;
 
     let i = 0;
-    let c = wordBuf.length;
+    const c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
       char = php.strings.ord(wordBuf, i);
 
-      /////////////////////////////////
+      // ///////////////////////////////
       // find char in state begin
       // tree version
       result = true;
@@ -90,7 +90,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
               break;
             }
 
-            idx = idx << 1;
+            idx <<= 1;
           } else {
             if (trans & 0x0400) {
               result = false;
@@ -111,7 +111,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       }
 
       // find char in state end
-      /////////////////////////////////
+      // ///////////////////////////////
 
       if (!result) {
         trans = prev_trans;
@@ -175,7 +175,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
 
     do {
       let i = start_idx;
-      let c = _.size(state);
+      const c = _.size(state);
       for (; i < c; i++) {
         trans = state[i];
 
@@ -188,12 +188,12 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          // if (!php.funchand.call_user_func(callback, path, annot)) {
           if (!php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.strings.chr((trans & 0xFF));
+          // path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState((trans >> 11) & 0x1fffff);
@@ -206,9 +206,9 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.strings.substr(path, 0, -1);
+        // path = php.strings.substr(path, 0, -1);
       }
-    } while (!!stack.length);
+    } while (stack.length);
 
     return total;
   }
@@ -273,13 +273,13 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     const fh = this.resource;
     const fsa_start = this.fsa_start;
 
-    let buf = php.strings.substr(fh, fsa_start + 0, 4);
+    const buf = php.strings.substr(fh, fsa_start + 0, 4);
     return php.unpack('V', buf)[0];
   }
 
   readAlphabet() {
     const fh = this.resource;
-    let buf = php.strings.substr(fh, this.header['alphabet_offset'], this.header['alphabet_size']);
+    const buf = php.strings.substr(fh, this.header.alphabet_offset, this.header.alphabet_size);
 
     return buf.toString();
   }
@@ -290,12 +290,11 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     }
 
     const fh = this.resource;
-    const offset =
-      this.header['annot_offset'] + (((trans & 0xff) << 21) | ((trans >> 11) & 0x1fffff));
+    const offset = this.header.annot_offset + (((trans & 0xff) << 21) | ((trans >> 11) & 0x1fffff));
 
     let annot;
     let buf = php.strings.substr(fh, offset, 1);
-    let len = php.strings.ord(buf);
+    const len = php.strings.ord(buf);
     if (len) {
       buf = php.strings.substr(fh, offset + 1, len);
       annot = buf;

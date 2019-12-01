@@ -19,8 +19,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-import _ from 'lodash';
 import fs from 'fs';
+import _ from 'lodash';
 import { php } from '../utils';
 import { STORAGE_FILE, STORAGE_MEM } from './constants';
 
@@ -60,18 +60,14 @@ class Morphy_Storage {
     let result;
     try {
       result = this.readUnsafe(offset, len);
-    } catch (e) {
+    } catch (error) {
       throw new Error(
-        `Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file: ${
-          e.message
-        }`,
+        `Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file: ${error.message}`,
       );
     }
 
     if (exactLength && result.length < len) {
-      throw new Error(
-        `Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file`,
-      );
+      throw new Error(`Can't read ${len} bytes at ${offset} offset, from '${this.getFileName()}' file`);
     }
 
     return result;
@@ -151,7 +147,7 @@ class Morphy_Storage_File extends Morphy_Storage {
       throw new Error(`Can't invoke fs.fstatSync for '${this.file_name}' file`);
     }
 
-    return stat['size'];
+    return stat.size;
   }
 
   readUnsafe(offset, len) {
@@ -186,7 +182,7 @@ class Morphy_Storage_Mem extends Morphy_Storage {
 
   readUnsafe(offset, len) {
     return php.strings.substr(this.resource, offset, len);
-    //return this.resource.slice(offset, offset + len - 1);
+    // return this.resource.slice(offset, offset + len - 1);
   }
 
   open(fileName) {
@@ -221,16 +217,10 @@ class Morphy_Storage_Factory {
       return new Morphy_Storage_Proxy(type, fileName, this);
     }
 
-    const className = 'Morphy_Storage_' + php.strings.ucfirst(type.toLowerCase());
+    const className = `Morphy_Storage_${php.strings.ucfirst(type.toLowerCase())}`;
 
     return new Morphy_Storage_Factory.storages[className](fileName);
   }
 }
 
-export {
-  Morphy_Storage,
-  Morphy_Storage_Proxy,
-  Morphy_Storage_File,
-  Morphy_Storage_Mem,
-  Morphy_Storage_Factory,
-};
+export { Morphy_Storage, Morphy_Storage_Proxy, Morphy_Storage_File, Morphy_Storage_Mem, Morphy_Storage_Factory };

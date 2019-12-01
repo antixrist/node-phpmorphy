@@ -52,7 +52,7 @@ class Morphy {
       opts.lang = lang;
     }
 
-    opts = Object.assign({}, defaults, opts);
+    opts = { ...defaults, ...opts };
 
     switch (opts.lang.toLowerCase()) {
       case 'de':

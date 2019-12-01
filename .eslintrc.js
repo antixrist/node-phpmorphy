@@ -56,10 +56,7 @@ module.exports = {
     'no-plusplus': 2,
     'no-await-in-loop': 1,
     'no-return-assign': 0,
-    'no-underscore-dangle': [
-      2,
-      { allowAfterThis: true, allowAfterSuper: true, enforceInMethodNames: false },
-    ],
+    'no-underscore-dangle': [2, { allowAfterThis: true, allowAfterSuper: true, enforceInMethodNames: false }],
     'prefer-destructuring': 0,
     // 'prefer-destructuring': [
     //   1, // fixable
@@ -120,13 +117,11 @@ module.exports = {
       },
       {
         selector: 'LabeledStatement',
-        message:
-          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
+        message: 'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
       },
       {
         selector: 'WithStatement',
-        message:
-          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
+        message: '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
       },
     ],
 

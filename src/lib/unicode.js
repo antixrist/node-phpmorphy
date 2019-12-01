@@ -49,26 +49,26 @@ class Morphy_UnicodeHelper {
   }
 
   static doCreate(encoding) {
-    let matches = encoding.match(/^(utf|ucs)(-)?([0-9]+)(-)?(le|be)?$/);
+    const matches = encoding.match(/^(utf|ucs)(-)?(\d+)(-)?(le|be)?$/);
     if (matches) {
       let tmp;
       let encoding_name;
       let className;
 
-      let utf_type = matches[1];
-      let utf_base = parseInt(matches[3], 10);
+      const utf_type = matches[1];
+      const utf_base = parseInt(matches[3], 10);
       let endiannes = '';
 
       switch (utf_type) {
         case 'utf':
-          if ([8, 16, 32].indexOf(utf_base) < 0) {
+          if (![8, 16, 32].includes(utf_base)) {
             // if (!php.array.in_array(utf_base, [8, 16, 32])) {
             throw new Error('Invalid utf base');
           }
 
           break;
         case 'ucs':
-          if ([2, 4].indexOf(utf_base) < 0) {
+          if (![2, 4].includes(utf_base)) {
             // if (!php.array.in_array(utf_base, [2, 4])) {
             throw new Error('Invalid ucs base');
           }
@@ -78,7 +78,7 @@ class Morphy_UnicodeHelper {
           throw new Error('Internal error');
       }
 
-      if (utf_base > 8 || 'ucs' === utf_type) {
+      if (utf_base > 8 || utf_type === 'ucs') {
         if (php.var.isset(matches[5])) {
           endiannes = matches[5] == 'be' ? 'be' : 'le';
         } else {
@@ -88,17 +88,16 @@ class Morphy_UnicodeHelper {
       }
 
       if (utf_type == 'ucs' || utf_base > 8) {
-        encoding_name = utf_type + '-' + utf_base + endiannes;
+        encoding_name = `${utf_type}-${utf_base}${endiannes}`;
       } else {
-        encoding_name = utf_type + '-' + utf_base;
+        encoding_name = `${utf_type}-${utf_base}`;
       }
 
       className = `Morphy_UnicodeHelper_${php.strings.str_replace('-', '_', encoding_name)}`;
 
       return new Morphy_UnicodeHelper.unicodeHelpers[className](encoding_name);
-    } else {
-      return new Morphy_UnicodeHelper_singlebyte(encoding);
     }
+    return new Morphy_UnicodeHelper_singlebyte(encoding);
   }
 
   firstCharSize(str) {}
@@ -237,9 +236,8 @@ class Morphy_UnicodeHelper_utf_8 extends Morphy_UnicodeHelper_Base {
 
         if (miss) {
           return str.slice(0, -(seq_len - miss));
-        } else {
-          return str;
         }
+        return str;
       }
     }
 
@@ -577,9 +575,8 @@ class Morphy_UnicodeHelper_utf_16_Base extends Morphy_UnicodeHelper_Base {
       if (this.isSurrogate(ord)) {
         // full surrogate pair
         return str;
-      } else {
-        return php.strings.substr(str, 0, -2);
       }
+      return php.strings.substr(str, 0, -2);
     }
 
     return str;

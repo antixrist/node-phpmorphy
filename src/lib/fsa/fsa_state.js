@@ -61,15 +61,15 @@ class Morphy_Link extends Morphy_Link_Base {
   }
 
   getDest() {
-    return this.trans['dest'];
+    return this.trans.dest;
   }
 
   getAttr() {
-    return this.trans['attr'];
+    return this.trans.attr;
   }
 
   getTargetState() {
-    return this.createState(this.trans['dest']);
+    return this.createState(this.trans.dest);
   }
 
   createState(index) {
@@ -109,7 +109,7 @@ class Morphy_State {
     for (let i = 0, c = this.transes.length; i < c; i++) {
       trans = this.transes[i];
 
-      if (!trans['term']) {
+      if (!trans.term) {
         result.push(this.createNormalLink(trans, this.raw_transes[i]));
       } else {
         result.push(this.createAnnotLink(trans, this.raw_transes[i]));

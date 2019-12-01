@@ -19,8 +19,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-import _ from 'lodash';
 import fs from 'fs';
+import _ from 'lodash';
 import { php, castArray } from '../../../utils';
 import { Morphy_Fsa } from '../fsa';
 
@@ -48,12 +48,12 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
     let buf;
 
     let i = 0;
-    let c = wordBuf.length;
+    const c = wordBuf.length;
     for (; i < c; i++) {
       prev_trans = trans;
       char = php.strings.ord(wordBuf, i);
 
-      /////////////////////////////////
+      // ///////////////////////////////
       // find char in state begin
       // sparse version
       result = true;
@@ -65,7 +65,7 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
         result = false;
       }
       // find char in state end
-      /////////////////////////////////
+      // ///////////////////////////////
 
       if (!result) {
         trans = prev_trans;
@@ -128,7 +128,7 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
 
     do {
       let i = start_idx;
-      let c = _.size(state);
+      const c = _.size(state);
       for (; i < c; i++) {
         trans = state[i];
 
@@ -141,12 +141,12 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
             annot = trans;
           }
 
-          //if (!php.funchand.call_user_func(callback, path, annot)) {
+          // if (!php.funchand.call_user_func(callback, path, annot)) {
           if (!php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
         } else {
-          //path += php.strings.chr((trans & 0xFF));
+          // path += php.strings.chr((trans & 0xFF));
           stack.push(state);
           stack_idx.push(i + 1);
           state = this.readState((trans >> 10) & 0x3fffff);
@@ -159,9 +159,9 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        //path = php.strings.substr(Buffer.from(path), 0, -1).toString();
+        // path = php.strings.substr(Buffer.from(path), 0, -1).toString();
       }
-    } while (!!stack.length);
+    } while (stack.length);
 
     return total;
   }
@@ -191,7 +191,7 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
       fs.readSync(fh, buf, 0, 4, start_offset + (char << 2));
       trans = php.unpack('V', buf)[0];
 
-      //if(!(trans & 0x0200) && (trans & 0xFF) == char) {
+      // if(!(trans & 0x0200) && (trans & 0xFF) == char) {
       // TODO: check term and empty flags at once i.e. trans & 0x0300
       if (!(trans & 0x0200 || trans & 0x0100) && (trans & 0xff) == char) {
         result.push(trans);
@@ -234,8 +234,8 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
     const fh = this.resource;
     let buf;
 
-    buf = Buffer.alloc(this.header['alphabet_size']);
-    fs.readSync(fh, buf, 0, this.header['alphabet_size'], this.header['alphabet_offset']);
+    buf = Buffer.alloc(this.header.alphabet_size);
+    fs.readSync(fh, buf, 0, this.header.alphabet_size, this.header.alphabet_offset);
 
     return buf.toString();
   }
@@ -246,8 +246,7 @@ class Morphy_Fsa_Sparse_File extends Morphy_Fsa {
     }
 
     const fh = this.resource;
-    const offset =
-      this.header['annot_offset'] + (((trans & 0xff) << 22) | ((trans >> 10) & 0x3fffff));
+    const offset = this.header.annot_offset + (((trans & 0xff) << 22) | ((trans >> 10) & 0x3fffff));
     let len;
     let annot;
     let buf;

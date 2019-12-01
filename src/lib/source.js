@@ -38,11 +38,11 @@ class Morphy_Source_Fsa extends Morphy_Source_Interface {
 
   getValue(key) {
     const result = this.fsa.walk(this.root, key, true);
-    if (result === false || !result['annot']) {
+    if (result === false || !result.annot) {
       return false;
     }
 
-    return result['annot'];
+    return result.annot;
   }
 }
 

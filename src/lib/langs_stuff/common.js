@@ -164,8 +164,8 @@ class Morphy_GrammemsProvider_Factory {
       let grammemsProviders = {};
 
       try {
-        grammemsProviders = require('./' + locale);
-      } catch (err) {
+        grammemsProviders = require(`./${locale}`);
+      } catch (error) {
         included[locale] = new Morphy_GrammemsProvider_Empty(morphy);
         return included[locale];
       }
@@ -173,7 +173,7 @@ class Morphy_GrammemsProvider_Factory {
       if (_.isFunction(grammemsProviders[className])) {
         included[locale] = grammemsProviders[className].instance(morphy);
       } else {
-        throw new Error("Class '" + className + "' not found");
+        throw new TypeError(`Class '${className}' not found`);
       }
     }
 

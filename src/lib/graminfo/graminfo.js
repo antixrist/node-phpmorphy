@@ -18,9 +18,9 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
+import _ from 'lodash';
 import { php } from '../../utils';
 
 class Morphy_GramInfo_Interface {
@@ -116,7 +116,7 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
 
     const storage_type = storage.getTypeAsString();
     const className = `Morphy_GramInfo_${php.strings.ucfirst(storage_type)}`;
-    const graminfoAccess = require('./access/graminfo_' + storage_type);
+    const graminfoAccess = require(`./access/graminfo_${storage_type}`);
 
     return new graminfoAccess[className](storage.getResource(), header);
   }
@@ -156,16 +156,16 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
     let offset = 24 * 4;
     let len = php.strings.ord(php.strings.substr(headerRaw, offset++, 1));
 
-    header['lang'] = php.strings.rtrim(php.strings.substr(headerRaw, offset, len));
+    header.lang = php.strings.rtrim(php.strings.substr(headerRaw, offset, len));
     offset += len;
     len = php.strings.ord(php.strings.substr(headerRaw, offset++, 1));
-    header['encoding'] = php.strings.rtrim(php.strings.substr(headerRaw, offset, len));
+    header.encoding = php.strings.rtrim(php.strings.substr(headerRaw, offset, len));
 
     return header;
   }
 
   static validateHeader(header) {
-    return header['ver'] == 3 || header['is_be'] != 1;
+    return header.ver == 3 || header.is_be != 1;
   }
 
   constructor(resource, header) {
@@ -173,23 +173,23 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
 
     this.resource = resource;
     this.header = header;
-    //this.ends      = php.strings.str_repeat('\0', header['char_size'] + 1);
-    //this.ends_size = php.strings.strlen(this.ends);
-    const buf = Buffer.alloc(header['char_size'] + 1);
+    // this.ends      = php.strings.str_repeat('\0', header['char_size'] + 1);
+    // this.ends_size = php.strings.strlen(this.ends);
+    const buf = Buffer.alloc(header.char_size + 1);
     this.ends = buf.fill('\0');
     this.ends_size = buf.length;
   }
 
   getLocale() {
-    return this.header['lang'];
+    return this.header.lang;
   }
 
   getEncoding() {
-    return this.header['encoding'];
+    return this.header.encoding;
   }
 
   getCharSize() {
-    return this.header['char_size'];
+    return this.header.char_size;
   }
 
   getEnds() {
@@ -201,10 +201,10 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
   }
 
   cleanupCString(string) {
-    //var pos = php.strings.strpos(string, this.ends);
-    //if (pos !== false) {
+    // var pos = php.strings.strpos(string, this.ends);
+    // if (pos !== false) {
     //  string = php.strings.substr(string, 0, pos);
-    //}
+    // }
 
     let stringBuf = Buffer.isBuffer(string) ? string : Buffer.from(string);
     const pos = this.ends.indexOf(stringBuf);
@@ -334,7 +334,7 @@ class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
     this.storage = $storage;
     this._info = null;
     this.cache = this.readCache($cacheFile);
-    //this.ends = php.strings.str_repeat('\0', this.getCharSize() + 1);
+    // this.ends = php.strings.str_repeat('\0', this.getCharSize() + 1);
     const buf = Buffer.alloc(this.getCharSize() + 1);
     this.ends = buf.fill('\0');
   }
@@ -342,7 +342,7 @@ class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
   readCache(fileName) {
     let result = fs.readFileSync(fileName);
 
-    result = /\(([\s\S]*)\)/gim.exec(result.toString())[1];
+    result = /\(([\S\s]*)\)/gim.exec(result.toString())[1];
     result = result
       .replace(/\s/gim, '')
       .replace(/,$/, '')
@@ -355,27 +355,27 @@ class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
     try {
       result = JSON.parse(result);
       parsingGood = _.isPlainObject(result);
-    } catch (e) {
+    } catch (error) {
       parsingGood = false;
     }
 
     if (!parsingGood) {
-      throw new Error('Can`t get header cache from "' + fileName + '" file');
+      throw new Error(`Can\`t get header cache from "${fileName}" file`);
     }
 
     return result;
   }
 
   getLocale() {
-    return this.cache['lang'];
+    return this.cache.lang;
   }
 
   getEncoding() {
-    return this.cache['encoding'];
+    return this.cache.encoding;
   }
 
   getCharSize() {
-    return this.cache['char_size'];
+    return this.cache.char_size;
   }
 
   getEnds() {
@@ -408,7 +408,7 @@ class Morphy_GramInfo_RuntimeCaching extends Morphy_GramInfo_Decorator {
   }
 
   readFlexiaData(info) {
-    const offset = info['offset'];
+    const offset = info.offset;
 
     if (!php.var.isset(this.$flexia_all[offset])) {
       this.$flexia_all[offset] = this.info.readFlexiaData(info);
@@ -437,7 +437,7 @@ class Morphy_GramInfo_AncodeCache extends Morphy_GramInfo_Decorator {
   }
 
   readAncodes(info) {
-    const $offset = info['offset'];
+    const $offset = info.offset;
 
     // todo: проверить доступ по индекс
     if (php.var.isset(this.cache[$offset])) {
