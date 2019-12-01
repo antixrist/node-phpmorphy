@@ -1,7 +1,6 @@
 import util from 'util';
 import _ from 'lodash';
 import php from 'locutus/php';
-import phpunserialize from 'phpunserialize';
 
 export const logger = {};
 logger.log = console.log.bind(console);
@@ -217,8 +216,6 @@ php.unpack = function unpack(format, buffer) {
 
   return result;
 };
-
-php.var.unserialize = phpunserialize;
 
 php.strings.ord = function ord(str, idx) {
   if (!Buffer.isBuffer(str)) {
