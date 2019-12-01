@@ -1,6 +1,10 @@
 root=true
 
-[src/**]
+[*]
+# if change line length don't forget set same value:
+#  - for `max-len` rule in `eslint` config
+#  - for `printWidth` option in `prettier` config
+max_line_length = 120
 indent_style = space
 indent_size = 2
 end_of_line = lf
@@ -11,8 +15,4 @@ charset = utf-8
 trim_trailing_whitespace = false
 
 [src/**/*.{js,mjs,ts,json}]
-# if change line length don't forget set same value:
-#  - for `max-len` rule in `eslint` config
-#  - for `printWidth` option in `prettier` config
-max_line_length = 100
 trim_trailing_whitespace = true

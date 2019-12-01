@@ -2,7 +2,7 @@
 //  - for `max_line_length` in `.editorconfig`
 //  - for `max-len` rule in `eslint` config
 module.exports = {
-  printWidth: 100,
+  printWidth: 120,
   singleQuote: true,
   trailingComma: 'all',
 };
