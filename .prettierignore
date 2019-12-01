@@ -1,4 +1,4 @@
-# exluding all *.js files everywhere
+# exluding all files everywhere
 **/*.*
 
 # except any config files in project root (including dot-files) and files from 'src' directory
