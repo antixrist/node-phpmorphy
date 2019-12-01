@@ -5,7 +5,6 @@ module.exports = {
       {
         targets: { node: true },
         useBuiltIns: false,
-        modules: 'umd',
       },
     ],
   ],
