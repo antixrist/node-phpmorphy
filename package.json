@@ -13,6 +13,7 @@
     "test": "node -r source-map-support/register ./dist/test",
     "lint": "eslint . --ext .js,.mjs,.ts",
     "lint:fix": "eslint . --ext .js,.mjs,.ts --fix && prettier \"**/*.{json,md}\" --write",
+    "postintall": "echo 'POSTINSTALL!!!!!'",
     "_prepublish": "npm run build && npm run test"
   },
   "main": "./dist/index.js",
