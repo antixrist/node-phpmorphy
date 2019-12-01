@@ -69,6 +69,7 @@ class Morphy {
   static get PREDICT_BY_SUFFIX() {
     return PREDICT_BY_SUFFIX;
   }
+
   static get PREDICT_BY_DB() {
     return PREDICT_BY_DB;
   }
