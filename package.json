@@ -7,13 +7,13 @@
     "_dev": "cross-env NODE_ENV=development nodemon",
     "clean": "rm -rf dist && mkdir dist",
     "babel": "babel src --out-dir dist --copy-files --source-maps",
-    "babel:watch": "run-s \"babel -- --watch\"",
+    "babel:watch": "run-s \"babel -- --watch --verbose\"",
     "watch": "run-s clean babel:watch",
     "build": "run-s clean babel",
-    "test": "node ./dist/test",
+    "test": "node -r source-map-support/register ./dist/test",
     "lint": "eslint . --ext .js,.mjs,.ts",
     "lint:fix": "eslint . --ext .js,.mjs,.ts --fix && prettier \"**/*.{json,md}\" --write",
-    "prepublish": "npm run build && npm run test"
+    "_prepublish": "npm run build && npm run test"
   },
   "main": "./dist/index.js",
   "dependencies": {
@@ -57,7 +57,8 @@
     "eslint-plugin-security": "^1.4.0",
     "eslint-plugin-sonarjs": "^0.5.0",
     "eslint-plugin-unicorn": "^14.0.1",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "source-map-support": "^0.5.16"
   },
   "keywords": [
     "phpmorphy",
