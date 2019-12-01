@@ -112,7 +112,7 @@ export function clone(instance) {
 }
 
 // php.info.ini_set('unicode.semantics', 'on');
-php.info.ini_set('locutus.objectsAsArrays', false);
+// php.info.ini_set('locutus.objectsAsArrays', false);
 
 /**
  * @param {string} format
