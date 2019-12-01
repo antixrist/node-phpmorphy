@@ -54,6 +54,7 @@ module.exports = {
   rules: {
     'no-console': 2,
     'no-plusplus': 2,
+    'no-bitwise': 0,
     'no-await-in-loop': 1,
     'no-return-assign': 0,
     'no-underscore-dangle': [2, { allowAfterThis: true, allowAfterSuper: true, enforceInMethodNames: false }],
@@ -294,7 +295,7 @@ module.exports = {
     'security/detect-non-literal-fs-filename': 1,
     'security/detect-non-literal-regexp': 1,
     'security/detect-non-literal-require': 2,
-    'security/detect-object-injection': 1,
+    'security/detect-object-injection': 0,
     'security/detect-possible-timing-attacks': 1,
     'security/detect-pseudoRandomBytes': 2,
 
