@@ -2,9 +2,6 @@
   "name": "phpmorphy",
   "version": "2.1.2",
   "scripts": {
-    "_rebuilder": "cross-env NODE_ENV=development webpack --watch",
-    "_build": "cross-env NODE_ENV=production webpack",
-    "_dev": "cross-env NODE_ENV=development nodemon",
     "clean": "rm -rf dist && mkdir dist",
     "babel": "babel src --out-dir dist --copy-files --source-maps",
     "babel:watch": "run-s \"babel -- --watch --verbose\"",
@@ -14,7 +11,7 @@
     "lint": "eslint . --ext .js,.mjs,.ts",
     "lint:fix": "eslint . --ext .js,.mjs,.ts --fix && prettier \"**/*.{json,md}\" --write",
     "install": "in-install && npm run build || not-in-install",
-    "_prepublish": "npm run build && npm run test"
+    "prepublish": "in-publish && npm run test || not-in-publish"
   },
   "main": "./index.js",
   "dependencies": {
