@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import path from 'path';
+import _ from 'lodash';
 import phpMorphy, {
   STORAGE_FILE,
   STORAGE_MEM,
@@ -26,42 +26,20 @@ const defaults = {
 };
 
 class Morphy {
-  static get STORAGE_FILE() {
-    return STORAGE_FILE;
-  }
-  static get STORAGE_MEM() {
-    return STORAGE_MEM;
-  }
-  static get SOURCE_FSA() {
-    return SOURCE_FSA;
-  }
-  static get RESOLVE_ANCODES_AS_TEXT() {
-    return RESOLVE_ANCODES_AS_TEXT;
-  }
-  static get RESOLVE_ANCODES_AS_DIALING() {
-    return RESOLVE_ANCODES_AS_DIALING;
-  }
-  static get RESOLVE_ANCODES_AS_INT() {
-    return RESOLVE_ANCODES_AS_INT;
-  }
-  static get NORMAL() {
-    return NORMAL;
-  }
-  static get IGNORE_PREDICT() {
-    return IGNORE_PREDICT;
-  }
-  static get ONLY_PREDICT() {
-    return ONLY_PREDICT;
-  }
-  static get PREDICT_BY_NONE() {
-    return PREDICT_BY_NONE;
-  }
-  static get PREDICT_BY_SUFFIX() {
-    return PREDICT_BY_SUFFIX;
-  }
-  static get PREDICT_BY_DB() {
-    return PREDICT_BY_DB;
-  }
+  static STORAGE_FILE = STORAGE_FILE;
+  static STORAGE_MEM = STORAGE_MEM;
+  static SOURCE_FSA = SOURCE_FSA;
+
+  static RESOLVE_ANCODES_AS_TEXT = RESOLVE_ANCODES_AS_TEXT;
+  static RESOLVE_ANCODES_AS_DIALING = RESOLVE_ANCODES_AS_DIALING;
+  static RESOLVE_ANCODES_AS_INT = RESOLVE_ANCODES_AS_INT;
+
+  static NORMAL = NORMAL;
+  static IGNORE_PREDICT = IGNORE_PREDICT;
+  static ONLY_PREDICT = ONLY_PREDICT;
+  static PREDICT_BY_NONE = PREDICT_BY_NONE;
+  static PREDICT_BY_SUFFIX = PREDICT_BY_SUFFIX;
+  static PREDICT_BY_DB = PREDICT_BY_DB;
 
   /**
    * @param {string|{}} lang
@@ -340,22 +318,8 @@ class Morphy {
    * @param {*} [type=Morphy]
    * @returns {[]}
    */
-  castFormByAncode(
-    word,
-    ancode,
-    commonAncode = null,
-    returnOnlyWord = false,
-    callback = null,
-    type = Morphy.NORMAL,
-  ) {
-    return this.morpher.castFormByAncode(
-      this.prepareWord(word),
-      ancode,
-      commonAncode,
-      returnOnlyWord,
-      callback,
-      type,
-    );
+  castFormByAncode(word, ancode, commonAncode = null, returnOnlyWord = false, callback = null, type = Morphy.NORMAL) {
+    return this.morpher.castFormByAncode(this.prepareWord(word), ancode, commonAncode, returnOnlyWord, callback, type);
   }
 
   /**
@@ -367,14 +331,7 @@ class Morphy {
    * @param {*} [type=Morphy.NORMAL]
    * @returns {[]|boolean}
    */
-  castFormByGramInfo(
-    word,
-    partOfSpeech,
-    grammems,
-    returnOnlyWord = false,
-    callback = null,
-    type = Morphy.NORMAL,
-  ) {
+  castFormByGramInfo(word, partOfSpeech, grammems, returnOnlyWord = false, callback = null, type = Morphy.NORMAL) {
     return this.morpher.castFormByGramInfo(
       this.prepareWord(word),
       partOfSpeech,
