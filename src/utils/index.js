@@ -23,7 +23,7 @@ export function castArray(any) {
 
 /**
  * @param object
- * @param {{}} [opts]
+ * @param {object} [opts]
  * @returns {string}
  */
 export function inspect(
@@ -113,12 +113,12 @@ export function clone(instance) {
 }
 
 // php.info.ini_set('unicode.semantics', 'on');
-php.info.ini_set('phpjs.objectsAsArrays', false);
+php.info.ini_set('locutus.objectsAsArrays', false);
 
 /**
  * @param {string} format
  * @param {Buffer} buffer
- * @returns {{}|[]}
+ * @returns {Object|Object[]}
  */
 php.unpack = function unpack(format, buffer) {
   /**
