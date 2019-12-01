@@ -1,4 +1,7 @@
 <?php
+
+// `mbstring` должен быть раскомментирован в `php.ini`
+
 error_reporting(E_ERROR);
 //ini_set('display_errors', 'Off');
 

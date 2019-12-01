@@ -1,48 +1,20 @@
-/**
- * This file is part of phpMorphy library
- *
- * Copyright c 2007-2008 Kamaev Vladimir <heromantor@users.sourceforge.net>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
-
-import _ from 'lodash';
 import path from 'path';
-import { php, toBuffer } from '../utils';
-import { Morphy_Fsa } from './fsa/fsa';
-import { Morphy_Source_Fsa } from './source';
-import { Morphy_GramTab_Proxy } from './gramtab';
-import { Morphy_Storage_Factory } from './storage';
+import _ from 'lodash';
+import { php, toBuffer } from '~/utils';
+import { Fsa } from './fsa/fsa';
+import { SourceFsa } from './source';
+import { GramTabProxy } from './gramtab';
+import { StorageFactory } from './storage';
+import { GrammemsProviderFactory, GrammemsProviderInterface } from './langs-stuff/common';
+import { GramInfoRuntimeCaching, GramInfoProxyWithHeader, GramInfoAncodeCache } from './graminfo/graminfo';
 import {
-  Morphy_GrammemsProvider_Factory,
-  Morphy_GrammemsProvider_Interface
-} from './langs_stuff/common';
-import {
-  Morphy_GramInfo_RuntimeCaching,
-  Morphy_GramInfo_Proxy_WithHeader,
-  Morphy_GramInfo_AncodeCache
-} from './graminfo/graminfo';
-import {
-  Morphy_AncodesResolver_Proxy,
-  Morphy_Morphier_Helper,
-  Morphy_Morphier_Common,
-  Morphy_Morphier_Bulk,
-  Morphy_Morphier_Predict_Database,
-  Morphy_Morphier_Empty,
-  Morphy_Morphier_Predict_Suffix
+  AncodesResolverProxy,
+  MorphierHelper,
+  MorphierCommon,
+  MorphierBulk,
+  MorphierPredictDatabase,
+  MorphierEmpty,
+  MorphierPredictSuffix,
 } from './morphiers';
 import {
   STORAGE_FILE,
@@ -56,78 +28,69 @@ import {
   ONLY_PREDICT,
   PREDICT_BY_NONE,
   PREDICT_BY_SUFFIX,
-  PREDICT_BY_DB
+  PREDICT_BY_DB,
 } from './constants';
 
-class Morphy_FilesBundle {
-
-  constructor (dirName, lang) {
+class FilesBundle {
+  constructor(dirName, lang) {
     this.dir = dirName;
     this.setLang(lang);
   }
 
-  getLang () {
+  getLang() {
     return this.lang;
   }
 
-  setLang (lang) {
+  setLang(lang) {
     this.lang = lang.toLowerCase();
   }
 
-  getCommonAutomatFile () {
+  getCommonAutomatFile() {
     return this.genFileName('common_aut');
   }
 
-  getPredictAutomatFile () {
+  getPredictAutomatFile() {
     return this.genFileName('predict_aut');
   }
 
-  getGramInfoFile () {
+  getGramInfoFile() {
     return this.genFileName('morph_data');
   }
 
-  getGramInfoAncodesCacheFile () {
+  getGramInfoAncodesCacheFile() {
     return this.genFileName('morph_data_ancodes_cache');
   }
 
-  getAncodesMapFile () {
+  getAncodesMapFile() {
     return this.genFileName('morph_data_ancodes_map');
   }
 
-  getGramTabFile () {
+  getGramTabFile() {
     return this.genFileName('gramtab');
   }
 
-  getGramTabFileWithTextIds () {
+  getGramTabFileWithTextIds() {
     return this.genFileName('gramtab_txt');
   }
 
-  getGramInfoHeaderCacheFile () {
+  getGramInfoHeaderCacheFile() {
     return this.genFileName('morph_data_header_cache');
   }
 
-  genFileName (token, extraExt) {
-    extraExt = (!_.isUndefined(extraExt)) ? extraExt : null;
-    
-    return path.join(this.dir, [
-      token,
-      '.',
-      this.lang,
-      (php.var.isset(extraExt) ? '.' + extraExt : ''),
-      '.bin'
-    ].join(''));
-  }
+  genFileName(token, extraExt) {
+    extraExt = !_.isUndefined(extraExt) ? extraExt : null;
 
+    return path.join(this.dir, [token, '.', this.lang, php.var.isset(extraExt) ? `.${extraExt}` : '', '.bin'].join(''));
+  }
 }
 
-class Morphy_WordDescriptor_Collection_Serializer {
-
+class WordDescriptorCollectionSerializer {
   /**
-   * @param {Morphy_WordDescriptor_Collection} collection
+   * @param {WordDescriptorCollection} collection
    * @param {boolean} [asText=false]
    * @returns {*}
    */
-  serialize (collection, asText = false) {
+  serialize(collection, asText = false) {
     const result = [];
     _.forEach(collection, descriptor => result.push(this.processWordDescriptor(descriptor, asText)));
 
@@ -135,157 +98,160 @@ class Morphy_WordDescriptor_Collection_Serializer {
   }
 
   /**
-   * @param {Morphy_WordDescriptor} descriptor
+   * @param {WordDescriptor} descriptor
    * @param {boolean} [asText=false]
    * @returns {{forms: *, all: *, common: string}}
    */
-  processWordDescriptor (descriptor, asText = false) {
+  processWordDescriptor(descriptor, asText = false) {
     const all = [];
     const forms = [];
 
-    _.forEach(descriptor, word_form => {
-      forms.push(word_form.getWord());
-      all.push(this.serializeGramInfo(word_form, asText));
+    _.forEach(descriptor, wordForm => {
+      forms.push(wordForm.getWord());
+      all.push(this.serializeGramInfo(wordForm, asText));
     });
 
     return {
       all,
       forms,
-      common: ''
+      common: '',
     };
   }
 
   /**
-   * @param {Morphy_WordForm} wordForm
+   * @param {WordForm} wordForm
    * @param {boolean} [asText=false]
    * @returns {*}
    */
-  serializeGramInfo (wordForm, asText = false) {
+  serializeGramInfo(wordForm, asText = false) {
     if (asText) {
-      return wordForm.getPartOfSpeech() + ' ' + php.strings.implode(',', wordForm.getGrammems());
+      return `${wordForm.getPartOfSpeech()} ${php.strings.implode(',', wordForm.getGrammems())}`;
     }
 
     return {
       pos: wordForm.getPartOfSpeech(),
-      grammems: wordForm.getGrammems()
+      grammems: wordForm.getGrammems(),
     };
   }
-
 }
 
-class phpMorphy {
-  
-  constructor (dir, lang = null, options = {}) {
+class PhpMorphy {
+  constructor(dir, lang = null, options = {}) {
     this.options = this.repairOptions(options);
     this.init(this.createFilesBundle(dir, lang), this.options);
     this.last_prediction_type = PREDICT_BY_NONE;
   }
 
   /**
-   * @param {Morphy_FilesBundle} bundle
+   * @param {FilesBundle} bundle
    * @param options
    */
-  init (bundle, options) {
+  init(bundle, options) {
     this.options = this.repairOptions(options);
     this.storage_factory = this.createStorageFactory();
     this.common_fsa = this.createFsa(
-      this.storage_factory.open(this.options['storage'], bundle.getCommonAutomatFile(), false),
-      false
+      this.storage_factory.open(this.options.storage, bundle.getCommonAutomatFile(), false),
+      false,
     );
     this.predict_fsa = this.createFsa(
-      this.storage_factory.open(this.options['storage'], bundle.getPredictAutomatFile(), true),
-      true
+      this.storage_factory.open(this.options.storage, bundle.getPredictAutomatFile(), true),
+      true,
     );
 
-    const graminfo = this.createGramInfo(this.storage_factory.open(this.options['storage'], bundle.getGramInfoFile(), true), bundle);
-    const gramtab = this.createGramTab(this.storage_factory.open(
-      this.options['storage'],
-      (this.options['graminfo_as_text'] ? bundle.getGramTabFileWithTextIds() : bundle.getGramTabFile()),
-      true
-    ));
-    this.helper = this.createMorphierHelper(graminfo, gramtab, this.options['graminfo_as_text'], bundle);
+    const graminfo = this.createGramInfo(
+      this.storage_factory.open(this.options.storage, bundle.getGramInfoFile(), true),
+      bundle,
+    );
+    const gramtab = this.createGramTab(
+      this.storage_factory.open(
+        this.options.storage,
+        this.options.graminfo_as_text ? bundle.getGramTabFileWithTextIds() : bundle.getGramTabFile(),
+        true,
+      ),
+    );
+    this.helper = this.createMorphierHelper(graminfo, gramtab, this.options.graminfo_as_text, bundle);
   }
 
   /**
-   * @return {Morphy_Morphier_Interface}
+   * @return {MorphierInterface}
    */
-  getCommonMorphier () {
+  getCommonMorphier() {
     return this.__common_morphier;
   }
 
   /**
-   * @return {Morphy_Morphier_Interface}
+   * @return {MorphierInterface}
    */
-  getPredictBySuffixMorphier () {
+  getPredictBySuffixMorphier() {
     return this.__predict_by_suf_morphier;
   }
 
   /**
-   * @return {Morphy_Morphier_Interface}
+   * @return {MorphierInterface}
    */
-  getPredictByDatabaseMorphier () {
+  getPredictByDatabaseMorphier() {
     return this.__predict_by_db_morphier;
   }
 
   /**
-   * @return {Morphy_Morphier_Bulk}
+   * @return {MorphierBulk}
    */
-  getBulkMorphier () {
+  getBulkMorphier() {
     return this.__bulk_morphier;
   }
 
   /**
    * @return {string}
    */
-  getEncoding () {
+  getEncoding() {
     return this.helper.getGramInfo().getEncoding();
   }
 
   /**
    * @return {string}
    */
-  getLocale () {
+  getLocale() {
     return this.helper.getGramInfo().getLocale();
   }
 
   /**
-   * @return {Morphy_GrammemsProvider_Base}
+   * @return {GrammemsProviderBase}
    */
-  getGrammemsProvider () {
+  getGrammemsProvider() {
     return _.cloneDeep(this.__grammems_provider);
   }
 
   /**
-   * @return {Morphy_GrammemsProvider_Base}
+   * @return {GrammemsProviderBase}
    */
-  getDefaultGrammemsProvider () {
+  getDefaultGrammemsProvider() {
     return this.__grammems_provider;
   }
 
   /**
    * @return {boolean}
    */
-  isLastPredicted () {
+  isLastPredicted() {
     return this.last_prediction_type !== PREDICT_BY_NONE;
   }
 
   /**
    * @returns {string}
    */
-  getLastPredictionType () {
+  getLastPredictionType() {
     return this.last_prediction_type;
   }
 
   /**
    * @param {*} word - string or array of strings
    * @param {*} [type=NORMAL] - prediction managment
-   * @return {Morphy_WordDescriptor_Collection|{}}
+   * @return {WordDescriptorCollection|{}}
    */
-  findWord (word, type = NORMAL) {
+  findWord(word, type = NORMAL) {
     const result = {};
 
     if (php.var.is_array(word)) {
-      word.forEach(w => result[w] = this.invoke('getWordDescriptor', toBuffer(w), type));
+      word.forEach(w => (result[w] = this.invoke('getWordDescriptor', toBuffer(w), type)));
       return result;
     }
 
@@ -299,10 +265,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  lemmatize (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.getBaseForm(word, type);
+  lemmatize(word, type = NORMAL) {
+    return this.getBaseForm(toBuffer(word), type);
   }
 
   /**
@@ -310,10 +274,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getBaseForm (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getBaseForm', word, type);
+  getBaseForm(word, type = NORMAL) {
+    return this.invoke('getBaseForm', toBuffer(word), type);
   }
 
   /**
@@ -321,10 +283,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getAllForms (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getAllForms', word, type);
+  getAllForms(word, type = NORMAL) {
+    return this.invoke('getAllForms', toBuffer(word), type);
   }
 
   /**
@@ -332,10 +292,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getPseudoRoot (word, type = NORMAL) {
-    word = toBuffer(word);
-    
-    return this.invoke('getPseudoRoot', word, type);
+  getPseudoRoot(word, type = NORMAL) {
+    return this.invoke('getPseudoRoot', toBuffer(word), type);
   }
 
   /**
@@ -343,10 +301,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getPartOfSpeech (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getPartOfSpeech', word, type);
+  getPartOfSpeech(word, type = NORMAL) {
+    return this.invoke('getPartOfSpeech', toBuffer(word), type);
   }
 
   /**
@@ -354,10 +310,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getAllFormsWithAncodes (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getAllFormsWithAncodes', word, type);
+  getAllFormsWithAncodes(word, type = NORMAL) {
+    return this.invoke('getAllFormsWithAncodes', toBuffer(word), type);
   }
 
   /**
@@ -366,19 +320,15 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {*}
    */
-  getAllFormsWithGramInfo (word, asText = true, type = NORMAL) {
-    word = toBuffer(word);
+  getAllFormsWithGramInfo(word, asText = true, type = NORMAL) {
+    const result = this.findWord(toBuffer(word), type);
 
-    const result = this.findWord(word, type);
-
-    if (!result) {
-      return false;
-    }
+    if (!result) return false;
 
     if (php.var.is_array(word)) {
       const out = {};
       _.forEach(result, (r, w) => {
-        if (false !== r) {
+        if (r !== false) {
           out[w] = this.processWordsCollection(r, asText);
         } else {
           out[w] = false;
@@ -387,7 +337,7 @@ class phpMorphy {
 
       return out;
     }
-  
+
     return this.processWordsCollection(result, asText);
   }
 
@@ -396,10 +346,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getAncode (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getAncode', word, type);
+  getAncode(word, type = NORMAL) {
+    return this.invoke('getAncode', toBuffer(word), type);
   }
 
   /**
@@ -407,10 +355,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getGramInfo (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getGrammarInfo', word, type);
+  getGramInfo(word, type = NORMAL) {
+    return this.invoke('getGrammarInfo', toBuffer(word), type);
   }
 
   /**
@@ -418,10 +364,8 @@ class phpMorphy {
    * @param {*} [type=NORMAL] - prediction managment
    * @return {[]}
    */
-  getGramInfoMergeForms (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getGrammarInfoMergeForms', word, type);
+  getGramInfoMergeForms(word, type = NORMAL) {
+    return this.invoke('getGrammarInfoMergeForms', toBuffer(word), type);
   }
 
   /**
@@ -429,10 +373,8 @@ class phpMorphy {
    * @param [type=NORMAL] - prediction managment
    * @returns {[]}
    */
-  getAnnotForWord (word, type = NORMAL) {
-    word = toBuffer(word);
-
-    return this.invoke('getAnnot', word, type);
+  getAnnotForWord(word, type = NORMAL) {
+    return this.invoke('getAnnot', toBuffer(word), type);
   }
 
   /**
@@ -444,26 +386,17 @@ class phpMorphy {
    * @param {*} [type=NORMAL]
    * @return {[]}
    */
-  castFormByAncode (word, ancode, commonAncode = null, returnOnlyWord = false, callback = null, type = NORMAL) {
-    word = toBuffer(word);
-
+  castFormByAncode(word, ancode, commonAncode = null, returnOnlyWord = false, callback = null, type = NORMAL) {
     const resolver = this.helper.getAncodesResolver();
-    const common_ancode_id = resolver.unresolve(commonAncode);
-    const ancode_id = resolver.unresolve(ancode);
-    const data = this.helper.getGrammemsAndPartOfSpeech(ancode_id);
+    const commonAncodeId = resolver.unresolve(commonAncode);
+    const ancodeId = resolver.unresolve(ancode);
+    const data = this.helper.getGrammemsAndPartOfSpeech(ancodeId);
 
-    if (php.var.isset(common_ancode_id)) {
-      data[1] = php.array.array_merge(data[1], this.helper.getGrammems(common_ancode_id));
+    if (php.var.isset(commonAncodeId)) {
+      data[1] = php.array.array_merge(data[1], this.helper.getGrammems(commonAncodeId));
     }
 
-    return this.castFormByGramInfo(
-      word,
-      data[0],
-      data[1],
-      returnOnlyWord,
-      callback,
-      type
-    );
+    return this.castFormByGramInfo(toBuffer(word), data[0], data[1], returnOnlyWord, callback, type);
   }
 
   /**
@@ -475,61 +408,55 @@ class phpMorphy {
    * @param {*} [type=NORMAL]
    * @return {[]|boolean}
    */
-  castFormByGramInfo (word, partOfSpeech, grammems, returnOnlyWord = false, callback = null, type = NORMAL) {
-    word = toBuffer(word);
+  castFormByGramInfo(word, partOfSpeech, grammems, returnOnlyWord = false, callback = null, type = NORMAL) {
+    const annot = this.getAnnotForWord(toBuffer(word), type);
+    if (!annot) return false;
 
-    const annot = this.getAnnotForWord(word, type);
-    if (!annot) {
-      return false;
-    }
-
-    return this.helper.castFormByGramInfo(word, annot, partOfSpeech, grammems, returnOnlyWord, callback);
+    return this.helper.castFormByGramInfo(toBuffer(word), annot, partOfSpeech, grammems, returnOnlyWord, callback);
   }
 
   /**
    * @param {string} word
    * @param {string} patternWord
-   * @param {Morphy_GrammemsProvider_Interface} [grammemsProvider=null]
+   * @param {GrammemsProviderInterface} [grammemsProvider=null]
    * @param {boolean} [returnOnlyWord=false]
    * @param {*} [callback=false]
    * @param {*} [type=NORMAL]
    * @return {[]|boolean}
    */
-  castFormByPattern (word, patternWord, grammemsProvider = null, returnOnlyWord = false, callback = null, type = NORMAL) {
+  castFormByPattern(
+    word,
+    patternWord,
+    grammemsProvider = null,
+    returnOnlyWord = false,
+    callback = null,
+    type = NORMAL,
+  ) {
     word = toBuffer(word);
     patternWord = toBuffer(patternWord);
 
-    const word_annot = this.getAnnotForWord(word, type);
-    if (!word_annot) {
+    const wordAnnot = this.getAnnotForWord(word, type);
+    if (!wordAnnot) {
       return false;
     }
-    
-    if (!(grammemsProvider instanceof Morphy_GrammemsProvider_Interface)) {
+
+    if (!(grammemsProvider instanceof GrammemsProviderInterface)) {
       grammemsProvider = this.__grammems_provider;
     }
-    
+
     let result = [];
     _.forEach(this.getGramInfo(patternWord, type), paradigm => {
       _.forEach(paradigm, grammar => {
-        const pos = grammar['pos'];
-        const essential_grammems = grammemsProvider.getGrammems(pos);
-  
-        const grammems = (essential_grammems !== false)
-          ? php.array.array_intersect(grammar['grammems'], essential_grammems)
-          : grammar['grammems']
-        ;
-        
-        const res = this.helper.castFormByGramInfo(
-          word,
-          word_annot,
-          pos,
-          grammems,
-          returnOnlyWord,
-          callback,
-          type
-        );
+        const pos = grammar.pos;
+        const essentialGrammems = grammemsProvider.getGrammems(pos);
 
-        if (res.length) {
+        const grammems =
+          essentialGrammems !== false
+            ? php.array.array_intersect(grammar.grammems, essentialGrammems)
+            : grammar.grammems;
+        const res = this.helper.castFormByGramInfo(word, wordAnnot, pos, grammems, returnOnlyWord, callback, type);
+
+        if (res.length > 0) {
           result = php.array.array_merge(result, res);
         }
       });
@@ -539,54 +466,50 @@ class phpMorphy {
   }
 
   /**
-   * @param {Morphy_WordDescriptor_Collection} collection
+   * @param {WordDescriptorCollection} collection
    * @param {boolean} asText
    * @returns {*}
    */
-  processWordsCollection (collection, asText) {
+  processWordsCollection(collection, asText) {
     return this.__word_descriptor_serializer.serialize(collection, asText);
   }
 
-  invoke (method, word, type) {
+  invoke(method, word, type) {
     this.last_prediction_type = PREDICT_BY_NONE;
     word = toBuffer(word);
-    
+
     let result;
-    let not_found;
+    let notFound;
 
     if (type === ONLY_PREDICT) {
       if (php.var.is_array(word)) {
         result = {};
-        _.forEach(word, w => result[w] = this.predictWord(method, w));
+        _.forEach(word, w => (result[w] = this.predictWord(method, w)));
 
         return result;
-      } else {
-        return this.predictWord(method, word);
       }
+      return this.predictWord(method, word);
     }
 
     if (php.var.is_array(word)) {
       result = this.__bulk_morphier[method](word);
-      not_found = this.__bulk_morphier.getNotFoundWords();
+      notFound = this.__bulk_morphier.getNotFoundWords();
 
-      _.forEach(not_found, word => {
-        result[word] = (type !== IGNORE_PREDICT)
-          ? this.predictWord(method, word)
-          : false
-        ;
+      _.forEach(notFound, word => {
+        result[word] = type !== IGNORE_PREDICT ? this.predictWord(method, word) : false;
       });
     } else {
       result = this.__common_morphier[method](word);
-  
+
       if (!result && type !== IGNORE_PREDICT) {
         result = this.predictWord(method, word);
       }
     }
-    
+
     return result;
   }
 
-  predictWord (method, word) {
+  predictWord(method, word) {
     word = toBuffer(word);
 
     let result = this.__predict_by_suf_morphier[method](word);
@@ -605,163 +528,167 @@ class phpMorphy {
   }
 
   /**
-   * @param {Morphy_FilesBundle} bundle
+   * @param {FilesBundle} bundle
    * @param {{}} opts
    * @returns {*}
    */
-  createCommonSource (bundle, opts) {
-    const type = opts['type'];
+  createCommonSource(bundle, opts) {
+    const type = opts.type;
 
+    // eslint-disable-next-line sonarjs/no-small-switch
     switch (type) {
       case SOURCE_FSA:
-        return new Morphy_Source_Fsa(this.common_fsa);
+        return new SourceFsa(this.common_fsa);
       default:
-        throw new Error(`Unknown source type given '${ type }'`);
+        throw new Error(`Unknown source type given '${type}'`);
     }
   }
 
-  repairOldOptions (options = {}) {
+  repairOldOptions(options = {}) {
     const defaults = {
       predict_by_suffix: false,
-      predict_by_db:     false
+      predict_by_db: false,
     };
 
     return Object.assign(defaults, options);
   }
 
-  repairSourceOptions (options = {}) {
+  repairSourceOptions(options = {}) {
     const defaults = {
       type: SOURCE_FSA,
-      opts: null
+      opts: null,
     };
 
     return Object.assign(defaults, options);
   }
 
-  repairOptions (options = {}) {
+  repairOptions(options = {}) {
     const defaults = {
-      graminfo_as_text:  true,
-      storage:           STORAGE_MEM,
-      common_source:     this.repairSourceOptions(options.common_source || null),
+      graminfo_as_text: true,
+      storage: STORAGE_MEM,
+      common_source: this.repairSourceOptions(options.common_source || null),
       predict_by_suffix: true,
-      predict_by_db:     true,
+      predict_by_db: true,
       use_ancodes_cache: false,
-      resolve_ancodes:   RESOLVE_ANCODES_AS_TEXT
+      resolve_ancodes: RESOLVE_ANCODES_AS_TEXT,
     };
 
     return Object.assign(defaults, options);
   }
 
-  get __predict_by_db_morphier () {
+  get __predict_by_db_morphier() {
     if (!this.___predict_by_db_morphier) {
       this.___predict_by_db_morphier = this.createPredictByDbMorphier(this.predict_fsa, this.helper);
     }
 
     return this.___predict_by_db_morphier;
   }
-  set __predict_by_db_morphier (value) {
-    this.___predict_by_db_morphier = (!_.isUndefined(value)) ? value : null;
+
+  set __predict_by_db_morphier(value) {
+    this.___predict_by_db_morphier = !_.isUndefined(value) ? value : null;
   }
 
-  get __predict_by_suf_morphier () {
+  get __predict_by_suf_morphier() {
     if (!this.___predict_by_suf_morphier) {
       this.___predict_by_suf_morphier = this.createPredictBySuffixMorphier(this.common_fsa, this.helper);
     }
 
     return this.___predict_by_suf_morphier;
   }
-  set __predict_by_suf_morphier (value) {
-    this.___predict_by_suf_morphier = (!_.isUndefined(value)) ? value : null;
+
+  set __predict_by_suf_morphier(value) {
+    this.___predict_by_suf_morphier = !_.isUndefined(value) ? value : null;
   }
 
-  get __bulk_morphier () {
+  get __bulk_morphier() {
     if (!this.___bulk_morphier) {
       this.___bulk_morphier = this.createBulkMorphier(this.common_fsa, this.helper);
     }
 
     return this.___bulk_morphier;
   }
-  set __bulk_morphier (value) {
-    this.___bulk_morphier = (!_.isUndefined(value)) ? value : null;
+
+  set __bulk_morphier(value) {
+    this.___bulk_morphier = !_.isUndefined(value) ? value : null;
   }
 
-  get __common_morphier () {
+  get __common_morphier() {
     if (!this.___common_morphier) {
       this.___common_morphier = this.createCommonMorphier(this.common_fsa, this.helper);
     }
 
     return this.___common_morphier;
   }
-  set __common_morphier (value) {
-    this.___common_morphier = (!_.isUndefined(value)) ? value : null;
+
+  set __common_morphier(value) {
+    this.___common_morphier = !_.isUndefined(value) ? value : null;
   }
 
-  get __word_descriptor_serializer () {
+  get __word_descriptor_serializer() {
     if (!this.___word_descriptor_serializer) {
       this.___word_descriptor_serializer = this.createWordDescriptorSerializer();
     }
 
     return this.___word_descriptor_serializer;
   }
-  set __word_descriptor_serializer (value) {
-    this.___word_descriptor_serializer = (!_.isUndefined(value)) ? value : null;
+
+  set __word_descriptor_serializer(value) {
+    this.___word_descriptor_serializer = !_.isUndefined(value) ? value : null;
   }
 
-  get __grammems_provider () {
+  get __grammems_provider() {
     if (!this.___grammems_provider) {
       this.___grammems_provider = this.createGrammemsProvider();
     }
 
     return this.___grammems_provider;
   }
-  set __grammems_provider (value) {
-    this.___grammems_provider = (!_.isUndefined(value)) ? value : null;
+
+  set __grammems_provider(value) {
+    this.___grammems_provider = !_.isUndefined(value) ? value : null;
   }
 
-  ////////////////////
+  // //////////////////
   // factory methods
-  ////////////////////
-  createGrammemsProvider () {
-    return Morphy_GrammemsProvider_Factory.create(this);
+  // //////////////////
+  createGrammemsProvider() {
+    return GrammemsProviderFactory.create(this);
   }
 
-  createWordDescriptorSerializer () {
-    return new Morphy_WordDescriptor_Collection_Serializer();
+  createWordDescriptorSerializer() {
+    return new WordDescriptorCollectionSerializer();
   }
 
-  createFilesBundle (dir, lang) {
-    return new Morphy_FilesBundle(dir, lang);
+  createFilesBundle(dir, lang) {
+    return new FilesBundle(dir, lang);
   }
 
-  createStorageFactory () {
-    return new Morphy_Storage_Factory();
+  createStorageFactory() {
+    return new StorageFactory();
   }
 
   /**
-   * @param {Morphy_Storage} storage
+   * @param {Storage} storage
    * @param {boolean} lazy
    * @returns {*}
    */
-  createFsa (storage, lazy) {
-    return Morphy_Fsa.create(storage, lazy);
+  createFsa(storage, lazy) {
+    return Fsa.create(storage, lazy);
   }
 
   /**
-   * @param {Morphy_Storage} graminfoFile
-   * @param {Morphy_FilesBundle} bundle
+   * @param {Storage} graminfoFile
+   * @param {FilesBundle} bundle
    */
-  createGramInfo (graminfoFile, bundle) {
-    const result = new Morphy_GramInfo_RuntimeCaching(
-      new Morphy_GramInfo_Proxy_WithHeader(
-        graminfoFile,
-        bundle.getGramInfoHeaderCacheFile()
-      )
+  createGramInfo(graminfoFile, bundle) {
+    const result = new GramInfoRuntimeCaching(
+      new GramInfoProxyWithHeader(graminfoFile, bundle.getGramInfoHeaderCacheFile()),
     );
 
-    if (this.options['use_ancodes_cache']) {
-      return new Morphy_GramInfo_AncodeCache(
+    if (this.options.use_ancodes_cache) {
+      return new GramInfoAncodeCache(
         result,
-        this.storage_factory.open(this.options['storage'], bundle.getGramInfoAncodesCacheFile(), true)
+        this.storage_factory.open(this.options.storage, bundle.getGramInfoAncodesCacheFile(), true),
       );
     }
 
@@ -769,110 +696,102 @@ class phpMorphy {
   }
 
   /**
-   * @param {Morphy_Storage} storage
-   * @returns {Morphy_GramTab_Proxy}
+   * @param {Storage} storage
+   * @returns {GramTabProxy}
    */
-  createGramTab (storage) {
-    return new Morphy_GramTab_Proxy(storage);
+  createGramTab(storage) {
+    return new GramTabProxy(storage);
   }
 
   /**
-   * @param {Morphy_GramTab_Interface} gramtab
-   * @param {Morphy_FilesBundle} bundle
+   * @param {GramTabInterface} gramtab
+   * @param {FilesBundle} bundle
    */
-  createAncodesResolverInternal (gramtab, bundle) {
-    switch (this.options['resolve_ancodes']) {
+  createAncodesResolverInternal(gramtab, bundle) {
+    switch (this.options.resolve_ancodes) {
       case RESOLVE_ANCODES_AS_TEXT:
-        return ['Morphy_AncodesResolver_ToText', [gramtab]];
+        return ['AncodesResolverToText', [gramtab]];
       case RESOLVE_ANCODES_AS_INT:
-        return ['Morphy_AncodesResolver_AsIs', []];
+        return ['AncodesResolverAsIs', []];
       case RESOLVE_ANCODES_AS_DIALING:
-        return ['Morphy_AncodesResolver_ToDialingAncodes', [
-          this.storage_factory.open(
-            this.options['storage'],
-            bundle.getAncodesMapFile(),
-            true
-          )
-        ]];
+        return [
+          'AncodesResolverToDialingAncodes',
+          [this.storage_factory.open(this.options.storage, bundle.getAncodesMapFile(), true)],
+        ];
       default:
-        throw new Error('Invalid resolve_ancodes option, valid values are RESOLVE_ANCODES_AS_DIALING, RESOLVE_ANCODES_AS_INT, RESOLVE_ANCODES_AS_TEXT');
+        throw new Error(
+          'Invalid resolve_ancodes option, valid values are RESOLVE_ANCODES_AS_DIALING, RESOLVE_ANCODES_AS_INT, RESOLVE_ANCODES_AS_TEXT',
+        );
     }
   }
 
   /**
-   * @param {Morphy_GramTab_Interface} gramtab
-   * @param {Morphy_FilesBundle} bundle
+   * @param {GramTabInterface} gramtab
+   * @param {FilesBundle} bundle
    * @param {boolean} lazy
    */
-  createAncodesResolver (gramtab, bundle, lazy) {
+  createAncodesResolver(gramtab, bundle, lazy) {
     const [className, args] = this.createAncodesResolverInternal(gramtab, bundle);
-        
-    if (!!lazy) {
-      return new Morphy_AncodesResolver_Proxy(className, args);
+
+    if (lazy) {
+      return new AncodesResolverProxy(className, args);
     }
 
-    return Morphy_AncodesResolver_Proxy.instantinate(className, args);
+    return AncodesResolverProxy.instantinate(className, args);
   }
 
   /**
-   * @param {Morphy_GramInfo_Interface} graminfo
-   * @param {Morphy_GramTab_Interface} gramtab
+   * @param {GramInfoInterface} graminfo
+   * @param {GramTabInterface} gramtab
    * @param {boolean} graminfoAsText
-   * @param {Morphy_FilesBundle} bundle
+   * @param {FilesBundle} bundle
    */
-  createMorphierHelper (graminfo, gramtab, graminfoAsText, bundle) {
-
-    return new Morphy_Morphier_Helper(
-      graminfo,
-      gramtab,
-      this.createAncodesResolver(gramtab, bundle, true),
-      graminfoAsText
-    );
+  createMorphierHelper(graminfo, gramtab, graminfoAsText, bundle) {
+    return new MorphierHelper(graminfo, gramtab, this.createAncodesResolver(gramtab, bundle, true), graminfoAsText);
   }
 
   /**
-   * @param {Morphy_Fsa_Interface} fsa
-   * @param {Morphy_Morphier_Helper} helper
+   * @param {FsaInterface} fsa
+   * @param {MorphierHelper} helper
    */
-  createCommonMorphier (fsa, helper) {
-    return new Morphy_Morphier_Common(fsa, helper);
+  createCommonMorphier(fsa, helper) {
+    return new MorphierCommon(fsa, helper);
   }
 
   /**
-   * @param {Morphy_Fsa_Interface} fsa
-   * @param {Morphy_Morphier_Helper} helper
+   * @param {FsaInterface} fsa
+   * @param {MorphierHelper} helper
    */
-  createBulkMorphier (fsa, helper) {
-    return new Morphy_Morphier_Bulk(fsa, helper);
+  createBulkMorphier(fsa, helper) {
+    return new MorphierBulk(fsa, helper);
   }
 
   /**
-   * @param {Morphy_Fsa_Interface} fsa
-   * @param {Morphy_Morphier_Helper} helper
+   * @param {FsaInterface} fsa
+   * @param {MorphierHelper} helper
    */
-  createPredictByDbMorphier (fsa, helper) {
-    if (this.options['predict_by_db']) {
-      return new Morphy_Morphier_Predict_Database(fsa, helper);
+  createPredictByDbMorphier(fsa, helper) {
+    if (this.options.predict_by_db) {
+      return new MorphierPredictDatabase(fsa, helper);
     }
 
-    return new Morphy_Morphier_Empty();
+    return new MorphierEmpty();
   }
 
   /**
-   * @param {Morphy_Fsa_Interface} fsa
-   * @param {Morphy_Morphier_Helper} helper
+   * @param {FsaInterface} fsa
+   * @param {MorphierHelper} helper
    */
-  createPredictBySuffixMorphier (fsa, helper) {
-    if (this.options['predict_by_suffix']) {
-      return new Morphy_Morphier_Predict_Suffix(fsa, helper);
+  createPredictBySuffixMorphier(fsa, helper) {
+    if (this.options.predict_by_suffix) {
+      return new MorphierPredictSuffix(fsa, helper);
     }
 
-    return new Morphy_Morphier_Empty();
+    return new MorphierEmpty();
   }
-
 }
 
-export default phpMorphy;
+export default PhpMorphy;
 export {
   STORAGE_FILE,
   STORAGE_MEM,
@@ -885,5 +804,5 @@ export {
   ONLY_PREDICT,
   PREDICT_BY_NONE,
   PREDICT_BY_SUFFIX,
-  PREDICT_BY_DB
+  PREDICT_BY_DB,
 };
