@@ -10,6 +10,7 @@
   "main": "./build/index.js",
   "dependencies": {
     "babel-polyfill": "^6.20.0",
+    "core-js": "^2.5.7",
     "encoding": "^0.1.12",
     "locutus": "^2.0.11",
     "lodash": "^4.17.15",
