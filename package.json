@@ -1,6 +1,6 @@
 {
   "name": "phpmorphy",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "scripts": {
     "clean": "rm -rf dist && mkdir dist",
     "babel": "babel src --out-dir dist --copy-files --source-maps",
