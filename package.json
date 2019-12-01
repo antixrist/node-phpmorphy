@@ -37,7 +37,8 @@
     "encoding": "^0.1.12",
     "locutus": "^2.0.11",
     "lodash": "^4.17.15",
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "phpunserialize": "^1.0.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",

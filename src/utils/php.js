@@ -1,8 +1,11 @@
 import _ from 'lodash';
 import * as php from 'locutus/php';
+import phpunserialize from 'phpunserialize';
 
 // php.info.ini_set('unicode.semantics', 'on');
 // php.info.ini_set('locutus.objectsAsArrays', false);
+
+php.var.unserialize = phpunserialize;
 
 /**
  * @param {string} format
