@@ -16,7 +16,7 @@
     "install": "in-install && npm run build || not-in-install",
     "_prepublish": "npm run build && npm run test"
   },
-  "main": "./dist/index.js",
+  "main": "./index.js",
   "dependencies": {
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
