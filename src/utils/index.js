@@ -1,11 +1,9 @@
 import _ from 'lodash';
 import util from 'util';
-// import jschardet from 'jschardet';
-// import encoding from 'encoding';
 import php from 'locutus/php';
 import phpunserialize from 'phpunserialize';
 
-const logger = {};
+export const logger = {};
 logger.log = console.log.bind(console);
 logger.trace = console.trace.bind(console);
 logger.info = console.info.bind(console);
@@ -16,7 +14,7 @@ logger.error = console.error.bind(console);
  * @param any
  * @returns {Array}
  */
-function castArray(any) {
+export function castArray(any) {
   any = !_.isUndefined(any) && !_.isNull(any) ? any : [];
   any = _.isArray(any) ? any : [any];
 
@@ -28,7 +26,7 @@ function castArray(any) {
  * @param {{}} [opts]
  * @returns {string}
  */
-function inspect(
+export function inspect(
   object,
   opts = {
     depth: null,
@@ -39,65 +37,80 @@ function inspect(
   return util.inspect(object, opts);
 }
 
-// /**
-//  * @param {String|Buffer} text
-//  * @returns {String}
-//  */
-// function detectCharset (text) {
-//   let buffer;
-//   let retVal = null;
-//
-//   if (_.isArray(text)) {
-//     return _.map(text, item => detectCharset(item));
-//   } else
-//   if (_.isString(text)) {
-//     buffer = Buffer.from(text, 'binary');
-//   } else
-//   if (!Buffer.isBuffer(text)) {
-//     buffer = null;
-//   }
-//
-//   if (buffer) {
-//     retVal = jschardet.detect(buffer).encoding;
-//     retVal = (retVal) ? retVal.toLowerCase() : null;
-//   }
-//
-//   return retVal;
-// }
+/**
+ * @param any
+ * @returns {boolean}
+ */
+export function isStringifyedNumber(any) {
+  let int = _.toInteger(any);
 
-// /**
-//  * @param {String|Buffer} text
-//  * @param {String} to
-//  * @param {String} [from='UTF-8']
-//  * @returns {*}
-//  */
-// function convert (text, to, from = 'UTF-8') {
-//   let args = _.toArray(arguments);
-//   let buffer = null;
-//   let retVal = text;
-//
-//   if (_.isArray(text)) {
-//     return _.map(text, (item) => convert.apply(convert, [item].concat(args.slice(1))));
-//   } else
-//   if (_.isString(text)) {
-//     buffer = Buffer.from(text, 'binary');
-//   } else
-//   if (!Buffer.isBuffer(text)) {
-//     buffer = null;
-//   }
-//
-//   if (buffer) {
-//     from = (!from) ? detectCharset(buffer) : from;
-//
-//     if (from) {
-//       retVal = encoding.convert(buffer, to, from);
-//     }
-//
-//     return retVal.toString();
-//   }
-//
-//   return retVal;
-// }
+  if (int === 0 && any !== '0') {
+    return false;
+  }
+
+  return any == int;
+}
+/**
+ * @param something
+ * @param [encoding='utf-8']
+ * @returns {Buffer|*}
+ */
+export function toBuffer(something, encoding = 'utf-8') {
+  let retVal = something;
+
+  if (_.isArray(something)) {
+    retVal = _.map(something, item => toBuffer(item, encoding));
+  } else if (Buffer.isBuffer(something)) {
+    retVal = something;
+  } else if (_.isString(something)) {
+    retVal = Buffer.from(something, encoding);
+  } else if (_.isPlainObject(something)) {
+    let obj = _.clone(something);
+    _.forEach(obj, (val, key) => (obj[key] = toBuffer(val, encoding)));
+
+    retVal = obj;
+  }
+
+  return retVal;
+}
+
+/**
+ * @param something
+ * @param {String} [encoding='utf8']
+ * @returns {string|*}
+ */
+export function buffer2str(something, encoding = 'utf8') {
+  return Buffer.isBuffer(something) ? something.toString(encoding) : something;
+}
+
+/**
+ * @param something
+ * @returns {Array}
+ */
+export function str2ascii(something) {
+  let retVal = [];
+  let buffer = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
+
+  for (let i = 0, length = buffer.length; i < length; i++) {
+    retVal.push(buffer[i]);
+  }
+
+  return retVal;
+}
+
+/**
+ * @param something
+ * @returns {String}
+ */
+export function str2hex(something) {
+  let retVal = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
+
+  return retVal.toString('hex');
+}
+
+export function clone(instance) {
+  return _.merge({}, Object.create(Object.getPrototypeOf(instance)), instance);
+}
 
 //php.info.ini_set('unicode.semantics', 'on');
 php.info.ini_set('phpjs.objectsAsArrays', false);
@@ -234,111 +247,4 @@ php.strings.substr = function php$substr(str, start, len) {
   return php.strings._substr.apply(php.strings._substr, arguments);
 };
 
-// /**
-//  * @param raw
-//  * @returns {String|null}
-//  */
-// function detectEncoding (raw) {
-//   let buffer, result;
-//   if (Buffer.isBuffer(raw)) {
-//     buffer = raw;
-//   } else {
-//     raw = (_.isString(raw)) ? raw : raw +'';
-//     buffer = Buffer.from(raw, 'binary');
-//   }
-//
-//   result = jschardet.detect(buffer);
-//
-//   return (result.encoding) ? result.encoding : null;
-// }
-
-/**
- * @param any
- * @returns {boolean}
- */
-function isStringifyedNumber(any) {
-  let int = _.toInteger(any);
-
-  if (int === 0 && any !== '0') {
-    return false;
-  }
-
-  return any == int;
-}
-/**
- * @param something
- * @param [encoding='utf-8']
- * @returns {Buffer|*}
- */
-function toBuffer(something, encoding = 'utf-8') {
-  let retVal = something;
-
-  if (_.isArray(something)) {
-    retVal = _.map(something, item => toBuffer(item, encoding));
-  } else if (Buffer.isBuffer(something)) {
-    retVal = something;
-  } else if (_.isString(something)) {
-    retVal = Buffer.from(something, encoding);
-  } else if (_.isPlainObject(something)) {
-    let obj = _.clone(something);
-    _.forEach(obj, (val, key) => (obj[key] = toBuffer(val, encoding)));
-
-    retVal = obj;
-  }
-
-  return retVal;
-}
-
-/**
- * @param something
- * @param {String} [encoding='utf8']
- * @returns {string|*}
- */
-function buffer2str(something, encoding = 'utf8') {
-  return Buffer.isBuffer(something) ? something.toString(encoding) : something;
-}
-
-/**
- * @param something
- * @returns {Array}
- */
-function str2ascii(something) {
-  let retVal = [];
-  let buffer = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
-
-  for (let i = 0, length = buffer.length; i < length; i++) {
-    retVal.push(buffer[i]);
-  }
-
-  return retVal;
-}
-
-/**
- * @param something
- * @returns {String}
- */
-function str2hex(something) {
-  let retVal = !Buffer.isBuffer(something) ? Buffer.from(something, 'binary') : something;
-
-  return retVal.toString('hex');
-}
-
-function clone(instance) {
-  return _.merge({}, Object.create(Object.getPrototypeOf(instance)), instance);
-}
-
-export {
-  castArray,
-  logger,
-  inspect,
-  // detectCharset,
-  // convert,
-  php,
-  // detectEncoding,
-  isStringifyedNumber,
-  toBuffer,
-  buffer2str,
-  str2ascii,
-  str2hex,
-  clone,
-};
+export { php };

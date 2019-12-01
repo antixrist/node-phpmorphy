@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import path from 'path';
-import encoding from 'encoding';
 import { exec } from 'child_process';
 import { inspect, logger, isStringifyedNumber } from '../utils';
 import Morphy from '../';
@@ -11,21 +10,6 @@ import {
   Morphy_WordDescriptor,
   Morphy_WordDescriptor_Collection,
 } from '../lib/morphiers';
-
-// let html = ``;
-// let text = html
-//   .replace(/<\/?[^>]+(>|$)/gm, "")
-//   .replace(/[^a-zа-яё]+/igm, ' ')
-//   .replace(/\s+/gm, ' ')
-//   .trim()
-//   .toLowerCase()
-// ;
-// let words = _(text.split(' '))
-//   .filter(w => w.length > 1)
-//   .uniq()
-//   .sort()
-//   .value()
-// ;
 
 const log = function(...args) {
   logger.log(...args.map(item => inspect(item)));
