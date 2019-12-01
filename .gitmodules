@@ -1,0 +1,3 @@
+[submodule "phpmorphy"]
+	path = phpmorphy
+	url = git@github.com:DASGroup/phpmorphy.git
