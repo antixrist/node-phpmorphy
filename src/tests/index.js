@@ -1,26 +1,17 @@
 import path from 'path';
 import { exec } from 'child_process';
 import _ from 'lodash';
-import Morphy from '..';
-import { inspect, logger, isStringifyedNumber } from '../utils';
-import {
-  Morphy_Morphier_Interface,
-  Morphy_WordForm,
-  Morphy_WordDescriptor,
-  Morphy_WordDescriptor_Collection,
-} from '../lib/morphiers';
+import { inspect, logger, isStringifyedNumber } from '~/utils';
+import { MorphierInterface, WordForm, WordDescriptor, WordDescriptorCollection } from '~/lib/morphiers';
+import Morphy from '~/';
 
-const log = function(...args) {
-  logger.log(...args.map(item => inspect(item)));
-};
+// const log = (...args) => logger.log(...args.map(item => inspect(item)));
 
 function cliEncode(any) {
   return Buffer.from(JSON.stringify(any)).toString('base64');
 }
 const phpTestsFile = path.join(__dirname, 'index.php');
-function runPhpFileWithArgs(args, cb) {
-  cb = _.isFunction(cb) ? cb : _.noop;
-
+function runPhpFileWithArgs(args) {
   const cliArgs = Object.keys(args)
     .map(key => {
       return `--${key} ${cliEncode(args[key])}`;
@@ -33,17 +24,11 @@ function runPhpFileWithArgs(args, cb) {
       {
         maxBuffer: 1024 * 1000, // 1MB
       },
+      // eslint-disable-next-line promise/prefer-await-to-callbacks
       (err, stdout, stderr) => {
-        if (err) {
-          cb(err);
-          return reject(err);
-        }
-        if (stderr) {
-          cb(stderr);
-          return reject(stderr);
-        }
+        if (err) return reject(err);
+        if (stderr) return reject(stderr);
 
-        cb(null, stdout);
         return resolve(stdout);
       },
     );
@@ -51,20 +36,16 @@ function runPhpFileWithArgs(args, cb) {
 }
 
 async function runPhpTests(words, opts) {
-  let res;
-
-  try {
-    res = await runPhpFileWithArgs({ words, opts });
-  } catch (error) {
-    throw error;
-  }
+  let res = await runPhpFileWithArgs({ words, opts });
 
   try {
     res = JSON.parse(res);
   } catch (error) {
-    !!res &&
-      (error.message = `${error.message}
-[php]: ${inspect(res)}`);
+    if (res) {
+      error.message = `${error.message}
+[php]: ${inspect(res)}`;
+    }
+
     throw error;
   }
 
@@ -88,10 +69,10 @@ async function runLocalTests(words, morphy) {
 
   tests.getters = () => {
     return [
-      morphy.getCommonMorphier() instanceof Morphy_Morphier_Interface,
-      morphy.getPredictBySuffixMorphier() instanceof Morphy_Morphier_Interface,
-      morphy.getPredictByDatabaseMorphier() instanceof Morphy_Morphier_Interface,
-      morphy.getBulkMorphier() instanceof Morphy_Morphier_Interface,
+      morphy.getCommonMorphier() instanceof MorphierInterface,
+      morphy.getPredictBySuffixMorphier() instanceof MorphierInterface,
+      morphy.getPredictByDatabaseMorphier() instanceof MorphierInterface,
+      morphy.getBulkMorphier() instanceof MorphierInterface,
     ];
   };
 
@@ -110,21 +91,21 @@ async function runLocalTests(words, morphy) {
   tests.getLastPredictionType = () => {
     const res = [];
 
-    res.push(morphy.lemmatize('тест', Morphy.NORMAL), morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE);
+    res.push(morphy.lemmatize('тест', Morphy.NORMAL), morphy.getLastPredictionType() === Morphy.PREDICT_BY_NONE);
 
     res.push(
       morphy.lemmatize('глокая', Morphy.IGNORE_PREDICT),
-      morphy.getLastPredictionType() == Morphy.PREDICT_BY_NONE,
+      morphy.getLastPredictionType() === Morphy.PREDICT_BY_NONE,
     );
 
     res.push(
       morphy.lemmatize('тестдрайв', Morphy.ONLY_PREDICT),
-      morphy.getLastPredictionType() == Morphy.PREDICT_BY_SUFFIX,
+      morphy.getLastPredictionType() === Morphy.PREDICT_BY_SUFFIX,
     );
 
     res.push(
       morphy.lemmatize('подфигачить', Morphy.ONLY_PREDICT),
-      morphy.getLastPredictionType() == Morphy.PREDICT_BY_DB,
+      morphy.getLastPredictionType() === Morphy.PREDICT_BY_DB,
     );
 
     return res;
@@ -140,16 +121,14 @@ async function runLocalTests(words, morphy) {
   };
 
   tests['lemmatize bulk && getBaseForm bulk'] = () => {
-    const res = {};
-
-    res.lemmatize = morphy.lemmatize(words);
-    res.getBaseForm = morphy.getBaseForm(words);
-
-    return res;
+    return {
+      lemmatize: morphy.lemmatize(words),
+      getBaseForm: morphy.getBaseForm(words),
+    };
   };
 
   /**
-   * @param {Morphy_WordDescriptor_Collection} paradigms
+   * @param {WordDescriptorCollection} paradigms
    * @param {Array} res
    */
   function testFoundWordParadigms(paradigms, res) {
@@ -157,11 +136,11 @@ async function runLocalTests(words, morphy) {
       return;
     }
 
-    res.push(paradigms instanceof Morphy_WordDescriptor_Collection, paradigms.length);
+    res.push(paradigms instanceof WordDescriptorCollection, paradigms.length);
 
     paradigms.forEach(paradigm => {
       res.push(
-        paradigm instanceof Morphy_WordDescriptor,
+        paradigm instanceof WordDescriptor,
         paradigm.length,
 
         paradigm.getBaseForm(),
@@ -187,9 +166,9 @@ async function runLocalTests(words, morphy) {
     // для русских слов
     paradigms.getByPartOfSpeech('С').forEach(paradigm => {
       res.push(
-        paradigm instanceof Morphy_WordDescriptor,
+        paradigm instanceof WordDescriptor,
         paradigm.length,
-        paradigm.length ? paradigm.getWordForm(0) instanceof Morphy_WordDescriptor : null,
+        paradigm.length > 0 ? paradigm.getWordForm(0) instanceof WordDescriptor : null,
       );
 
       const formsOfSourceWord = paradigm.getFoundWordForm();
@@ -197,7 +176,7 @@ async function runLocalTests(words, morphy) {
 
       formsOfSourceWord.forEach(form =>
         res.push(
-          form instanceof Morphy_WordForm,
+          form instanceof WordForm,
           form.getWord(),
           form.getFormNo(),
           form.getGrammems(),
@@ -211,7 +190,7 @@ async function runLocalTests(words, morphy) {
 
       sampleFormsByGrammem.forEach(form =>
         res.push(
-          form instanceof Morphy_WordForm,
+          form instanceof WordForm,
           form.getWord(),
           form.getFormNo(),
           form.getGrammems(),
@@ -225,7 +204,7 @@ async function runLocalTests(words, morphy) {
 
       sampleFormsByPartOfSpeech.forEach(form =>
         res.push(
-          form instanceof Morphy_WordForm,
+          form instanceof WordForm,
           form.getWord(),
           form.getFormNo(),
           form.getGrammems(),
@@ -238,9 +217,9 @@ async function runLocalTests(words, morphy) {
     // для английских слов
     paradigms.getByPartOfSpeech('VERB').forEach(paradigm => {
       res.push(
-        paradigm instanceof Morphy_WordDescriptor,
+        paradigm instanceof WordDescriptor,
         paradigm.length,
-        paradigm.length ? paradigm.getWordForm(0) instanceof Morphy_WordDescriptor : null,
+        paradigm.length > 0 ? paradigm.getWordForm(0) instanceof WordDescriptor : null,
       );
 
       const formsOfSourceWord = paradigm.getFoundWordForm();
@@ -248,7 +227,7 @@ async function runLocalTests(words, morphy) {
 
       formsOfSourceWord.forEach(form =>
         res.push(
-          form instanceof Morphy_WordForm,
+          form instanceof WordForm,
           form.getWord(),
           form.getFormNo(),
           form.getGrammems(),
@@ -262,7 +241,7 @@ async function runLocalTests(words, morphy) {
 
       sampleFormsByGrammem.forEach(form =>
         res.push(
-          form instanceof Morphy_WordForm,
+          form instanceof WordForm,
           form.getWord(),
           form.getFormNo(),
           form.getGrammems(),
@@ -276,7 +255,7 @@ async function runLocalTests(words, morphy) {
 
       sampleFormsByPartOfSpeech.forEach(form =>
         res.push(
-          form instanceof Morphy_WordForm,
+          form instanceof WordForm,
           form.getWord(),
           form.getFormNo(),
           form.getGrammems(),
@@ -457,7 +436,7 @@ const opts = [
       predict_by_suffix: true,
       predict_by_db: true,
       graminfo_as_text: true,
-      use_ancodes_cache: false,
+      use_ancodes_cache: true,
       resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_TEXT,
     },
   },
@@ -479,7 +458,7 @@ const opts = [
       predict_by_suffix: false,
       predict_by_db: true,
       graminfo_as_text: true,
-      use_ancodes_cache: false,
+      use_ancodes_cache: true,
       resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_TEXT,
     },
   },
@@ -501,7 +480,7 @@ const opts = [
       predict_by_suffix: false,
       predict_by_db: false,
       graminfo_as_text: true,
-      use_ancodes_cache: false,
+      use_ancodes_cache: true,
       resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_TEXT,
     },
   },
@@ -546,7 +525,7 @@ const opts = [
       predict_by_suffix: true,
       predict_by_db: true,
       graminfo_as_text: true,
-      use_ancodes_cache: false,
+      use_ancodes_cache: true,
       resolve_ancodes: Morphy.RESOLVE_ANCODES_AS_DIALING,
     },
   },
@@ -617,32 +596,27 @@ opts.forEach(config => {
       name = name || idx;
 
       const morphy = new Morphy(opts);
-      try {
-        const [phpResults, localResults] = await Promise.all([
-          runPhpTests(words, morphy.options),
-          runLocalTests(words, morphy),
-        ]);
+      const [phpResults, localResults] = await Promise.all([
+        runPhpTests(words, morphy.options),
+        runLocalTests(words, morphy),
+      ]);
 
-        results[name] = {
-          words,
-          opts,
-          tests: _.keys(localResults).reduce((tests, testName) => {
-            tests[testName] = {
-              // success: _.isEqual(phpResults[testName], localResults[testName]),
-              // php: phpResults[testName],
-              // local: localResults[testName]
-              success: _.isEqual(consistentResults(phpResults[testName]), consistentResults(localResults[testName])),
-              php: phpResults[testName],
-              local: localResults[testName],
-            };
+      results[name] = {
+        words,
+        opts,
+        tests: _.keys(localResults).reduce((tests, testName) => {
+          tests[testName] = {
+            // success: _.isEqual(phpResults[testName], localResults[testName]),
+            // php: phpResults[testName],
+            // local: localResults[testName]
+            success: _.isEqual(consistentResults(phpResults[testName]), consistentResults(localResults[testName])),
+            php: phpResults[testName],
+            local: localResults[testName],
+          };
 
-            return tests;
-          }, {}),
-        };
-      } catch (err) {
-        throw err;
-        // logger.error(err);
-      }
+          return tests;
+        }, {}),
+      };
 
       return true;
     }),
@@ -669,8 +643,8 @@ Local results: ${inspect(test.local)}
     });
   });
 
-  !hasErrors && logger.log('All tests passed!');
-})().catch(err => logger.error(err));
+  if (!hasErrors) logger.log('All tests passed!');
+})().catch(error => logger.error(error));
 
 function consistentResults(any) {
   if (_.isPlainObject(any)) {

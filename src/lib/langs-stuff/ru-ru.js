@@ -1,15 +1,14 @@
 import _ from 'lodash';
-import { php } from '../../utils';
-import { Morphy_GrammemsProvider_ForFactory } from './common';
+import { GrammemsProviderForFactory } from './common';
 
-const Morphy_GrammemsProvider_ru_ru_instances = new WeakMap();
+const GrammemsProviderRuRuInstances = new WeakMap();
 
-class Morphy_GrammemsProvider_ru_ru extends Morphy_GrammemsProvider_ForFactory {
-  static get self_encoding() {
+class GrammemsProviderRuRu extends GrammemsProviderForFactory {
+  static get selfEncoding() {
     return 'utf-8';
   }
 
-  static get grammems_map() {
+  static get grammemsMap() {
     return {
       род: ['МР', 'ЖР', 'СР'],
       одушевленность: ['ОД', 'НО'],
@@ -29,26 +28,22 @@ class Morphy_GrammemsProvider_ru_ru extends Morphy_GrammemsProvider_ForFactory {
   }
 
   /**
-   * @param {phpMorphy} morphy
+   * @param {PhpMorphy} morphy
    * @returns {*}
    */
   static instance(morphy) {
     const key = morphy.getEncoding();
-    if (!Morphy_GrammemsProvider_ru_ru_instances.has(morphy)) {
-      Morphy_GrammemsProvider_ru_ru_instances.set(morphy, {});
+    if (!GrammemsProviderRuRuInstances.has(morphy)) {
+      GrammemsProviderRuRuInstances.set(morphy, {});
     }
 
-    const instances = Morphy_GrammemsProvider_ru_ru_instances.get(morphy);
+    const instances = GrammemsProviderRuRuInstances.get(morphy);
 
     if (_.isUndefined(instances[key])) {
-      instances[key] = new Morphy_GrammemsProvider_ru_ru(key);
+      instances[key] = new GrammemsProviderRuRu(key);
     }
 
     return instances[key];
-  }
-
-  constructor() {
-    super(...arguments);
   }
 
   getSelfEncoding() {
@@ -56,8 +51,8 @@ class Morphy_GrammemsProvider_ru_ru extends Morphy_GrammemsProvider_ForFactory {
   }
 
   getGrammemsMap() {
-    return Morphy_GrammemsProvider_ru_ru.grammems_map;
+    return GrammemsProviderRuRu.grammemsMap;
   }
 }
 
-export { Morphy_GrammemsProvider_ru_ru };
+export { GrammemsProviderRuRu };

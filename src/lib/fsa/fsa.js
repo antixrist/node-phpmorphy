@@ -1,29 +1,8 @@
-/**
- * This file is part of phpMorphy library
- *
- * Copyright c 2007-2008 Kamaev Vladimir <heromantor@users.sourceforge.net>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
-
 import _ from 'lodash';
-import { php } from '../../utils';
-import { Morphy_State } from './fsa_state';
+import { php } from '~/utils';
+import { State } from './fsa-state';
 
-class Morphy_Fsa_Interface {
+class FsaInterface {
   /**
    * Return root transition of fsa
    * @return {[]}
@@ -91,22 +70,20 @@ class Morphy_Fsa_Interface {
   unpackTranses(rawTranses) {}
 }
 
-class Morphy_Fsa extends Morphy_Fsa_Interface {
-  static get HEADER_SIZE() {
-    return 128;
-  }
+class Fsa extends FsaInterface {
+  static HEADER_SIZE = 128;
 
   /**
-   * @param {Morphy_Storage} storage
+   * @param {Storage} storage
    * @param {boolean} lazy
    * @returns {*}
    */
   static create(storage, lazy) {
     if (lazy) {
-      return new Morphy_Fsa_Proxy(storage);
+      return new FsaProxy(storage);
     }
 
-    const { readHeader, validateHeader, HEADER_SIZE } = Morphy_Fsa;
+    const { readHeader, validateHeader, HEADER_SIZE } = Fsa;
     const header = readHeader(storage.read(0, HEADER_SIZE, true));
 
     if (!validateHeader(header)) {
@@ -122,17 +99,17 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
       throw new Error('Only sparse or tree fsa`s supported');
     }
 
-    const storage_type = storage.getTypeAsString();
-    const className = `Morphy_Fsa_${php.strings.ucfirst(type)}_${php.strings.ucfirst(storage_type)}`;
-    const fsaAccess = require(`./access/fsa_${type}_${storage_type}`);
+    const storageType = storage.getTypeAsString();
+    const className = `Fsa${_.upperFirst(type)}${_.upperFirst(storageType)}`;
+    const fsaAccess = require(`./access/fsa-${type}-${storageType}`);
 
     return new fsaAccess[className](storage.getResource(), header);
   }
 
   static readHeader(headerRaw) {
-    const { HEADER_SIZE } = Morphy_Fsa;
+    const { HEADER_SIZE } = Fsa;
 
-    if (headerRaw.length != HEADER_SIZE) {
+    if (headerRaw.length !== HEADER_SIZE) {
       throw new Error('Invalid header string given');
     }
 
@@ -177,14 +154,14 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
 
   static validateHeader(header) {
     return !(
-      header.fourcc != 'meal' ||
-      header.ver != 3 ||
-      header.char_size != 1 ||
+      header.fourcc !== 'meal' ||
+      header.ver !== 3 ||
+      header.char_size !== 1 ||
       header.padding_size > 0 ||
-      header.dest_size != 3 ||
-      header.hash_size != 0 ||
-      header.annot_length_size != 1 ||
-      header.annot_chunk_size != 1 ||
+      header.dest_size !== 3 ||
+      header.hash_size !== 0 ||
+      header.annot_length_size !== 1 ||
+      header.annot_chunk_size !== 1 ||
       header.flags.is_be ||
       header.flags.is_hash ||
       1 === 0
@@ -192,7 +169,7 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
   }
 
   constructor(resource, header) {
-    super(...arguments);
+    super();
     this.resource = resource;
     this.header = header;
     this.fsa_start = header.fsa_offset;
@@ -227,7 +204,7 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
   }
 
   createState(index) {
-    return new Morphy_State(this, index);
+    return new State(this, index);
   }
 
   getRootStateIndex() {}
@@ -237,7 +214,7 @@ class Morphy_Fsa extends Morphy_Fsa_Interface {
   readAlphabet() {}
 }
 
-class Morphy_Fsa_WordsCollector {
+class FsaWordsCollector {
   constructor(collectLimit) {
     this.limit = collectLimit;
     this.items = {};
@@ -265,12 +242,12 @@ class Morphy_Fsa_WordsCollector {
   }
 }
 
-class Morphy_Fsa_Decorator extends Morphy_Fsa_Interface {
+class FsaDecorator extends FsaInterface {
   /**
-   * @param {Morphy_Fsa_Interface} fsa
+   * @param {FsaInterface} fsa
    */
   constructor(fsa) {
-    super(...arguments);
+    super();
     this.fsa = fsa;
   }
 
@@ -307,19 +284,19 @@ class Morphy_Fsa_Decorator extends Morphy_Fsa_Interface {
   }
 }
 
-class Morphy_Fsa_Proxy extends Morphy_Fsa_Decorator {
+class FsaProxy extends FsaDecorator {
   /**
-   * @param {Morphy_Storage} storage
+   * @param {Storage} storage
    */
   constructor(storage) {
-    super(...arguments);
+    super(storage);
     this.storage = storage;
     this._fsa = null;
   }
 
   get fsa() {
     if (!this._fsa) {
-      this._fsa = Morphy_Fsa.create(this.storage, false);
+      this._fsa = Fsa.create(this.storage, false);
       delete this.storage;
     }
 
@@ -331,4 +308,4 @@ class Morphy_Fsa_Proxy extends Morphy_Fsa_Decorator {
   }
 }
 
-export { Morphy_Fsa_Interface, Morphy_Fsa, Morphy_Fsa_WordsCollector, Morphy_Fsa_Decorator, Morphy_Fsa_Proxy };
+export { FsaInterface, Fsa, FsaWordsCollector, FsaDecorator, FsaProxy };

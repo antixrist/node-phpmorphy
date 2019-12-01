@@ -1,33 +1,9 @@
-/**
- * This file is part of phpMorphy library
- *
- * Copyright c 2007-2008 Kamaev Vladimir <heromantor@users.sourceforge.net>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
-
+import fs from 'fs';
 import _ from 'lodash';
-import { php, castArray } from '../../../utils';
-import { Morphy_Fsa } from '../fsa';
+import { php, castArray } from '~/utils';
+import { Fsa } from '~/lib/fsa/fsa';
 
-class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
-  constructor(...args) {
-    super(...args);
-  }
-
+class FsaTreeFile extends Fsa {
   /**
    * @param trans
    * @param word
@@ -35,7 +11,7 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
    * @returns {*}
    */
   walk(trans, word, readAnnot = true) {
-    const mem = this.resource;
+    const fh = this.resource;
     const fsa_start = this.fsa_start;
     const wordBuf = Buffer.from(word);
 
@@ -60,7 +36,8 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       start_offset = fsa_start + (((trans >> 11) & 0x1fffff) << 2);
 
       // read first trans in state
-      buf = php.strings.substr(mem, start_offset, 4);
+      buf = Buffer.alloc(4);
+      fs.readSync(fh, buf, 0, 4, start_offset);
       trans = php.unpack('V', buf)[0];
 
       // If first trans is term(i.e. pointing to annot) then skip it
@@ -70,7 +47,8 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
           result = false;
         } else {
           start_offset += 4;
-          buf = php.strings.substr(mem, start_offset, 4);
+          buf = Buffer.alloc(4);
+          fs.readSync(fh, buf, 0, 4, start_offset);
           trans = php.unpack('V', buf)[0];
         }
       }
@@ -78,7 +56,9 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       // if all ok process rest transitions in state
       if (result) {
         // walk through state
-        for (let idx = 1, j = 0; ; j++) {
+        let idx = 1;
+        let j = 0;
+        for (; ; j++) {
           attr = trans & 0xff;
 
           if (attr == char) {
@@ -105,11 +85,11 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
           }
 
           // read next trans
-          buf = php.strings.substr(mem, start_offset + ((idx - 1) << 2), 4);
+          buf = Buffer.alloc(4);
+          fs.readSync(fh, buf, 0, 4, start_offset + ((idx - 1) << 2));
           trans = php.unpack('V', buf)[0];
         }
       }
-
       // find char in state end
       // ///////////////////////////////
 
@@ -129,7 +109,8 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
 
       if (readAnnot) {
         // read annot trans
-        buf = php.strings.substr(mem, fsa_start + (((trans >> 11) & 0x1fffff) << 2), 4);
+        buf = Buffer.alloc(4);
+        fs.readSync(fh, buf, 0, 4, fsa_start + (((trans >> 11) & 0x1fffff) << 2));
         trans = php.unpack('V', buf)[0];
 
         if ((trans & 0x0100) == 0) {
@@ -159,19 +140,18 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
   collect(startNode, callback, readAnnot = true, path = '') {
     // `path` нигде не используется, даже в `Morphy_Morphier_PredictCollector.collect`,
     // куда попадает этот `path` через вызов коллбека ниже
-
     const stack = [];
     const stack_idx = [];
 
     let total = 0;
     let start_idx = 0;
+    let state;
     let trans;
     let annot;
 
     stack.push(null);
     stack_idx.push(null);
-
-    let state = this.readState((startNode >> 11) & 0x1fffff);
+    state = this.readState((startNode >> 11) & 0x1fffff);
 
     do {
       let i = start_idx;
@@ -188,7 +168,6 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
             annot = trans;
           }
 
-          // if (!php.funchand.call_user_func(callback, path, annot)) {
           if (!php.funchand.call_user_func(callback, null, annot)) {
             return total;
           }
@@ -214,19 +193,25 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
   }
 
   readState(index) {
-    const mem = this.resource;
+    const fh = this.resource;
     const fsa_start = this.fsa_start;
     const result = [];
 
+    let buf;
+    let trans;
     let offset = fsa_start + (index << 2);
+
     // read first trans
-    let buf = php.strings.substr(mem, offset, 4);
-    let trans = php.unpack('V', buf)[0];
+    buf = Buffer.alloc(4);
+    fs.readSync(fh, buf, 0, 4, offset);
+    trans = php.unpack('V', buf)[0];
 
     // check if first trans is pointer to annot, and not single in state
     if (trans & 0x0100 && !(trans & 0x0200 || trans & 0x0400)) {
       result.push(trans);
-      buf = php.strings.substr(mem, offset, 4);
+
+      buf = Buffer.alloc(4);
+      fs.readSync(fh, buf, 0, 4, null);
       trans = php.unpack('V', buf)[0];
       offset += 4;
     }
@@ -243,7 +228,8 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
       result.push(trans);
 
       if (expect > 1) {
-        buf = php.strings.substr(mem, offset, 4);
+        buf = Buffer.alloc(4);
+        fs.readSync(fh, buf, 0, 4, null);
         trans = php.unpack('V', buf)[0];
         offset += 4;
       }
@@ -273,13 +259,15 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     const fh = this.resource;
     const fsa_start = this.fsa_start;
 
-    const buf = php.strings.substr(fh, fsa_start + 0, 4);
+    const buf = Buffer.alloc(4);
+    fs.readSync(fh, buf, 0, 4, fsa_start + 0);
     return php.unpack('V', buf)[0];
   }
 
   readAlphabet() {
     const fh = this.resource;
-    const buf = php.strings.substr(fh, this.header.alphabet_offset, this.header.alphabet_size);
+    const buf = Buffer.alloc(this.header.alphabet_size);
+    fs.readSync(fh, buf, 0, this.header.alphabet_size, this.header.alphabet_offset);
 
     return buf.toString();
   }
@@ -293,10 +281,13 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
     const offset = this.header.annot_offset + (((trans & 0xff) << 21) | ((trans >> 11) & 0x1fffff));
 
     let annot;
-    let buf = php.strings.substr(fh, offset, 1);
+    let buf = Buffer.alloc(1);
+    fs.readSync(fh, buf, 0, 1, offset);
+
     const len = php.strings.ord(buf);
     if (len) {
-      buf = php.strings.substr(fh, offset + 1, len);
+      buf = Buffer.alloc(len);
+      fs.readSync(fh, buf, 0, len, null);
       annot = buf;
     } else {
       annot = null;
@@ -306,4 +297,4 @@ class Morphy_Fsa_Tree_Mem extends Morphy_Fsa {
   }
 }
 
-export { Morphy_Fsa_Tree_Mem };
+export { FsaTreeFile };

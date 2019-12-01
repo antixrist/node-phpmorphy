@@ -1,29 +1,8 @@
-/**
- * This file is part of phpMorphy library
- *
- * Copyright c 2007-2008 Kamaev Vladimir <heromantor@users.sourceforge.net>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
 import fs from 'fs';
-import path from 'path';
 import _ from 'lodash';
-import { php } from '../../utils';
+import { php } from '~/utils';
 
-class Morphy_GramInfo_Interface {
+class GramInfoInterface {
   /**
    * Returns language for graminfo file
    * @returns {string}
@@ -92,31 +71,29 @@ class Morphy_GramInfo_Interface {
   readAllAncodes() {}
 }
 
-class Morphy_GramInfo extends Morphy_GramInfo_Interface {
-  static get HEADER_SIZE() {
-    return 128;
-  }
+class GramInfo extends GramInfoInterface {
+  static HEADER_SIZE = 128;
 
   /**
-   * @param {Morphy_Storage} storage
+   * @param {Storage} storage
    * @param {boolean} lazy
    * @returns {*}
    */
   static create(storage, lazy) {
     if (lazy) {
-      return new Morphy_GramInfo_Proxy(storage);
+      return new GramInfoProxy(storage);
     }
 
-    const { readHeader, validateHeader, HEADER_SIZE } = Morphy_GramInfo;
+    const { readHeader, validateHeader, HEADER_SIZE } = GramInfo;
     const header = readHeader(storage.read(0, HEADER_SIZE));
 
     if (!validateHeader(header)) {
       throw new Error('Invalid graminfo format');
     }
 
-    const storage_type = storage.getTypeAsString();
-    const className = `Morphy_GramInfo_${php.strings.ucfirst(storage_type)}`;
-    const graminfoAccess = require(`./access/graminfo_${storage_type}`);
+    const storageType = storage.getTypeAsString();
+    const className = `GramInfo${_.upperFirst(storageType)}`;
+    const graminfoAccess = require(`./access/graminfo-${storageType}`);
 
     return new graminfoAccess[className](storage.getResource(), header);
   }
@@ -165,11 +142,11 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
   }
 
   static validateHeader(header) {
-    return header.ver == 3 || header.is_be != 1;
+    return header.ver === 3 || header.is_be != 1;
   }
 
   constructor(resource, header) {
-    super(...arguments);
+    super();
 
     this.resource = resource;
     this.header = header;
@@ -236,12 +213,12 @@ class Morphy_GramInfo extends Morphy_GramInfo_Interface {
   }
 }
 
-class Morphy_GramInfo_Decorator extends Morphy_GramInfo_Interface {
+class GramInfoDecorator extends GramInfoInterface {
   /**
-   * @param {Morphy_GramInfo_Interface} info
+   * @param {GramInfoInterface} info
    */
   constructor(info) {
-    super(...arguments);
+    super();
     this.info = info;
   }
 
@@ -298,20 +275,20 @@ class Morphy_GramInfo_Decorator extends Morphy_GramInfo_Interface {
   }
 }
 
-class Morphy_GramInfo_Proxy extends Morphy_GramInfo_Decorator {
+class GramInfoProxy extends GramInfoDecorator {
   /**
-   * @param {Morphy_Storage} $storage
+   * @param {Storage} storage
    */
-  constructor($storage) {
-    super(...arguments);
+  constructor(storage) {
+    super(storage);
 
-    this.storage = $storage;
+    this.storage = storage;
     this._info = null;
   }
 
   get info() {
     if (!this._info) {
-      this._info = Morphy_GramInfo.create(this.storage, false);
+      this._info = GramInfo.create(this.storage, false);
       delete this.storage;
     }
 
@@ -323,17 +300,17 @@ class Morphy_GramInfo_Proxy extends Morphy_GramInfo_Decorator {
   }
 }
 
-class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
+class GramInfoProxyWithHeader extends GramInfoDecorator {
   /**
-   * @param {Morphy_Storage} $storage
-   * @param $cacheFile
+   * @param {Storage} storage
+   * @param cacheFile
    */
-  constructor($storage, $cacheFile) {
-    super(...arguments);
+  constructor(storage, cacheFile) {
+    super(storage);
 
-    this.storage = $storage;
+    this.storage = storage;
     this._info = null;
-    this.cache = this.readCache($cacheFile);
+    this.cache = this.readCache(cacheFile);
     // this.ends = php.strings.str_repeat('\0', this.getCharSize() + 1);
     const buf = Buffer.alloc(this.getCharSize() + 1);
     this.ends = buf.fill('\0');
@@ -388,7 +365,7 @@ class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
 
   get info() {
     if (!this._info) {
-      this._info = Morphy_GramInfo.create(this.storage, false);
+      this._info = GramInfo.create(this.storage, false);
       delete this.storage;
     }
 
@@ -400,31 +377,31 @@ class Morphy_GramInfo_Proxy_WithHeader extends Morphy_GramInfo_Decorator {
   }
 }
 
-class Morphy_GramInfo_RuntimeCaching extends Morphy_GramInfo_Decorator {
+class GramInfoRuntimeCaching extends GramInfoDecorator {
   constructor(...args) {
     super(...args);
-    this.$ancodes = {};
-    this.$flexia_all = {};
+    this.ancodes = {};
+    this.flexia_all = {};
   }
 
   readFlexiaData(info) {
     const offset = info.offset;
 
-    if (!php.var.isset(this.$flexia_all[offset])) {
-      this.$flexia_all[offset] = this.info.readFlexiaData(info);
+    if (!php.var.isset(this.flexia_all[offset])) {
+      this.flexia_all[offset] = this.info.readFlexiaData(info);
     }
 
-    return this.$flexia_all[offset];
+    return this.flexia_all[offset];
   }
 }
 
-class Morphy_GramInfo_AncodeCache extends Morphy_GramInfo_Decorator {
+class GramInfoAncodeCache extends GramInfoDecorator {
   /**
-   * @param {Morphy_GramInfo_Interface} inner
+   * @param {GramInfoInterface} inner
    * @param resource
    */
   constructor(inner, resource) {
-    super(...arguments);
+    super(inner);
 
     this.hits = 0;
     this.miss = 0;
@@ -437,27 +414,27 @@ class Morphy_GramInfo_AncodeCache extends Morphy_GramInfo_Decorator {
   }
 
   readAncodes(info) {
-    const $offset = info.offset;
+    const { offset } = info;
 
     // todo: проверить доступ по индекс
-    if (php.var.isset(this.cache[$offset])) {
-      this.hits++;
-      return this.cache[$offset];
+    if (php.var.isset(this.cache[offset])) {
+      this.hits += 1;
+      return this.cache[offset];
     }
 
     // in theory misses never occur
-    this.miss++;
+    this.miss += 1;
 
     return super.readAncodes(info);
   }
 }
 
 export {
-  Morphy_GramInfo_Interface,
-  Morphy_GramInfo,
-  Morphy_GramInfo_Decorator,
-  Morphy_GramInfo_Proxy,
-  Morphy_GramInfo_Proxy_WithHeader,
-  Morphy_GramInfo_RuntimeCaching,
-  Morphy_GramInfo_AncodeCache,
+  GramInfoInterface,
+  GramInfo,
+  GramInfoDecorator,
+  GramInfoProxy,
+  GramInfoProxyWithHeader,
+  GramInfoRuntimeCaching,
+  GramInfoAncodeCache,
 };

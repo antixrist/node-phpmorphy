@@ -1,6 +1,6 @@
 import path from 'path';
 import _ from 'lodash';
-import phpMorphy, {
+import PhpMorphy, {
   STORAGE_FILE,
   STORAGE_MEM,
   SOURCE_FSA,
@@ -42,72 +42,55 @@ class Morphy {
   static PREDICT_BY_DB = PREDICT_BY_DB;
 
   /**
-   * @param {string|{}} lang
+   * @param {string|object} lang
    * @param {object} [opts]
    */
   constructor(lang, opts = {}) {
+    let config = {};
     if (_.isPlainObject(lang)) {
-      opts = lang;
+      config = { ...lang };
     } else {
-      opts.lang = lang;
+      config.lang = lang;
     }
 
-    opts = { ...defaults, ...opts };
+    config = { ...defaults, ...config, ...opts };
 
-    switch (opts.lang.toLowerCase()) {
+    switch (config.lang.toLowerCase()) {
       case 'de':
       case 'de_de':
-        opts.lang = 'de_DE';
+        config.lang = 'de_DE';
         break;
       case 'en':
       case 'en_en':
-        opts.lang = 'en_EN';
+        config.lang = 'en_EN';
         break;
       case 'et':
       case 'ee':
       case 'et_ee':
-        opts.lang = 'et_EE';
+        config.lang = 'et_EE';
         break;
       case 'ua':
       case 'uk':
       case 'uk_ua':
-        opts.lang = 'uk_UA';
+        config.lang = 'uk_UA';
         break;
       case 'ru':
       case 'ru_ru':
       default:
-        opts.lang = 'ru_RU';
+        config.lang = 'ru_RU';
         break;
     }
 
-    this.lang = opts.lang;
-    this.dir = opts.dir;
-    this.options = opts;
+    this.lang = config.lang;
+    this.dir = config.dir;
+    this.options = config;
 
     if (this.options.lang !== 'ru_RU') {
       this.options.use_ancodes_cache = false;
     }
 
-    this.morpher = new phpMorphy(this.dir, this.lang, this.options);
+    this.morpher = new PhpMorphy(this.dir, this.lang, this.options);
   }
-
-  // wordConvertor (word) {
-  //   let encoding = null;
-  //
-  //   word = word.toUpperCase();
-  //   if (this.options.detectEncoding && !this.options.encoding) {
-  //     encoding = detectEncoding(word);
-  //   } else
-  //   if (this.options.encoding) {
-  //     encoding = this.options.encoding;
-  //   }
-  //
-  //   if (encoding) {
-  //     word = encoding.convert(toBuffer(word, encoding), this.morpher.getEncoding(), encoding);
-  //   }
-  //
-  //   return word;
-  // }
 
   /**
    * @param {string|Buffer} word
@@ -129,28 +112,28 @@ class Morphy {
   }
 
   /**
-   * @returns {Morphy_Morphier_Interface}
+   * @returns {MorphierInterface}
    */
   getCommonMorphier() {
     return this.morpher.getCommonMorphier();
   }
 
   /**
-   * @returns {Morphy_Morphier_Interface}
+   * @returns {MorphierInterface}
    */
   getPredictBySuffixMorphier() {
     return this.morpher.getPredictBySuffixMorphier();
   }
 
   /**
-   * @returns {Morphy_Morphier_Interface}
+   * @returns {MorphierInterface}
    */
   getPredictByDatabaseMorphier() {
     return this.morpher.getPredictByDatabaseMorphier();
   }
 
   /**
-   * @returns {Morphy_Morphier_Bulk}
+   * @returns {MorphierBulk}
    */
   getBulkMorphier() {
     return this.morpher.getBulkMorphier();
@@ -171,14 +154,14 @@ class Morphy {
   }
 
   /**
-   * @returns {Morphy_GrammemsProvider_Base}
+   * @returns {GrammemsProviderBase}
    */
   getGrammemsProvider() {
     return this.morpher.getGrammemsProvider();
   }
 
   /**
-   * @returns {Morphy_GrammemsProvider_Base}
+   * @returns {GrammemsProviderBase}
    */
   getDefaultGrammemsProvider() {
     return this.morpher.getDefaultGrammemsProvider();
@@ -201,7 +184,7 @@ class Morphy {
   /**
    * @param {*} word - string or array of strings
    * @param {*} [type=Morphy.NORMAL] - prediction managment
-   * @returns {Morphy_WordDescriptor_Collection}
+   * @returns {WordDescriptorCollection}
    */
   findWord(word, type = Morphy.NORMAL) {
     return this.morpher.findWord(this.prepareWord(word), type);
@@ -345,7 +328,7 @@ class Morphy {
   /**
    * @param {string} word
    * @param {string} patternWord
-   * @param {Morphy_GrammemsProvider_Interface} [grammemsProvider=null]
+   * @param {GrammemsProviderInterface} [grammemsProvider=null]
    * @param {boolean} [returnOnlyWord=false]
    * @param {*} [callback=false]
    * @param {*} [type=Morphy.NORMAL]

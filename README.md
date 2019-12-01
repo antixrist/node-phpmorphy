@@ -144,7 +144,7 @@ morphy.getLocale();
 ---
 
 ```javascript
-/** @returns {Morphy_Morphier_Interface} */
+/** @returns {MorphierInterface} */
 morphy.getCommonMorphier();
 ```
 
@@ -153,7 +153,7 @@ morphy.getCommonMorphier();
 ---
 
 ```javascript
-/** @returns {Morphy_Morphier_Interface} */
+/** @returns {MorphierInterface} */
 morphy.getPredictBySuffixMorphier();
 ```
 
@@ -162,7 +162,7 @@ morphy.getPredictBySuffixMorphier();
 ---
 
 ```javascript
-/** @returns {Morphy_Morphier_Interface} */
+/** @returns {MorphierInterface} */
 morphy.getPredictByDatabaseMorphier();
 ```
 
@@ -171,7 +171,7 @@ morphy.getPredictByDatabaseMorphier();
 ---
 
 ```javascript
-/** @returns {Morphy_Morphier_Interface} */
+/** @returns {MorphierInterface} */
 morphy.getBulkMorphier();
 ```
 
@@ -874,13 +874,7 @@ log(morphy.getGramInfoMergeForms('ТЕСТ'));
  * @param {*} [type=NORMAL]
  * @return {[]|boolean}
  */
-morphy.castFormByGramInfo(
-  word,
-  partOfSpeech,
-  grammems,
-  (returnOnlyWord = false),
-  (callback = null),
-);
+morphy.castFormByGramInfo(word, partOfSpeech, grammems, (returnOnlyWord = false), (callback = null));
 ```
 
 Приводит слово в заданную форму. partOfSpeech – необходим только для прилагательных и глаголов т.к. только для этих частей речи внутри парадигмы встречаются различные части речи. Если partOfSpeech == null, часть речи не используется.
@@ -933,7 +927,7 @@ log(morphy.castFormByGramInfo('КРАСНЫЙ', 'КР_ПРИЛ', ['ЕД', 'ЖР'
 /**
  * @param {string} word
  * @param {string} patternWord
- * @param {Morphy_GrammemsProvider_Interface} [grammemsProvider=null]
+ * @param {GrammemsProviderInterface} [grammemsProvider=null]
  * @param {boolean} [returnOnlyWord=false]
  * @param {*} [callback=false]
  * @param {*} [type=NORMAL]

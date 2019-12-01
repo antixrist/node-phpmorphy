@@ -1,29 +1,8 @@
-/**
- * This file is part of phpMorphy library
- *
- * Copyright c 2007-2008 Kamaev Vladimir <heromantor@users.sourceforge.net>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
-
 import _ from 'lodash';
 
-class Morphy_Link_Base {
+class LinkBase {
   /**
-   * @param {Morphy_Fsa_Interface} fsa
+   * @param {FsaInterface} fsa
    * @param trans
    * @param rawTrans
    */
@@ -51,11 +30,7 @@ class Morphy_Link_Base {
 /**
  * This class represent "normal" link i.e. link that points to automat state
  */
-class Morphy_Link extends Morphy_Link_Base {
-  constructor(...args) {
-    super(...args);
-  }
-
+class Link extends LinkBase {
   isAnnotation() {
     return false;
   }
@@ -73,15 +48,11 @@ class Morphy_Link extends Morphy_Link_Base {
   }
 
   createState(index) {
-    return new Morphy_State(this.fsa, index);
+    return new State(this.fsa, index);
   }
 }
 
-class Morphy_Link_Annot extends Morphy_Link_Base {
-  constructor(...args) {
-    super(...args);
-  }
-
+class LinkAnnot extends LinkBase {
   isAnnotation() {
     return true;
   }
@@ -91,9 +62,9 @@ class Morphy_Link_Annot extends Morphy_Link_Base {
   }
 }
 
-class Morphy_State {
+class State {
   /**
-   * @param {Morphy_Fsa_Interface} fsa
+   * @param {FsaInterface} fsa
    * @param index
    */
   constructor(fsa, index) {
@@ -124,12 +95,12 @@ class Morphy_State {
   }
 
   createNormalLink(trans, raw) {
-    return new Morphy_Link(this.fsa, trans, raw);
+    return new Link(this.fsa, trans, raw);
   }
 
   createAnnotLink(trans, raw) {
-    return new Morphy_Link_Annot(this.fsa, trans, raw);
+    return new LinkAnnot(this.fsa, trans, raw);
   }
 }
 
-export { Morphy_Link_Base, Morphy_Link, Morphy_Link_Annot, Morphy_State };
+export { LinkBase, Link, LinkAnnot, State };

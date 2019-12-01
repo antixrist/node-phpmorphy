@@ -1,28 +1,7 @@
-/**
- * This file is part of phpMorphy library
- *
- * Copyright c 2007-2008 Kamaev Vladimir <heromantor@users.sourceforge.net>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
-
 import _ from 'lodash';
-import { php } from '../utils';
+import { php } from '~/utils';
 
-class Morphy_GramTab_Interface {
+class GramTabInterface {
   getGrammems(ancodeId) {}
 
   getPartOfSpeech(ancodeId) {}
@@ -44,7 +23,7 @@ class Morphy_GramTab_Interface {
   toString(partOfSpeechId, grammemIds) {}
 }
 
-class Morphy_GramTab_Empty extends Morphy_GramTab_Interface {
+class GramTabEmpty extends GramTabInterface {
   getGrammems(ancodeId) {
     return [];
   }
@@ -76,9 +55,9 @@ class Morphy_GramTab_Empty extends Morphy_GramTab_Interface {
   }
 }
 
-class Morphy_GramTab_Proxy extends Morphy_GramTab_Interface {
+class GramTabProxy extends GramTabInterface {
   /**
-   * @param {Morphy_Storage} storage
+   * @param {Storage} storage
    */
   constructor(storage) {
     super();
@@ -120,7 +99,7 @@ class Morphy_GramTab_Proxy extends Morphy_GramTab_Interface {
 
   get __obj() {
     if (!this.___obj) {
-      this.___obj = Morphy_GramTab.create(this.storage);
+      this.___obj = GramTab.create(this.storage);
       delete this.storage;
     }
 
@@ -132,30 +111,30 @@ class Morphy_GramTab_Proxy extends Morphy_GramTab_Interface {
   }
 }
 
-class Morphy_GramTab extends Morphy_GramTab_Interface {
+class GramTab extends GramTabInterface {
   /**
-   * @param {Morphy_Storage} $storage
-   * @returns {Morphy_GramTab}
+   * @param {Storage} $storage
+   * @returns {GramTab}
    */
   static create($storage) {
-    return new Morphy_GramTab($storage);
+    return new GramTab($storage);
   }
 
   /**
-   * @param {Morphy_Storage} storage
+   * @param {Storage} storage
    */
   constructor(storage) {
     super();
 
     this.data = php.var.unserialize(storage.read(0, storage.getFileSize()).toString());
-    if (this.data == false) {
+    if (!this.data) {
       throw new Error('Broken gramtab data');
     }
 
     this.grammems = this.data.grammems;
     this.poses = this.data.poses;
     this.ancodes = this.data.ancodes;
-    this.___ancodes_map = null;
+    this.___ancodesMap = null;
   }
 
   getGrammems(ancodeId) {
@@ -206,7 +185,7 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
 
   includeConsts() {
     /** todo: вот те самые константы */
-    return require('./gramtab_consts');
+    return require('./gramtab-consts');
   }
 
   ancodeToString(ancodeId, commonAncode) {
@@ -226,11 +205,11 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
       return null;
     }
 
-    if (!php.var.isset(this.__ancodes_map[string])) {
+    if (!php.var.isset(this.__ancodesMap[string])) {
       throw new Error(`Ancode with '${string}' graminfo not found`);
     }
 
-    return this.__ancodes_map[string];
+    return this.__ancodesMap[string];
   }
 
   /**
@@ -245,26 +224,26 @@ class Morphy_GramTab extends Morphy_GramTab_Interface {
   buildAncodesMap() {
     const result = {};
 
-    _.forEach(this.ancodes, (data, ancode_id) => {
+    _.forEach(this.ancodes, (data, ancodeId) => {
       const key = this.toString(data.pos_id, data.grammem_ids);
 
-      result[key] = ancode_id;
+      result[key] = ancodeId;
     });
 
     return result;
   }
 
-  get __ancodes_map() {
-    if (!this.___ancodes_map) {
-      this.___ancodes_map = this.buildAncodesMap();
+  get __ancodesMap() {
+    if (!this.___ancodesMap) {
+      this.___ancodesMap = this.buildAncodesMap();
     }
 
-    return this.___ancodes_map;
+    return this.___ancodesMap;
   }
 
-  set __ancodes_map(value) {
-    this.___ancodes_map = !_.isUndefined(value) ? value : null;
+  set __ancodesMap(value) {
+    this.___ancodesMap = !_.isUndefined(value) ? value : null;
   }
 }
 
-export { Morphy_GramTab_Interface, Morphy_GramTab_Empty, Morphy_GramTab_Proxy, Morphy_GramTab };
+export { GramTabInterface, GramTabEmpty, GramTabProxy, GramTab };

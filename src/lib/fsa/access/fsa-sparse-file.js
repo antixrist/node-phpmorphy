@@ -1,29 +1,9 @@
-/**
- * This file is part of phpMorphy library
- *
- * Copyright c 2007-2008 Kamaev Vladimir <heromantor@users.sourceforge.net>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
-
 import _ from 'lodash';
-import { php, castArray } from '../../../utils';
-import { Morphy_Fsa } from '../fsa';
+import fs from 'fs';
+import { php, castArray } from '~/utils';
+import { Fsa } from '~/lib/fsa/fsa';
 
-class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
+class FsaSparseFile extends Fsa {
   constructor(...args) {
     super(...args);
 
@@ -36,9 +16,10 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
    * @param {boolean} [readAnnot=true]
    */
   walk(trans, word, readAnnot = true) {
-    const mem = this.resource;
+    const fh = this.resource;
     const fsa_start = this.fsa_start;
     const wordBuf = Buffer.from(word);
+
     let prev_trans;
     let char;
     let result;
@@ -55,7 +36,8 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
       // find char in state begin
       // sparse version
       result = true;
-      buf = php.strings.substr(mem, fsa_start + ((((trans >> 10) & 0x3fffff) + char + 1) << 2), 4);
+      buf = Buffer.alloc(4);
+      fs.readSync(fh, buf, 0, 4, fsa_start + ((((trans >> 10) & 0x3fffff) + char + 1) << 2));
       trans = php.unpack('V', buf)[0];
 
       if (trans & 0x0200 || (trans & 0xff) != char) {
@@ -80,7 +62,8 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
 
       if (readAnnot) {
         // read annot trans
-        buf = php.strings.substr(mem, fsa_start + (((trans >> 10) & 0x3fffff) << 2), 4);
+        buf = Buffer.alloc(4);
+        fs.readSync(fh, buf, 0, 4, fsa_start + (((trans >> 10) & 0x3fffff) << 2));
         trans = php.unpack('V', buf)[0];
 
         if ((trans & 0x0100) == 0) {
@@ -155,24 +138,25 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
       if (i >= c) {
         state = stack.pop();
         start_idx = stack_idx.pop();
-        // path      = php.strings.substr(Buffer.from(path), 0, -1).toString();
+        // path = php.strings.substr(Buffer.from(path), 0, -1).toString();
       }
     } while (stack.length);
 
     return total;
   }
 
-  readState($index) {
-    const mem = this.resource;
+  readState(index) {
+    const fh = this.resource;
     const fsa_start = this.fsa_start;
     const result = [];
 
     let buf;
     let trans;
-    let start_offset = fsa_start + ($index << 2);
+    let start_offset = fsa_start + (index << 2);
 
     // first try read annot transition
-    buf = php.strings.substr(mem, start_offset, 4);
+    buf = Buffer.alloc(4);
+    fs.readSync(fh, buf, 0, 4, start_offset);
     trans = php.unpack('V', buf)[0];
 
     if (trans & 0x0100) {
@@ -182,7 +166,8 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
     // read rest
     start_offset += 4;
     _.forEach(this.getAlphabetNum(), char => {
-      buf = php.strings.substr(mem, start_offset + (char << 2), 4);
+      buf = Buffer.alloc(4);
+      fs.readSync(fh, buf, 0, 4, start_offset + (char << 2));
       trans = php.unpack('V', buf)[0];
 
       // if(!(trans & 0x0200) && (trans & 0xFF) == char) {
@@ -212,21 +197,24 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
   }
 
   readRootTrans() {
-    const mem = this.resource;
+    const fh = this.resource;
     const fsa_start = this.fsa_start;
-
-    let buf;
     let trans;
+    let buf;
 
-    buf = php.strings.substr(mem, fsa_start + 4, 4);
+    buf = Buffer.alloc(4);
+    fs.readSync(fh, buf, 0, 4, fsa_start + 4);
     trans = php.unpack('V', buf)[0];
 
     return trans;
   }
 
   readAlphabet() {
-    const mem = this.resource;
-    const buf = php.strings.substr(mem, this.header.alphabet_offset, this.header.alphabet_size);
+    const fh = this.resource;
+    let buf;
+
+    buf = Buffer.alloc(this.header.alphabet_size);
+    fs.readSync(fh, buf, 0, this.header.alphabet_size, this.header.alphabet_offset);
 
     return buf.toString();
   }
@@ -236,15 +224,19 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
       return null;
     }
 
-    const mem = this.resource;
+    const fh = this.resource;
     const offset = this.header.annot_offset + (((trans & 0xff) << 22) | ((trans >> 10) & 0x3fffff));
-
+    let len;
     let annot;
-    let buf = php.strings.substr(mem, offset, 1);
-    const len = php.strings.ord(buf);
+    let buf;
+
+    buf = Buffer.alloc(1);
+    fs.readSync(fh, buf, 0, 1, offset);
+    len = php.strings.ord(buf);
 
     if (len) {
-      buf = php.strings.substr(mem, offset + 1, len);
+      buf = Buffer.alloc(len);
+      fs.readSync(fh, buf, 0, len, offset + 1);
       annot = buf;
     } else {
       annot = null;
@@ -262,4 +254,4 @@ class Morphy_Fsa_Sparse_Mem extends Morphy_Fsa {
   }
 }
 
-export { Morphy_Fsa_Sparse_Mem };
+export { FsaSparseFile };
