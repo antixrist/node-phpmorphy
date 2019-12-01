@@ -1,3 +1,5 @@
 .idea
 phpmorphy
 dist
+src/test.js
+src/tests
