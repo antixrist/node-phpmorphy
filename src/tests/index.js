@@ -34,7 +34,7 @@ const log = function(...args) {
 function cliEncode(any) {
   return Buffer.from(JSON.stringify(any)).toString('base64');
 }
-const phpTestsFile = path.join(path.relative(process.cwd(), __dirname), 'tests/index.php');
+const phpTestsFile = path.join(__dirname, 'index.php');
 function runPhpFileWithArgs(args, cb) {
   cb = _.isFunction(cb) ? cb : _.noop;
 
