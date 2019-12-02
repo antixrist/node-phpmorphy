@@ -22,13 +22,13 @@
 
 С помощью `npm`
 
-```
-npm install phpmorphy --save
+```sh
+npm install phpmorphy
 ```
 
 С помощью `yarn`
 
-```
+```sh
 yarn add phpmorphy
 ```
 
@@ -43,7 +43,7 @@ import Morphy from 'phpmorphy';
 CommonJS:
 
 ```javascript
-const Morphy = require('phpmorphy').default;
+const Morphy = require('phpmorphy');
 ```
 
 ## Использование
@@ -62,7 +62,7 @@ const Morphy = require('phpmorphy').default;
 
 ```javascript
 const morphy = new Morphy('ru', {
-  //  nojo:                false,
+  // nojo: false,
   storage: Morphy.STORAGE_MEM,
   predict_by_suffix: true,
   predict_by_db: true,
